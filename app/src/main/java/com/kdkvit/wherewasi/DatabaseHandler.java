@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,14 +16,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "wherewasi.db";
     private static final String TABLE_LOCATIONS = "locations";
-    private static final String KEY_LAT = "latitude";
-    private static final String KEY_LON = "longitude";
-    private static final String KEY_PROVIDER = "provider";
-    private static final String KEY_UPDATED_TIME = "updated_time";
+
 
     public enum SORTING_PARAM{
-        LastUpdated( " order by " + KEY_UPDATED_TIME + " desc"),
-        firstUpdate( " order by " + KEY_UPDATED_TIME + " asc");
+        LastUpdated( " order by " + LocationColumn.UPDATED_TIME.toString() + " desc"),
+        firstUpdate( " order by " + LocationColumn.UPDATED_TIME.toString() + " asc");
 
         private String sorting;
         SORTING_PARAM(String s) {
@@ -42,10 +41,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_LOCATIONS + "("
-                + KEY_LAT + " DOUBLE,"
-                + KEY_LON + " DOUBLE,"
-                + KEY_PROVIDER + " TEXT,"
-                + KEY_UPDATED_TIME + " DATETIME DEFAULT CURRENT_TIMESTAMP "
+                + LocationColumn.LATITUDE.toString() + " DOUBLE,"
+                + LocationColumn.LONGITUDE.toString() + " DOUBLE,"
+                + LocationColumn.PROVIDER.toString() + " TEXT,"
+                + LocationColumn.ADDRESS_LINE.toString() + " TEXT,"
+                + LocationColumn.COUNTRY_CODE.toString() + " TEXT,"
+                + LocationColumn.ADMIN_AREA.toString() + " TEXT,"
+                + LocationColumn.FEATURE_NAME.toString() + " TEXT,"
+                + LocationColumn.SUB_AREA_NAME.toString() + " TEXT,"
+                + LocationColumn.UPDATED_TIME.toString() + " DATETIME DEFAULT CURRENT_TIMESTAMP "
                 + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
@@ -65,14 +69,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_LAT, location.getLatitude());
-        values.put(KEY_LON, location.getLongitude());
-        values.put(KEY_UPDATED_TIME,location.getTime().getTime());
+        values.put(LocationColumn.LATITUDE.toString(), location.getLatitude());
+        values.put(LocationColumn.LONGITUDE.toString(), location.getLongitude());
+        values.put(LocationColumn.PROVIDER.toString(), location.getProvider());
+        values.put(LocationColumn.ADDRESS_LINE.toString(), location.getAddressLine());
+        values.put(LocationColumn.COUNTRY_CODE.toString(), location.getCountryCode());
+        values.put(LocationColumn.ADMIN_AREA.toString(), location.getAdminArea());
+        values.put(LocationColumn.FEATURE_NAME.toString(), location.getFeatureName());
+        values.put(LocationColumn.SUB_AREA_NAME.toString(), location.getSubAdminArea());
+        values.put(LocationColumn.UPDATED_TIME.toString(),location.getTime().getTime());
 
         // Inserting Row
         db.insert(TABLE_LOCATIONS, null, values);
         //2nd argument is String containing nullColumnHack
         db.close(); // Closing database connection
+
+        Log.i("db_changed","new location");
     }
 
     // code to get the single contact

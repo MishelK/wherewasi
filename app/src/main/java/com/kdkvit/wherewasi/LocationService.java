@@ -1,6 +1,7 @@
 package com.kdkvit.wherewasi;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,6 +9,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,6 +20,9 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+
+import java.io.IOException;
+import java.util.List;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -31,6 +37,7 @@ public class LocationService extends Service {
     public Location previousBestLocation = null;
 
     DatabaseHandler db;
+    Geocoder geocoder;
 
     NotificationManager manager;
     NotificationCompat.Builder builder;
@@ -55,15 +62,14 @@ public class LocationService extends Service {
 
         Intent closeIntent = new Intent(this, LocationService.class);
         closeIntent.putExtra("command", "close");
-        PendingIntent closePendingIntent = PendingIntent.getService(this, 0, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent closePendingIntent = PendingIntent.getService(this, 1, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.stop_service_btn,closePendingIntent);
-
-
-        builder.setCustomContentView(remoteViews);
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("working", true);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        builder.setCustomContentView(remoteViews);
 
         builder.setContentIntent(pendingIntent);
 
@@ -77,37 +83,37 @@ public class LocationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String command = intent.getStringExtra("command");
-        if(command!=null) {
+        if(command !=null) {
             switch (command) {
                 case "app_created":
                     initLocation();
 //                return START_STICKY;
+                    break;
                 case "close":
                     close();
                     break;
             }
         }
-
         return super.onStartCommand(intent,flags,startId);
     }
 
     private void close() {
         stopSelf();
         Intent receiverIntent = new Intent(BROADCAST_CHANNEL);
-        receiverIntent.putExtra("close",true);
+        receiverIntent.putExtra("command","close");
         LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(receiverIntent);
     }
 
+    @SuppressLint("MissingPermission")
     public void initLocation(){
         db = new DatabaseHandler(this); // init database handler
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         listener = new MyLocationListener();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 4000, 0, (LocationListener) listener);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 4000, 0, listener);
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 100, listener);
+
+        geocoder = new Geocoder(this);
     }
 
 
@@ -214,7 +220,26 @@ public class LocationService extends Service {
                 loc.getLatitude();
                 loc.getLongitude();
                 MyLocation location = new MyLocation(loc.getLatitude(), loc.getLongitude(),loc.getProvider());
+                receiverIntent.putExtra("command","location_changed");
                 receiverIntent.putExtra("location",location);
+                new Thread(){
+                    public void run(){
+                        super.run();
+                        try {
+                            List<Address> addressList = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+                            if(addressList.size() > 0){
+                                Address address = addressList.get(0);
+                                location.setAdminArea(address.getAdminArea());
+                                location.setCountryCode(address.getCountryCode());
+                                location.setFeatureName(address.getFeatureName());
+                                location.setSubAdminArea(address.getSubAdminArea());
+                                location.setAddressLine(address.getAddressLine(0));
+                            }
+                        } catch (IOException e) {
+                        }
+                        db.addLocation(location);
+                    }
+                }.start();
                 LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(receiverIntent);
             }
         }

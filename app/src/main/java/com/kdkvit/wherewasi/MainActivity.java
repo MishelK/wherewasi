@@ -12,24 +12,31 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
 import java.net.URI;
+import java.util.List;
 
 import static com.kdkvit.wherewasi.LocationService.BROADCAST_CHANNEL;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LocationListener {
 
     final int LOCATION_PERMISSION_REQUEST = 1;
 
     BroadcastReceiver receiver;
+    DatabaseHandler db;
+    LocationManager manager;
 
     boolean Running;
     TextView mainTv;
@@ -39,19 +46,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Running = getIntent().getBooleanExtra("working",false);
+
+        initReceiver();
+
+        db = new DatabaseHandler(this);
+
+
         if (Build.VERSION.SDK_INT >=23){
             int hasLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
             if(hasLocationPermission != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
+            }else{
+                if(!Running)
+                    initService();
             }
+        }else{
+            if(!Running)
+                initService();
         }
 
-        initReceiver();
-
-        Running = getIntent().getBooleanExtra("working",false);
-
-        if(!Running)
-            initService();
+//        manager = (LocationManager) getSystemService(LOCATION_SERVICE);
+//        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,100,MainActivity.this);
 
         mainTv = findViewById(R.id.main_text_view);
 
@@ -67,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
                     switch (command) {
                         case "location_changed":
                             MyLocation location = (MyLocation) intent.getSerializableExtra("location");
-                            Toast.makeText(context, "Location changed: " + location.getLongitude() + " , " + location.getLatitude(), Toast.LENGTH_LONG).show();
                             mainTv.setText("Location: " + location.getLongitude() + " , " + location.getLatitude());
                             break;
                         case "close":
@@ -111,7 +126,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        manager.removeUpdates(MainActivity.this);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mainTv.setText(location.getLatitude() + " , " + location.getLongitude());
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
     }
 }

@@ -10,6 +10,14 @@ public class MyLocation implements Serializable {
     private String provider;
     private Date time;
 
+    //Address
+    private String adminArea;
+    private String countryCode;
+    private String featureName;
+    private String locality;
+    private String subAdminArea;
+    private String addressLine;
+
     public MyLocation(double latitude, double longitude, String provider){
         this.latitude = latitude;
         this.longitude = longitude;
@@ -54,5 +62,53 @@ public class MyLocation implements Serializable {
 
     public void setTime(Date time) {
         this.time = time;
+    }
+
+    public String getAdminArea() {
+        return adminArea;
+    }
+
+    public void setAdminArea(String adminArea) {
+        this.adminArea = adminArea;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    public String getFeatureName() {
+        return featureName;
+    }
+
+    public void setFeatureName(String featureName) {
+        this.featureName = featureName;
+    }
+
+    public String getLocality() {
+        return locality;
+    }
+
+    public void setLocality(String locality) {
+        this.locality = locality;
+    }
+
+    public String getSubAdminArea() {
+        return subAdminArea;
+    }
+
+    public void setSubAdminArea(String subAdminArea) {
+        this.subAdminArea = subAdminArea;
+    }
+
+    public String getAddressLine() {
+        return addressLine;
+    }
+
+    public void setAddressLine(String addressLine) {
+        this.addressLine = addressLine;
     }
 }
