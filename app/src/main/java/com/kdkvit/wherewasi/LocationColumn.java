@@ -1,6 +1,7 @@
 package com.kdkvit.wherewasi;
 
 public enum LocationColumn {
+    ID("id"),
     LATITUDE("latitude"),
     LONGITUDE("longitude"),
     PROVIDER("provider"),

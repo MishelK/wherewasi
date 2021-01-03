@@ -3,6 +3,8 @@ package com.kdkvit.wherewasi;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -12,34 +14,36 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
-import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import org.w3c.dom.Text;
 
-import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.kdkvit.wherewasi.LocationService.BROADCAST_CHANNEL;
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+public class MainActivity extends AppCompatActivity {
 
     final int LOCATION_PERMISSION_REQUEST = 1;
 
     BroadcastReceiver receiver;
     DatabaseHandler db;
-    LocationManager manager;
+
+    public static List<MyLocation> locations = new ArrayList<>();
+
+    boolean dbInit = false;
+
+    Handler handler;
+    LocationsAdapter locationsAdapter;
 
     boolean Running;
-    TextView mainTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +52,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         Running = getIntent().getBooleanExtra("working",false);
 
-        initReceiver();
-
+        handler = new Handler();
         db = new DatabaseHandler(this);
 
+        initReceiver();
 
         if (Build.VERSION.SDK_INT >=23){
             int hasLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
@@ -66,11 +70,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 initService();
         }
 
-//        manager = (LocationManager) getSystemService(LOCATION_SERVICE);
-//        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,100,MainActivity.this);
 
-        mainTv = findViewById(R.id.main_text_view);
+        RecyclerView recyclerView = findViewById(R.id.reclyer);
+        recyclerView.setHasFixedSize(true);
 
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        locationsAdapter = new LocationsAdapter();
+
+
+        recyclerView.setAdapter(locationsAdapter);
+
+        getLocationsHistory();
     }
 
     private void initReceiver() {
@@ -82,8 +93,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 if (command != null) {
                     switch (command) {
                         case "location_changed":
-                            MyLocation location = (MyLocation) intent.getSerializableExtra("location");
-                            mainTv.setText("Location: " + location.getLongitude() + " , " + location.getLatitude());
+                            if(dbInit) {
+                                MyLocation location = (MyLocation) intent.getSerializableExtra("location");
+                                locations.add(0,location);
+                                locationsAdapter.notifyDataSetChanged();
+                            }
                             break;
                         case "close":
                             finish();
@@ -97,6 +111,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
+    private  void getLocationsHistory(){
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                locations = db.getAllLocations(DatabaseHandler.SORTING_PARAM.LastUpdated);
+
+                dbInit = true;
+                handler.post(()->locationsAdapter.notifyDataSetChanged());
+            }
+        }.start();
+    }
 
     private void initService() {
         Intent intent = new Intent(this, LocationService.class);
@@ -126,27 +152,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        manager.removeUpdates(MainActivity.this);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        mainTv.setText(location.getLatitude() + " , " + location.getLongitude());
-    }
 
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
-    }
 }

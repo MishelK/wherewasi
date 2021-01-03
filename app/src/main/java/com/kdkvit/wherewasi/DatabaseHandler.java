@@ -41,6 +41,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_LOCATIONS + "("
+                + LocationColumn.ID.toString() + " INTEGER PRIMARY KEY,"
                 + LocationColumn.LATITUDE.toString() + " DOUBLE,"
                 + LocationColumn.LONGITUDE.toString() + " DOUBLE,"
                 + LocationColumn.PROVIDER.toString() + " TEXT,"
@@ -107,7 +108,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<MyLocation> getAllLocations(SORTING_PARAM sorting) {
         List<MyLocation> locations = new ArrayList<>();
         // Select All Query
-        String selectQuery = "SELECT  * FROM " + TABLE_LOCATIONS + " ";
+        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s FROM %s ", LocationColumn.LATITUDE.toString(), LocationColumn.LONGITUDE.toString(), LocationColumn.PROVIDER.toString(), LocationColumn.UPDATED_TIME.toString(), LocationColumn.ADDRESS_LINE.toString(), LocationColumn.COUNTRY_CODE.toString(), LocationColumn.ADMIN_AREA.toString(), LocationColumn.FEATURE_NAME.toString(), LocationColumn.SUB_AREA_NAME.toString(), TABLE_LOCATIONS);
 
         if(sorting != null) {
             selectQuery += sorting.getSorting();
@@ -120,15 +121,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-
-                int id = cursor.getInt(0);
-                double lat = Double.parseDouble(cursor.getString(1));
-                double lon = Double.parseDouble(cursor.getString(2));
-                String provider = cursor.getString(3);
-                long s= cursor.getLong(4);
+                double lat = cursor.getDouble(0);
+                double lon = cursor.getDouble(1);
+                String provider = cursor.getString(2);
+                long s = cursor.getLong(3);
                 Date lastUpdated = new Date(s);
 
                 MyLocation location = new MyLocation(lat,lon,provider,lastUpdated);
+
+                location.setAddressLine(cursor.getString(4));
+                location.setCountryCode(cursor.getString(5));
+                location.setAdminArea(cursor.getString(6));
+                location.setFeatureName(cursor.getString(7));
+                location.setSubAdminArea(cursor.getString(8));
+
                 locations.add(location);
             } while (cursor.moveToNext());
         }

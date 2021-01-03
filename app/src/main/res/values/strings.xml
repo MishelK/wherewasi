@@ -2,4 +2,6 @@
     <string name="app_name">Where Was I</string>
     <string name="Stop">Stop</string>
     <string name="close">Close</string>
+    <string name="time">Time: </string>
+    <string name="coordinates">Coordinates: </string>
 </resources>
