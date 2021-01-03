@@ -216,12 +216,11 @@ public class LocationService extends Service {
         public void onLocationChanged(final Location loc) {
             Log.i("*****", "Location changed");
             if (isBetterLocation(loc, previousBestLocation)) {
-                Intent receiverIntent = new Intent(BROADCAST_CHANNEL);
+
                 loc.getLatitude();
                 loc.getLongitude();
                 MyLocation location = new MyLocation(loc.getLatitude(), loc.getLongitude(),loc.getProvider());
-                receiverIntent.putExtra("command","location_changed");
-                receiverIntent.putExtra("location",location);
+
                 new Thread(){
                     public void run(){
                         super.run();
@@ -238,9 +237,12 @@ public class LocationService extends Service {
                         } catch (IOException e) {
                         }
                         db.addLocation(location);
+                        Intent receiverIntent = new Intent(BROADCAST_CHANNEL);
+                        receiverIntent.putExtra("command","location_changed");
+                        receiverIntent.putExtra("location",location);
+                        LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(receiverIntent);
                     }
                 }.start();
-                LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(receiverIntent);
             }
         }
 

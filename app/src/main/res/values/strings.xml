@@ -4,4 +4,5 @@
     <string name="close">Close</string>
     <string name="time">Time: </string>
     <string name="coordinates">Coordinates: </string>
+    <string name="address">Address: </string>
 </resources>

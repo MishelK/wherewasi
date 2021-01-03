@@ -5,6 +5,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,10 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.kdkvit.wherewasi.MainActivity.locations;
 
-//import static com.kdkvit.wherewasi.MainActivity.locations;
-
 public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.LocationViewHolder> {
 
+    private static DecimalFormat df2 = new DecimalFormat("#.##");
 
     public LocationsAdapter(){
     }
@@ -24,12 +26,14 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
     public static class LocationViewHolder extends RecyclerView.ViewHolder {
         TextView timeTV;
         TextView coordinatesTV;
+        TextView addressTv;
 
         public LocationViewHolder(@NonNull View itemView) {
             super(itemView);
 
             timeTV = itemView.findViewById(R.id.location_time_tv);
             coordinatesTV = itemView.findViewById(R.id.coordinates_tv);
+            addressTv = itemView.findViewById(R.id.location_address_tv);
         }
 
     }
@@ -45,7 +49,8 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
     public void onBindViewHolder(@NonNull LocationViewHolder holder, int position) {
         MyLocation location = locations.get(position);
         holder.timeTV.setText(String.format("%s %s", holder.itemView.getResources().getString(R.string.time), location.getTime().toString()));
-        holder.coordinatesTV.setText(String.format("%s %s,%s", holder.itemView.getResources().getString(R.string.coordinates), location.getLatitude(), location.getLongitude()));
+        holder.coordinatesTV.setText(String.format("%s %s,%s", holder.itemView.getResources().getString(R.string.coordinates), df2.format(location.getLatitude()), df2.format(location.getLongitude())));
+        holder.addressTv.setText(String.format("%s %s",holder.itemView.getResources().getString(R.string.address),location.getAddressLine()));
     }
 
     @Override
