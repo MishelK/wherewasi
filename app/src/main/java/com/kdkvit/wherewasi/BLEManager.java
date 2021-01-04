@@ -29,11 +29,14 @@ public class BLEManager {
             else
                 Log.i("BLE", "ERROR: device name null");
 
-            String toString = result.toString();
+            String toString = result.getDevice().toString();
+                    //result.toString();
             if (toString != null)
                 Log.i("BLE", toString);
             else
                 Log.i("BLE", "ERROR: toString null");
+
+
         }
 
         @Override
@@ -47,7 +50,8 @@ public class BLEManager {
                 else
                     Log.i("BLE", "ERROR: device name null");
 
-                String toString = results.get(i).toString();
+                String toString = results.get(i).getDevice().toString();
+                        //results.get(i).toString();
                 if (toString != null)
                     Log.i("BLE", toString);
                 else
