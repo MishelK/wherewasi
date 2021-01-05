@@ -53,8 +53,26 @@ public class MainActivity extends AppCompatActivity {
                 if(hasBlePermissions()) {
                     if (bleManager.isScanning()) {
                         bleManager.stopScan();
+                        btnScan.setText("Start Scanning");
                     } else {
                         bleManager.startScan();
+                        btnScan.setText("Stop Scanning");
+                    }
+                }
+            }
+        });
+
+        Button btnAdvertise = findViewById(R.id.btnAdvertise);
+        btnAdvertise.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(hasBlePermissions()) {
+                    if(bleManager.isAdvertising()){
+                        bleManager.stopAdvertising();
+                        btnAdvertise.setText("Start Advertising");
+                    } else {
+                        bleManager.startAdvertising();
+                        btnAdvertise.setText("Stop Advertising");
                     }
                 }
             }
@@ -62,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //METHODS BELOW ARE FOR CHECKING REQUIRED PERMISSIONS IN ORDER TO USE BLE
+    // METHODS BELOW ARE FOR CHECKING REQUIRED PERMISSIONS IN ORDER TO USE BLE
     // In order to scan for devices using BLE, location services must be on, this method will be used to check if location is enabled
     public boolean checkLocationServicesEnabled(Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -75,11 +93,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Check for ble scan permissions
+    // Check for ble scan permissions
     public boolean hasBlePermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN)
                         != PackageManager.PERMISSION_GRANTED) {
             return false;
         } else {
@@ -87,10 +105,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Request ble permissions
+    // Request ble permissions
     public void requestBlePermissions(int requestCode) {
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_ADMIN},
                 requestCode);
     }
 
@@ -102,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //This method checks if both location permission were granted in the request, returns true only if both were granted
+    // This method checks if both location permission were granted in the request, returns true only if both were granted
     public boolean checkGrantResults(String[] permissions, int[] grantResults) {
         int granted = 0;
 
@@ -110,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
             for(int i = 0; i < permissions.length ; i++) {
                 String permission = permissions[i];
                 if (permission.equals(Manifest.permission.ACCESS_FINE_LOCATION) ||
-                        permission.equals(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                        permission.equals(Manifest.permission.BLUETOOTH_ADMIN)) {
                     if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                         granted++;
                     }

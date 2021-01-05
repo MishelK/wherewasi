@@ -10,9 +10,18 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Scan"
+        android:text="Start Scanning"
         android:layout_gravity="center"
-        android:id="@+id/btnScan" />
+        android:id="@+id/btnScan"
+        android:layout_marginTop="30dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Advertising"
+        android:layout_gravity="center"
+        android:id="@+id/btnAdvertise"
+        android:layout_marginTop="30dp"/>
 
 
 </LinearLayout>
