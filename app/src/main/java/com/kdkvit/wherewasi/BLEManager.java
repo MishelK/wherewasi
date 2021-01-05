@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat;
 import no.nordicsemi.android.support.v18.scanner.ScanCallback;
@@ -117,8 +118,17 @@ public class BLEManager {
                 .setReportDelay(1000)
                 .setUseHardwareBatchingIfSupported(true)
                 .build();
+
         List<ScanFilter> filters = new ArrayList<>();
-        filters.add(new ScanFilter.Builder().build());
+        UUID MY_SERVICE_UUID = UUID.fromString("00001810-0000-1000-8000-a0805f9b34fb");
+        UUID[] serviceUUIDs = new UUID[]{MY_SERVICE_UUID};
+        for (UUID serviceUUID : serviceUUIDs){
+            ScanFilter filter = new ScanFilter.Builder()
+                    .setServiceUuid(new ParcelUuid(serviceUUID))
+                    .build();
+            filters.add(filter);
+        }
+        
         scanner.startScan(filters, settings, scanCallback);
         Log.i("BLE","Start Scan");
     }
@@ -155,6 +165,7 @@ public class BLEManager {
                 AdvertiseData data = new AdvertiseData.Builder()
                         .setIncludeDeviceName(false)
                         .setIncludeTxPowerLevel(false)
+                        .addServiceUuid(new ParcelUuid(UUID.fromString("00001810-0000-1000-8000-a0805f9b34fb")))
                         .build();
 
                 bluetoothLeAdvertiser
