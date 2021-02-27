@@ -20,6 +20,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import java.util.Date;
 import java.util.List;
 
 import androidx.core.app.ActivityCompat;
@@ -230,8 +231,11 @@ public class LocationService extends Service {
         public void onLocationChanged(final Location loc) {
             Log.i("*****", "Location changed");
             if (isBetterLocation(loc, previousBestLocation)) {
-                MyLocation location = new MyLocation(loc.getLatitude(), loc.getLongitude(),loc.getProvider());
+                Date now = new Date();
+                MyLocation location = new MyLocation(loc.getLatitude(), loc.getLongitude(),loc.getProvider(),now,now);
                 sendLocationEvent(location);
+            }else{
+                //todo: send update to current location
             }
         }
 

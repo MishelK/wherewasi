@@ -10,7 +10,9 @@ public enum LocationColumn {
     ADMIN_AREA("admin_area"),
     COUNTRY_CODE("country_code"),
     FEATURE_NAME("feature_name"),
-    SUB_AREA_NAME("sub_area_name");
+    SUB_AREA_NAME("sub_area_name"),
+    START_TIME("start_time"),
+    END_TIME("end_time");
 
     private String name;
 

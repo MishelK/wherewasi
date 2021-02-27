@@ -5,10 +5,13 @@ import java.util.Date;
 
 public class MyLocation implements Serializable {
 
+    private long id;
     private double latitude;
     private double longitude;
     private String provider;
-    private Date time;
+    private Date startTime;
+    private Date endTime;
+    private Date updateTime;
 
     //Address
     private String adminArea;
@@ -18,18 +21,28 @@ public class MyLocation implements Serializable {
     private String subAdminArea;
     private String addressLine;
 
-    public MyLocation(double latitude, double longitude, String provider){
+    public MyLocation(long id,double latitude, double longitude, String provider){
+        this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
         this.provider = provider;
-        this.time = new Date();
+        this.updateTime = new Date();
     }
 
-    public MyLocation(double latitude, double longitude, String provider,Date time){
+    public MyLocation(double latitude, double longitude, String provider,Date startTime,Date endTime){
         this.latitude = latitude;
         this.longitude = longitude;
         this.provider = provider;
-        this.time = time;
+        this.updateTime = new Date();
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public MyLocation(double latitude, double longitude, String provider,Date updateTime){
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.provider = provider;
+        this.updateTime = updateTime;
     }
 
     public double getLatitude() {
@@ -56,12 +69,12 @@ public class MyLocation implements Serializable {
         this.provider = provider;
     }
 
-    public Date getTime() {
-        return time;
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     public String getAdminArea() {
@@ -110,5 +123,29 @@ public class MyLocation implements Serializable {
 
     public void setAddressLine(String addressLine) {
         this.addressLine = addressLine;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 }

@@ -52,6 +52,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + LocationColumn.ADMIN_AREA.toString() + " TEXT,"
                 + LocationColumn.FEATURE_NAME.toString() + " TEXT,"
                 + LocationColumn.SUB_AREA_NAME.toString() + " TEXT,"
+                + LocationColumn.START_TIME.toString() + " DATETIME DEFAULT CURRENT_TIMESTAMP ,"
+                + LocationColumn.END_TIME.toString() + " DATETIME DEFAULT CURRENT_TIMESTAMP ,"
                 + LocationColumn.UPDATED_TIME.toString() + " DATETIME DEFAULT CURRENT_TIMESTAMP "
                 + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
@@ -80,7 +82,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(LocationColumn.ADMIN_AREA.toString(), location.getAdminArea());
         values.put(LocationColumn.FEATURE_NAME.toString(), location.getFeatureName());
         values.put(LocationColumn.SUB_AREA_NAME.toString(), location.getSubAdminArea());
-        values.put(LocationColumn.UPDATED_TIME.toString(),location.getTime().getTime());
+        values.put(LocationColumn.START_TIME.toString(),location.getStartTime().getTime());
+        values.put(LocationColumn.END_TIME.toString(),location.getEndTime().getTime());
+        values.put(LocationColumn.UPDATED_TIME.toString(),location.getUpdateTime().getTime());
 
         // Inserting Row
         db.insert(TABLE_LOCATIONS, null, values);
@@ -110,7 +114,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<MyLocation> getAllLocations(SORTING_PARAM sorting) {
         List<MyLocation> locations = new ArrayList<>();
         // Select All Query
-        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s FROM %s ", LocationColumn.LATITUDE.toString(), LocationColumn.LONGITUDE.toString(), LocationColumn.PROVIDER.toString(), LocationColumn.UPDATED_TIME.toString(), LocationColumn.ADDRESS_LINE.toString(), LocationColumn.COUNTRY_CODE.toString(), LocationColumn.ADMIN_AREA.toString(), LocationColumn.FEATURE_NAME.toString(), LocationColumn.SUB_AREA_NAME.toString(), TABLE_LOCATIONS);
+        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s FROM %s ",
+                LocationColumn.LATITUDE.toString(),
+                LocationColumn.LONGITUDE.toString(),
+                LocationColumn.PROVIDER.toString(),
+                LocationColumn.UPDATED_TIME.toString(),
+                LocationColumn.ADDRESS_LINE.toString(),
+                LocationColumn.COUNTRY_CODE.toString(),
+                LocationColumn.ADMIN_AREA.toString(),
+                LocationColumn.FEATURE_NAME.toString(),
+                LocationColumn.SUB_AREA_NAME.toString(),
+                LocationColumn.START_TIME.toString(),
+                LocationColumn.END_TIME.toString(),
+                TABLE_LOCATIONS);
 
         if(sorting != null) {
             selectQuery += sorting.getSorting();
@@ -126,8 +142,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 double lat = cursor.getDouble(0);
                 double lon = cursor.getDouble(1);
                 String provider = cursor.getString(2);
-                long s = cursor.getLong(3);
-                Date lastUpdated = new Date(s);
+                long temp = cursor.getLong(3);
+                Date lastUpdated = new Date(temp);
 
                 MyLocation location = new MyLocation(lat,lon,provider,lastUpdated);
 
@@ -136,6 +152,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 location.setAdminArea(cursor.getString(6));
                 location.setFeatureName(cursor.getString(7));
                 location.setSubAdminArea(cursor.getString(8));
+
+                temp = cursor.getLong(9);
+                location.setStartTime(new Date(temp));
+
+                temp = cursor.getLong(10);
+                location.setEndTime(new Date(temp));
+
 
                 locations.add(location);
             } while (cursor.moveToNext());
