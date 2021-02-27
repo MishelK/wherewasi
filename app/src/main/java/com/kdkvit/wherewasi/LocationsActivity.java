@@ -26,6 +26,7 @@ import android.provider.Settings;
 import com.google.android.material.tabs.TabLayout;
 import com.kdkvit.wherewasi.adapters.LocationsAdapter;
 import com.kdkvit.wherewasi.adapters.LocationsTabsAdapter;
+import com.kdkvit.wherewasi.fragments.MapsFragment;
 import com.kdkvit.wherewasi.fragments.TimeLineFragment;
 import com.kdkvit.wherewasi.services.LocationService;
 
@@ -45,6 +46,7 @@ public class LocationsActivity extends AppCompatActivity {
     DatabaseHandler db;
 
     TimeLineFragment timeLineFragment = new TimeLineFragment();
+    MapsFragment mapsFragment = new MapsFragment();
 
     public static List<MyLocation> locations = new ArrayList<>();
 
@@ -81,6 +83,7 @@ public class LocationsActivity extends AppCompatActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.locations_view_pager);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.locations_tab_layout);
 
+        locationsTabsAdapter.addFragment(mapsFragment,"Map");
         locationsTabsAdapter.addFragment(timeLineFragment,"TimeLine");
 
         viewPager.setAdapter(locationsTabsAdapter);
@@ -102,6 +105,7 @@ public class LocationsActivity extends AppCompatActivity {
                                 MyLocation location = (MyLocation) intent.getSerializableExtra("location");
                                 locations.add(0,location);
                                 timeLineFragment.updateTimeLineAdapter();
+                                mapsFragment.setMapPointers();
                             }
                             break;
                         case "close":
@@ -124,7 +128,10 @@ public class LocationsActivity extends AppCompatActivity {
                 locations = db.getAllLocations(DatabaseHandler.SORTING_PARAM.LastUpdated);
 
                 dbInit = true;
-                handler.post(()->timeLineFragment.updateTimeLineAdapter());
+                handler.post(()-> {
+                    timeLineFragment.updateTimeLineAdapter();
+                    mapsFragment.setMapPointers();
+                });
             }
         }.start();
     }
