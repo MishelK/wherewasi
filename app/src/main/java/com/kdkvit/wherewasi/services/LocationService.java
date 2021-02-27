@@ -27,7 +27,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.kdkvit.wherewasi.MainActivity;
+import com.kdkvit.wherewasi.LocationsActivity;
 import com.kdkvit.wherewasi.R;
 
 import models.MyLocation;
@@ -70,7 +70,7 @@ public class LocationService extends Service {
         PendingIntent closePendingIntent = PendingIntent.getService(this, 1, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.stop_service_btn, closePendingIntent);
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, LocationsActivity.class);
         intent.putExtra("working", true);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

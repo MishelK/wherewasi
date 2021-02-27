@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -22,7 +23,10 @@ import android.os.Handler;
 import android.provider.Settings;
 
 
+import com.google.android.material.tabs.TabLayout;
 import com.kdkvit.wherewasi.adapters.LocationsAdapter;
+import com.kdkvit.wherewasi.adapters.LocationsTabsAdapter;
+import com.kdkvit.wherewasi.fragments.TimeLineFragment;
 import com.kdkvit.wherewasi.services.LocationService;
 
 import java.util.ArrayList;
@@ -33,26 +37,25 @@ import utils.DatabaseHandler;
 
 import static com.kdkvit.wherewasi.services.LocationService.BROADCAST_CHANNEL;
 
-public class MainActivity extends AppCompatActivity {
+public class LocationsActivity extends AppCompatActivity {
 
     final int LOCATION_PERMISSION_REQUEST = 1;
 
     BroadcastReceiver receiver;
     DatabaseHandler db;
 
+    TimeLineFragment timeLineFragment = new TimeLineFragment();
+
     public static List<MyLocation> locations = new ArrayList<>();
 
     boolean dbInit = false;
-
     Handler handler;
-    LocationsAdapter locationsAdapter;
-
     boolean Running;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_locations_layout);
 
         Running = getIntent().getBooleanExtra("working",false);
 
@@ -74,16 +77,14 @@ public class MainActivity extends AppCompatActivity {
                 initService();
         }
 
+        LocationsTabsAdapter locationsTabsAdapter = new LocationsTabsAdapter(getSupportFragmentManager(),1);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.locations_view_pager);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.locations_tab_layout);
 
-        RecyclerView recyclerView = findViewById(R.id.reclyer);
-        recyclerView.setHasFixedSize(true);
+        locationsTabsAdapter.addFragment(timeLineFragment,"TimeLine");
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        locationsAdapter = new LocationsAdapter();
-
-
-        recyclerView.setAdapter(locationsAdapter);
+        viewPager.setAdapter(locationsTabsAdapter);
+        tabLayout.setupWithViewPager(viewPager);
 
         getLocationsHistory();
     }
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                             if(dbInit) {
                                 MyLocation location = (MyLocation) intent.getSerializableExtra("location");
                                 locations.add(0,location);
-                                locationsAdapter.notifyDataSetChanged();
+                                timeLineFragment.updateTimeLineAdapter();
                             }
                             break;
                         case "close":
@@ -123,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 locations = db.getAllLocations(DatabaseHandler.SORTING_PARAM.LastUpdated);
 
                 dbInit = true;
-                handler.post(()->locationsAdapter.notifyDataSetChanged());
+                handler.post(()->timeLineFragment.updateTimeLineAdapter());
             }
         }.start();
     }
@@ -140,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(requestCode == LOCATION_PERMISSION_REQUEST){
             if(grantResults[0] != PackageManager.PERMISSION_GRANTED){
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(LocationsActivity.this);
                 builder.setTitle("Attention").setMessage("The application must have location permission in order for it to work").setPositiveButton("Settings", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

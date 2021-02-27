@@ -14,7 +14,7 @@ import com.kdkvit.wherewasi.R;
 
 import models.MyLocation;
 
-import static com.kdkvit.wherewasi.MainActivity.locations;
+import static com.kdkvit.wherewasi.LocationsActivity.locations;
 
 public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.LocationViewHolder> {
 
