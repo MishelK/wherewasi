@@ -22,12 +22,16 @@ import android.os.Handler;
 import android.provider.Settings;
 
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.kdkvit.wherewasi.adapters.LocationsAdapter;
+import com.kdkvit.wherewasi.services.LocationService;
 
-import static com.kdkvit.wherewasi.LocationService.BROADCAST_CHANNEL;
+import java.util.ArrayList;
+import java.util.List;
+
+import models.MyLocation;
+import utils.DatabaseHandler;
+
+import static com.kdkvit.wherewasi.services.LocationService.BROADCAST_CHANNEL;
 
 public class MainActivity extends AppCompatActivity {
 

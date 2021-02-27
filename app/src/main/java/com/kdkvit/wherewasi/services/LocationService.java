@@ -1,7 +1,6 @@
-package com.kdkvit.wherewasi;
+package com.kdkvit.wherewasi.services;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -21,18 +20,23 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.List;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.kdkvit.wherewasi.MainActivity;
+import com.kdkvit.wherewasi.R;
+
+import models.MyLocation;
+import utils.DatabaseHandler;
+
 public class LocationService extends Service {
     public static final String BROADCAST_CHANNEL = "WhereWasI Broadcast";
     private static final int TWO_MINUTES = 1000 * 60 * 2;
     private static final String CHANNEL_NAME = "WhereWasSI Channel";
-    public LocationManager locationManager;
+    public LocationManager mlocManager;
     public MyLocationListener listener;
     public Location previousBestLocation = null;
 
@@ -63,7 +67,7 @@ public class LocationService extends Service {
         Intent closeIntent = new Intent(this, LocationService.class);
         closeIntent.putExtra("command", "close");
         PendingIntent closePendingIntent = PendingIntent.getService(this, 1, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        remoteViews.setOnClickPendingIntent(R.id.stop_service_btn,closePendingIntent);
+        remoteViews.setOnClickPendingIntent(R.id.stop_service_btn, closePendingIntent);
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("working", true);
@@ -83,7 +87,7 @@ public class LocationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String command = intent.getStringExtra("command");
-        if(command !=null) {
+        if (command != null) {
             switch (command) {
                 case "app_created":
                     initLocation();
@@ -94,25 +98,35 @@ public class LocationService extends Service {
                     break;
             }
         }
-        return super.onStartCommand(intent,flags,startId);
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private void close() {
         stopSelf();
         Intent receiverIntent = new Intent(BROADCAST_CHANNEL);
-        receiverIntent.putExtra("command","close");
+        receiverIntent.putExtra("command", "close");
         LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(receiverIntent);
     }
 
-    @SuppressLint("MissingPermission")
-    public void initLocation(){
+
+    public void initLocation() {
         db = new DatabaseHandler(this); // init database handler
 
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         listener = new MyLocationListener();
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 100, listener);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "No premissions", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+
+        mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5*1000, 10, (LocationListener) listener);
+        if(mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5*1000, 10, (LocationListener) listener);
+        }else{
+            //Toast.makeText(this, "Failed to use gps...", Toast.LENGTH_SHORT).show();
+        }
         geocoder = new Geocoder(this);
     }
 
@@ -193,7 +207,7 @@ public class LocationService extends Service {
         super.onDestroy();
         Log.v("STOP_SERVICE", "DONE");
 
-        locationManager.removeUpdates(listener);
+        mlocManager.removeUpdates(listener);
     }
 
     public static Thread performOnBackgroundThread(final Runnable runnable) {
@@ -216,39 +230,14 @@ public class LocationService extends Service {
         public void onLocationChanged(final Location loc) {
             Log.i("*****", "Location changed");
             if (isBetterLocation(loc, previousBestLocation)) {
-
-                loc.getLatitude();
-                loc.getLongitude();
                 MyLocation location = new MyLocation(loc.getLatitude(), loc.getLongitude(),loc.getProvider());
-
-                new Thread(){
-                    public void run(){
-                        super.run();
-                        try {
-                            List<Address> addressList = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-                            if(addressList.size() > 0){
-                                Address address = addressList.get(0);
-                                location.setAdminArea(address.getAdminArea());
-                                location.setCountryCode(address.getCountryCode());
-                                location.setFeatureName(address.getFeatureName());
-                                location.setSubAdminArea(address.getSubAdminArea());
-                                location.setAddressLine(address.getAddressLine(0));
-                            }
-                        } catch (IOException e) {
-                        }
-                        db.addLocation(location);
-                        Intent receiverIntent = new Intent(BROADCAST_CHANNEL);
-                        receiverIntent.putExtra("command","location_changed");
-                        receiverIntent.putExtra("location",location);
-                        LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(receiverIntent);
-                    }
-                }.start();
+                sendLocationEvent(location);
             }
         }
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-
+            Toast.makeText(getApplicationContext(), "Status Changed", Toast.LENGTH_SHORT).show();
         }
 
         public void onProviderDisabled(String provider) {
@@ -259,5 +248,30 @@ public class LocationService extends Service {
         public void onProviderEnabled(String provider) {
             Toast.makeText(getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void sendLocationEvent(MyLocation location) {
+        new Thread(){
+            public void run(){
+                super.run();
+                try {
+                    List<Address> addressList = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+                    if(addressList.size() > 0){
+                        Address address = addressList.get(0);
+                        location.setAdminArea(address.getAdminArea());
+                        location.setCountryCode(address.getCountryCode());
+                        location.setFeatureName(address.getFeatureName());
+                        location.setSubAdminArea(address.getSubAdminArea());
+                        location.setAddressLine(address.getAddressLine(0));
+                    }
+                } catch (Exception e) {
+                }
+                db.addLocation(location);
+                Intent receiverIntent = new Intent(BROADCAST_CHANNEL);
+                receiverIntent.putExtra("command","location_changed");
+                receiverIntent.putExtra("location",location);
+                LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(receiverIntent);
+            }
+        }.start();
     }
 }

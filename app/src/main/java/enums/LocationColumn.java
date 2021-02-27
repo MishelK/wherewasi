@@ -1,4 +1,4 @@
-package com.kdkvit.wherewasi;
+package enums;
 
 public enum LocationColumn {
     ID("id"),

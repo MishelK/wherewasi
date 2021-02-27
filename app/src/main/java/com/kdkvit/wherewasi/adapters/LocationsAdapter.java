@@ -1,18 +1,18 @@
-package com.kdkvit.wherewasi;
+package com.kdkvit.wherewasi.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.kdkvit.wherewasi.R;
+
+import models.MyLocation;
 
 import static com.kdkvit.wherewasi.MainActivity.locations;
 

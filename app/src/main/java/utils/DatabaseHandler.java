@@ -1,4 +1,4 @@
-package com.kdkvit.wherewasi;
+package utils;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,7 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
+
+import enums.LocationColumn;
+import models.MyLocation;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,7 +68,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // code to add the new note
-    void addLocation(MyLocation location) {
+    public void addLocation(MyLocation location) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
