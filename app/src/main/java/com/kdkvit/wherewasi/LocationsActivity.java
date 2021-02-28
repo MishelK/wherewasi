@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 
 import android.net.Uri;
@@ -21,21 +22,27 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.widget.Toast;
 
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.gson.Gson;
 import com.kdkvit.wherewasi.adapters.LocationsAdapter;
 import com.kdkvit.wherewasi.adapters.LocationsTabsAdapter;
 import com.kdkvit.wherewasi.fragments.MapsFragment;
 import com.kdkvit.wherewasi.fragments.TimeLineFragment;
 import com.kdkvit.wherewasi.services.LocationService;
+import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import models.MyLocation;
+import models.User;
 import utils.DatabaseHandler;
 
+import static actions.actions.sendUserToBe;
 import static com.kdkvit.wherewasi.services.LocationService.BROADCAST_CHANNEL;
 
 public class LocationsActivity extends AppCompatActivity {
@@ -58,7 +65,13 @@ public class LocationsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locations_layout);
+        User user = SharedPreferencesUtils.getUser(this);
 
+        if(user == null || user.getId()==0){
+            user = new User();
+            user.setDeviceId(UUID.randomUUID().toString());
+            sendUserToBe(this,user);
+        }
         Running = getIntent().getBooleanExtra("working",false);
 
         handler = new Handler();
