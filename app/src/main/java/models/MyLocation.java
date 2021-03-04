@@ -2,6 +2,7 @@ package models;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 public class MyLocation implements Serializable {
 
@@ -12,6 +13,7 @@ public class MyLocation implements Serializable {
     private Date startTime;
     private Date endTime;
     private Date updateTime;
+    private float accuracy;
 
     //Address
     private String adminArea;
@@ -21,21 +23,24 @@ public class MyLocation implements Serializable {
     private String subAdminArea;
     private String addressLine;
 
-    public MyLocation(long id,double latitude, double longitude, String provider){
+    public MyLocation(long id,double latitude, double longitude, String provider,float accuracy){
         this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
         this.provider = provider;
         this.updateTime = new Date();
+        this.accuracy = accuracy;
     }
 
-    public MyLocation(double latitude, double longitude, String provider,Date startTime,Date endTime){
+    public MyLocation(double latitude, double longitude, String provider,Date startTime,Date endTime,float accuracy){
         this.latitude = latitude;
         this.longitude = longitude;
         this.provider = provider;
         this.updateTime = new Date();
         this.startTime = startTime;
         this.endTime = endTime;
+        this.accuracy = accuracy;
+
     }
 
     public MyLocation(double latitude, double longitude, String provider,Date updateTime){
@@ -147,5 +152,39 @@ public class MyLocation implements Serializable {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public float getAccuracy() {
+        return accuracy;
+    }
+
+    public void setAccuracy(float accuracy) {
+        this.accuracy = accuracy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MyLocation that = (MyLocation) o;
+        return id == that.id &&
+                Double.compare(that.latitude, latitude) == 0 &&
+                Double.compare(that.longitude, longitude) == 0 &&
+                Float.compare(that.accuracy, accuracy) == 0 &&
+                Objects.equals(provider, that.provider) &&
+                Objects.equals(startTime, that.startTime) &&
+                Objects.equals(endTime, that.endTime) &&
+                Objects.equals(updateTime, that.updateTime) &&
+                Objects.equals(adminArea, that.adminArea) &&
+                Objects.equals(countryCode, that.countryCode) &&
+                Objects.equals(featureName, that.featureName) &&
+                Objects.equals(locality, that.locality) &&
+                Objects.equals(subAdminArea, that.subAdminArea) &&
+                Objects.equals(addressLine, that.addressLine);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, latitude, longitude, provider, startTime, endTime, updateTime, accuracy, adminArea, countryCode, featureName, locality, subAdminArea, addressLine);
     }
 }

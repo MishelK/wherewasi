@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import enums.LocationColumn;
 import models.MyLocation;
@@ -54,7 +53,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + LocationColumn.SUB_AREA_NAME.toString() + " TEXT,"
                 + LocationColumn.START_TIME.toString() + " DATETIME DEFAULT CURRENT_TIMESTAMP ,"
                 + LocationColumn.END_TIME.toString() + " DATETIME DEFAULT CURRENT_TIMESTAMP ,"
-                + LocationColumn.UPDATED_TIME.toString() + " DATETIME DEFAULT CURRENT_TIMESTAMP "
+                + LocationColumn.UPDATED_TIME.toString() + " DATETIME DEFAULT CURRENT_TIMESTAMP ,"
+                + LocationColumn.ACCURACY.toString() + " FLOAT "
                 + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
@@ -70,7 +70,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // code to add the new note
-    public void addLocation(MyLocation location) {
+    public long addLocation(MyLocation location) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -85,13 +85,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(LocationColumn.START_TIME.toString(),location.getStartTime().getTime());
         values.put(LocationColumn.END_TIME.toString(),location.getEndTime().getTime());
         values.put(LocationColumn.UPDATED_TIME.toString(),location.getUpdateTime().getTime());
-
+        values.put(LocationColumn.ACCURACY.toString(),location.getAccuracy());
         // Inserting Row
-        db.insert(TABLE_LOCATIONS, null, values);
+        long id = db.insert(TABLE_LOCATIONS, null, values);
         //2nd argument is String containing nullColumnHack
         db.close(); // Closing database connection
-
-        Log.i("db_changed","new location");
+        return id;
     }
 
     // code to get the single contact
@@ -114,7 +113,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<MyLocation> getAllLocations(SORTING_PARAM sorting) {
         List<MyLocation> locations = new ArrayList<>();
         // Select All Query
-        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s FROM %s ",
+        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s ",
                 LocationColumn.LATITUDE.toString(),
                 LocationColumn.LONGITUDE.toString(),
                 LocationColumn.PROVIDER.toString(),
@@ -126,6 +125,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 LocationColumn.SUB_AREA_NAME.toString(),
                 LocationColumn.START_TIME.toString(),
                 LocationColumn.END_TIME.toString(),
+                LocationColumn.ACCURACY.toString(),
                 TABLE_LOCATIONS);
 
         if(sorting != null) {
@@ -158,7 +158,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 temp = cursor.getLong(10);
                 location.setEndTime(new Date(temp));
-
+                location.setAccuracy(cursor.getFloat(11));
 
                 locations.add(location);
             } while (cursor.moveToNext());
@@ -187,6 +187,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //        db.close();
 //        return false;
 //    }
+
+    public int updateLocation(MyLocation location) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(LocationColumn.END_TIME.toString(), location.getEndTime().getTime());
+        values.put(LocationColumn.UPDATED_TIME.toString(), location.getEndTime().getTime());
+        values.put(LocationColumn.ACCURACY.toString(), location.getAccuracy());
+        values.put(LocationColumn.LATITUDE.toString(),location.getLatitude());
+        values.put(LocationColumn.LONGITUDE.toString(),location.getLongitude());
+
+        // updating row
+        int success = db.update(TABLE_LOCATIONS, values, LocationColumn.ID.toString() + " = ?",
+                new String[] { String.valueOf(location.getId()) });
+        db.close();
+        return success;
+    }
+
+
 
     //code to update the single Note
 //    public int updateNote(Note note) {

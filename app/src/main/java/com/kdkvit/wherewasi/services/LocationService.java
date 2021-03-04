@@ -22,6 +22,8 @@ import android.widget.Toast;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -35,11 +37,12 @@ import utils.DatabaseHandler;
 
 public class LocationService extends Service {
     public static final String BROADCAST_CHANNEL = "WhereWasI Broadcast";
-    private static final int TWO_MINUTES = 1000 * 60 * 2;
+    private static final int SIGNIFICANT_TIME = 1000 * 60 * 15;
     private static final String CHANNEL_NAME = "WhereWasSI Channel";
+    private static final int TIME_CHECK_ACTIVE = 11 * 1000* 60;
     public LocationManager mlocManager;
     public MyLocationListener listener;
-    public Location previousBestLocation = null;
+    public MyLocation previousBestLocation = null;
 
     DatabaseHandler db;
     Geocoder geocoder;
@@ -48,6 +51,7 @@ public class LocationService extends Service {
     NotificationCompat.Builder builder;
     String channelId = "KDKVIT_NOTIF_CHANNEL";
     final int NOTIF_ID = 1;
+    private Timer timer = new Timer();
 
     @Override
     public void onCreate() {
@@ -121,13 +125,24 @@ public class LocationService extends Service {
             return;
         }
 
-
-        mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5*1000, 10, (LocationListener) listener);
+        mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5*60*1000, 0, (LocationListener) listener);
         if(mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5*1000, 10, (LocationListener) listener);
+            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5*60*1000, 0, (LocationListener) listener);
         }else{
             //Toast.makeText(this, "Failed to use gps...", Toast.LENGTH_SHORT).show();
         }
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Log.i("test","timer test");
+                if(previousBestLocation!=null && previousBestLocation.getId() > 0){
+                    previousBestLocation.setEndTime(new Date());
+                    previousBestLocation.setUpdateTime(new Date());
+                    sendLocationEvent(previousBestLocation);
+                }
+            }
+        }, 0,30*1000);
         geocoder = new Geocoder(this);
     }
 
@@ -148,16 +163,16 @@ public class LocationService extends Service {
         return null;
     }
 
-    protected boolean isBetterLocation(Location location, Location currentBestLocation) {
+    protected boolean isBetterLocation(MyLocation location, MyLocation currentBestLocation) {
         if (currentBestLocation == null) {
             // A new location is always better than no location
             return true;
         }
 
         // Check whether the new location fix is newer or older
-        long timeDelta = location.getTime() - currentBestLocation.getTime();
-        boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
-        boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
+        long timeDelta = location.getEndTime().getTime() - currentBestLocation.getEndTime().getTime();
+        boolean isSignificantlyNewer = timeDelta > SIGNIFICANT_TIME;
+        boolean isSignificantlyOlder = timeDelta < -SIGNIFICANT_TIME;
         boolean isNewer = timeDelta > 0;
 
         // If it's been more than two minutes since the current location, use the new location
@@ -169,27 +184,28 @@ public class LocationService extends Service {
             return false;
         }
 
-        // Check whether the new location fix is more or less accurate
-        int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
-        boolean isLessAccurate = accuracyDelta > 0;
-        boolean isMoreAccurate = accuracyDelta < 0;
-        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
-
-        // Check if the old and new location are from the same provider
-        boolean isFromSameProvider = isSameProvider(location.getProvider(),
-                currentBestLocation.getProvider());
-
-        // Determine location quality using a combination of timeliness and accuracy
-        if (isMoreAccurate) {
-            return true;
-        } else if (isNewer && !isLessAccurate) {
-            return true;
-        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+        double diffInKM = Math.abs(getDistanceFromLatLonInKm(location.getLatitude(),location.getLongitude(),currentBestLocation.getLatitude(),currentBestLocation.getLongitude()));
+        if(diffInKM > 0.15){
             return true;
         }
+
         return false;
     }
 
+    public double getDistanceFromLatLonInKm(double lat1,double lon1,double lat2,double lon2) {
+        int R = 6371; // Radius of the earth in km
+        double dLat = deg2rad(lat2 - lat1);  // deg2rad below
+        double dLon = deg2rad(lon2-lon1);
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                                Math.sin(dLon/2) * Math.sin(dLon/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return (R * c);
+    }
+
+    public double deg2rad(double deg) {
+        return deg * (Math.PI/180);
+    }
 
     /**
      * Checks whether two providers are the same
@@ -207,7 +223,7 @@ public class LocationService extends Service {
         // handler.removeCallbacks(sendUpdatesToUI);
         super.onDestroy();
         Log.v("STOP_SERVICE", "DONE");
-
+        timer.cancel();
         mlocManager.removeUpdates(listener);
     }
 
@@ -230,12 +246,31 @@ public class LocationService extends Service {
 
         public void onLocationChanged(final Location loc) {
             Log.i("*****", "Location changed");
-            if (isBetterLocation(loc, previousBestLocation)) {
-                Date now = new Date();
-                MyLocation location = new MyLocation(loc.getLatitude(), loc.getLongitude(),loc.getProvider(),now,now);
+            Date now = new Date();
+            MyLocation location = new MyLocation(loc.getLatitude(), loc.getLongitude(),loc.getProvider(),now,now,loc.getAccuracy());
+            if (isBetterLocation(location, previousBestLocation)) { //Check if better location; if it is writing new line if not updating current one
+                previousBestLocation=location;
                 sendLocationEvent(location);
             }else{
-                //todo: send update to current location
+
+//        // Check whether the new location fix is more or less accurate
+                int accuracyDelta = (int) (location.getAccuracy() - previousBestLocation.getAccuracy());
+                boolean isMoreAccurate = accuracyDelta > 0;
+
+                // Check if the old and new location are from the same provider
+                boolean isFromSameProvider = isSameProvider(location.getProvider(),
+                        previousBestLocation.getProvider());
+
+                //Determine location quality using a combination of timeliness and accuracy
+                if (isMoreAccurate) {
+                  previousBestLocation.setAccuracy(location.getAccuracy());
+                  previousBestLocation.setLatitude(location.getLatitude());
+                  previousBestLocation.setLongitude(location.getLongitude());
+                }
+
+                previousBestLocation.setEndTime(location.getEndTime());
+                previousBestLocation.setUpdateTime(new Date());
+                sendLocationEvent(previousBestLocation);
             }
         }
 
@@ -255,6 +290,7 @@ public class LocationService extends Service {
     }
 
     private void sendLocationEvent(MyLocation location) {
+        Log.i("sending_location","sending...");
         new Thread(){
             public void run(){
                 super.run();
@@ -270,10 +306,23 @@ public class LocationService extends Service {
                     }
                 } catch (Exception e) {
                 }
-                db.addLocation(location);
+                boolean isNew = location.getId() == 0;
+                if(isNew) {
+                    long locationId = db.addLocation(location);
+
+                    if (previousBestLocation!=null && previousBestLocation.equals(location)) {
+                        previousBestLocation.setId(locationId);
+                    }
+                    location.setId(locationId);
+                }else {
+                    int success = db.updateLocation(location);
+                    if(success == 0) return; //Failed to update location ?
+                }
+
                 Intent receiverIntent = new Intent(BROADCAST_CHANNEL);
-                receiverIntent.putExtra("command","location_changed");
+                receiverIntent.putExtra("command",isNew ? "new_location" : "location_changed");
                 receiverIntent.putExtra("location",location);
+
                 LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(receiverIntent);
             }
         }.start();
