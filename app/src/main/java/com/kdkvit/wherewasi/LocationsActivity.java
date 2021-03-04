@@ -22,6 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
 import android.widget.Toast;
 
 
@@ -113,9 +114,18 @@ public class LocationsActivity extends AppCompatActivity {
                 String command = intent.getStringExtra("command");
                 if (command != null) {
                     switch (command) {
+                        case "new_location":
+                            if(dbInit){
+                                MyLocation location = (MyLocation) intent.getSerializableExtra("location");
+                                locations.add(0,location);
+                                timeLineFragment.updateTimeLineAdapter();
+                                mapsFragment.setMapPointers();
+                            }
                         case "location_changed":
                             if(dbInit) {
-                                MyLocation location = (MyLocation) intent.getSerializableExtra("location");
+                                MyLocation location = (MyLocation)intent.getSerializableExtra("location");
+                                Log.i("changed","location");
+                                locations.remove(0);
                                 locations.add(0,location);
                                 timeLineFragment.updateTimeLineAdapter();
                                 mapsFragment.setMapPointers();

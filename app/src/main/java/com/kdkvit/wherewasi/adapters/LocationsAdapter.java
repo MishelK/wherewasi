@@ -48,7 +48,7 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
     @Override
     public void onBindViewHolder(@NonNull LocationViewHolder holder, int position) {
         MyLocation location = locations.get(position);
-        holder.timeTV.setText(String.format("%s %s", holder.itemView.getResources().getString(R.string.time), location.getUpdateTime().toString()));
+        holder.timeTV.setText(String.format("%s %s", holder.itemView.getResources().getString(R.string.time), location.getEndTime().toString()));
         holder.coordinatesTV.setText(String.format("%s %s,%s", holder.itemView.getResources().getString(R.string.coordinates), df2.format(location.getLatitude()), df2.format(location.getLongitude())));
         holder.addressTv.setText(String.format("%s %s",holder.itemView.getResources().getString(R.string.address),location.getAddressLine()));
     }

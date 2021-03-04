@@ -12,7 +12,8 @@ public enum LocationColumn {
     FEATURE_NAME("feature_name"),
     SUB_AREA_NAME("sub_area_name"),
     START_TIME("start_time"),
-    END_TIME("end_time");
+    END_TIME("end_time"),
+    ACCURACY("accuracy");
 
     private String name;
 
