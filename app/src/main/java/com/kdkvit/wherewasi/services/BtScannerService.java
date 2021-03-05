@@ -63,14 +63,16 @@ public class BtScannerService extends Service {
             super.onScanResult(callbackType, result);
             Log.i("BLE", "Scan Result:");
 
-            //ScanRecord scanRecord = result.getScanRecord();
-            String toString = result.getDevice().toString();
-            //result.toString();
-            if (toString != null)
-                Log.i("BLE", toString);
-            else
-                Log.i("BLE", "ERROR: toString null");
+            //String toString = result.getDevice().toString();
+            String mac = result.getDevice().getAddress();
+            int rssi = result.getRssi();
 
+            if (mac != null)
+                Log.i("BLE","MAC: " + mac);
+            else
+                Log.i("BLE", "ERROR: mac null");
+
+            Log.i("BLE", "Rssi: " + Integer.toString(rssi));
         }
 
         @Override
@@ -79,12 +81,16 @@ public class BtScannerService extends Service {
             for (int i = 0; i < results.size(); i++) {
                 Log.i("BLE", "Scan Result:");
 
-                String toString = results.get(i).getDevice().toString();
-                //results.get(i).toString();
-                if (toString != null)
-                    Log.i("BLE", toString);
+                //String toString = results.get(i).getDevice().toString();
+                String mac = results.get(i).getDevice().getAddress();
+                int rssi = results.get(i).getRssi();
+
+                if (mac != null)
+                    Log.i("BLE","MAC: " + mac);
                 else
-                    Log.i("BLE", "ERROR: toString null");
+                    Log.i("BLE", "ERROR: mac null");
+
+                Log.i("BLE", "Rssi: " + Integer.toString(rssi));
             }
         }
 
