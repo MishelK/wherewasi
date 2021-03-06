@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -17,8 +18,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.kdkvit.wherewasi.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import models.MyLocation;
 
@@ -90,6 +95,16 @@ public class MapsFragment extends Fragment {
                     return null;
                 }
             });
+
+            mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MyLocation>() {
+                @Override
+                public boolean onClusterClick(Cluster<MyLocation> cluster) {
+                    List<MyLocation> cLocations = new ArrayList<>(cluster.getItems());
+
+                    return true;
+                }
+            });
+
             initCluster();
 //            if (locations.size() > 0) {
 //                LatLng mapPoint = null;
