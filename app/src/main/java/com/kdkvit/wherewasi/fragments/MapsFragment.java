@@ -8,13 +8,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 import com.kdkvit.wherewasi.R;
 
 import models.MyLocation;
@@ -24,6 +27,8 @@ import static com.kdkvit.wherewasi.LocationsActivity.locations;
 public class MapsFragment extends Fragment {
 
     GoogleMap googleMap;
+    private ClusterManager<MyLocation> mClusterManager;
+
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -63,16 +68,43 @@ public class MapsFragment extends Fragment {
     }
 
     public void setMapPointers() {
-        if (googleMap != null) {
+        if (googleMap != null && getContext()!=null) {
             googleMap.clear();
-            if (locations.size() > 0) {
-                LatLng mapPoint = null;
-                for (MyLocation location : locations) {
-                    mapPoint = new LatLng(location.getLatitude(), location.getLongitude());
-                    googleMap.addMarker(new MarkerOptions().position(mapPoint).title(location.getAddressLine()));
+            mClusterManager = new ClusterManager<MyLocation>(getContext(), googleMap);
+            googleMap.setOnCameraIdleListener(mClusterManager);
+            googleMap.setOnMarkerClickListener(mClusterManager);
+            googleMap.setOnInfoWindowClickListener(mClusterManager);
+            mClusterManager.getMarkerCollection().setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                @Override
+                public View getInfoWindow(Marker marker) {
+                    final LayoutInflater inflater = LayoutInflater.from(getActivity());
+                    final View view = inflater.inflate(R.layout.custom_info_window, null);
+                    final TextView textView = view.findViewById(R.id.textViewTitle);
+                    String text = (marker.getTitle() != null) ? marker.getTitle() : "Cluster Item";
+                    textView.setText(text);
+                    return view;
                 }
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapPoint,16.0f));
-            }
+
+                @Override
+                public View getInfoContents(Marker marker) {
+                    return null;
+                }
+            });
+            initCluster();
+//            if (locations.size() > 0) {
+//                LatLng mapPoint = null;
+//                for (MyLocation location : locations) {
+//                    mapPoint = new LatLng(location.getLatitude(), location.getLongitude());
+//                    googleMap.addMarker(new MarkerOptions().position(mapPoint).title(location.getAddressLine()));
+//                }
+//                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapPoint,16.0f));
+//            }
         }
+    }
+
+    private void initCluster() {
+        mClusterManager.clearItems();
+        mClusterManager.addItems(locations);
+        mClusterManager.cluster();
     }
 }

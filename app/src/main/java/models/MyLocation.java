@@ -1,10 +1,16 @@
 package models;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
-public class MyLocation implements Serializable {
+public class MyLocation implements Serializable, ClusterItem {
 
     private long id;
     private double latitude;
@@ -14,6 +20,8 @@ public class MyLocation implements Serializable {
     private Date endTime;
     private Date updateTime;
     private float accuracy;
+
+    private LatLng latLng;
 
     //Address
     private String adminArea;
@@ -30,6 +38,7 @@ public class MyLocation implements Serializable {
         this.provider = provider;
         this.updateTime = new Date();
         this.accuracy = accuracy;
+        initLatLang();
     }
 
     public MyLocation(double latitude, double longitude, String provider,Date startTime,Date endTime,float accuracy){
@@ -40,7 +49,7 @@ public class MyLocation implements Serializable {
         this.startTime = startTime;
         this.endTime = endTime;
         this.accuracy = accuracy;
-
+        initLatLang();
     }
 
     public MyLocation(double latitude, double longitude, String provider,Date updateTime){
@@ -48,6 +57,11 @@ public class MyLocation implements Serializable {
         this.longitude = longitude;
         this.provider = provider;
         this.updateTime = updateTime;
+        initLatLang();
+    }
+
+    private void initLatLang() {
+        this.latLng = new LatLng(this.latitude,this.longitude);
     }
 
     public double getLatitude() {
@@ -56,6 +70,7 @@ public class MyLocation implements Serializable {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
+        initLatLang();
     }
 
     public double getLongitude() {
@@ -64,6 +79,7 @@ public class MyLocation implements Serializable {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+        initLatLang();
     }
 
     public String getProvider() {
@@ -186,5 +202,31 @@ public class MyLocation implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, latitude, longitude, provider, startTime, endTime, updateTime, accuracy, adminArea, countryCode, featureName, locality, subAdminArea, addressLine);
+    }
+
+    @NonNull
+    @Override
+    public LatLng getPosition() {
+        return this.latLng;
+    }
+
+    @Nullable
+    @Override
+    public String getTitle() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public String getSnippet() {
+        return null;
+    }
+
+    public LatLng getLatLng() {
+        return latLng;
+    }
+
+    public void setLatLng(LatLng latLng) {
+        this.latLng = latLng;
     }
 }
