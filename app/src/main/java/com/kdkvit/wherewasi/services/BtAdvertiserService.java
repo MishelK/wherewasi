@@ -50,6 +50,7 @@ public class BtAdvertiserService extends Service {
 
     @Override
     public void onDestroy() {
+        stopAdvertising();
         super.onDestroy();
     }
 
