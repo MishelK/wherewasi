@@ -54,6 +54,7 @@ public class BtScannerService extends Service {
 
     @Override
     public void onDestroy() {
+        stopScan();
         super.onDestroy();
     }
 
