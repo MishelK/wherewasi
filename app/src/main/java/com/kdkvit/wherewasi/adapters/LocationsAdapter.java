@@ -3,6 +3,7 @@ package com.kdkvit.wherewasi.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -23,7 +24,17 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
     public LocationsAdapter(){
     }
 
-    public static class LocationViewHolder extends RecyclerView.ViewHolder {
+    public interface LocationListener{
+        void onClick(int position);
+    }
+
+    private LocationListener listener;
+
+    public void setListener(LocationListener listener) {
+        this.listener = listener;
+    }
+
+    public class LocationViewHolder extends RecyclerView.ViewHolder {
         TextView timeTV;
         TextView coordinatesTV;
         TextView addressTv;
@@ -34,6 +45,16 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
             timeTV = itemView.findViewById(R.id.location_time_tv);
             coordinatesTV = itemView.findViewById(R.id.coordinates_tv);
             addressTv = itemView.findViewById(R.id.location_address_tv);
+            Button btn = (Button)itemView.findViewById(R.id.show_in_map_btn);
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(listener!=null){
+                        listener.onClick(getAdapterPosition());
+                    }
+                }
+            });
+
         }
 
     }
