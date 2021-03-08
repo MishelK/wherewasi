@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +22,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.kdkvit.wherewasi.R;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,13 +56,18 @@ public class MapsFragment extends Fragment {
             setMapPointers();
         }
     };
+    private View rootView;
+    private LinearLayout infoContainer;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_maps, container, false);
+        rootView = inflater.inflate(R.layout.fragment_maps, container, false);
+        infoContainer = rootView.findViewById(R.id.info_container);
+        infoContainer.setVisibility(View.GONE);
+        return rootView;
     }
 
     @Override
@@ -79,6 +87,7 @@ public class MapsFragment extends Fragment {
             googleMap.setOnCameraIdleListener(mClusterManager);
             googleMap.setOnMarkerClickListener(mClusterManager);
             googleMap.setOnInfoWindowClickListener(mClusterManager);
+
             mClusterManager.getMarkerCollection().setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 @Override
                 public View getInfoWindow(Marker marker) {
@@ -101,19 +110,21 @@ public class MapsFragment extends Fragment {
                 public boolean onClusterClick(Cluster<MyLocation> cluster) {
                     List<MyLocation> cLocations = new ArrayList<>(cluster.getItems());
 
+                    if(infoContainer.getVisibility() == View.VISIBLE){
+                        rootView.findViewById(R.id.info_container).setVisibility(View.GONE);
+                        TextView locationNumTV = (TextView) rootView.findViewById(R.id.location_num_tv);
+                        locationNumTV.setText("Locations: " + cLocations.size());
+                    }else {
+                        rootView.findViewById(R.id.info_container).setVisibility(View.VISIBLE);
+                    }
                     return true;
                 }
             });
 
             initCluster();
-//            if (locations.size() > 0) {
-//                LatLng mapPoint = null;
-//                for (MyLocation location : locations) {
-//                    mapPoint = new LatLng(location.getLatitude(), location.getLongitude());
-//                    googleMap.addMarker(new MarkerOptions().position(mapPoint).title(location.getAddressLine()));
-//                }
-//                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapPoint,16.0f));
-//            }
+            if (locations.size() > 0) {
+                focus(locations.get(0),true);
+            }
         }
     }
 
@@ -121,5 +132,14 @@ public class MapsFragment extends Fragment {
         mClusterManager.clearItems();
         mClusterManager.addItems(locations);
         mClusterManager.cluster();
+    }
+
+    public void focus(MyLocation myLocation,boolean init) {
+        LatLng mapPoint = new LatLng(myLocation.getLatitude(),myLocation.getLongitude());
+        float zoom = init ?  12.0f : 20.0f;
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapPoint,zoom));
+        if(!init){
+
+        }
     }
 }

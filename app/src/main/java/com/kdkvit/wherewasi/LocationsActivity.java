@@ -53,7 +53,13 @@ public class LocationsActivity extends AppCompatActivity {
     BroadcastReceiver receiver;
     DatabaseHandler db;
 
-    TimeLineFragment timeLineFragment = new TimeLineFragment();
+    TimeLineFragment timeLineFragment = new TimeLineFragment(new TimeLineFragment.TimeLineLocationListener() {
+        @Override
+        public void onClick(int position) {
+            onTLLocationClick(position);
+        }
+    });
+
     MapsFragment mapsFragment = new MapsFragment();
 
     public static List<MyLocation> locations = new ArrayList<>();
@@ -61,6 +67,9 @@ public class LocationsActivity extends AppCompatActivity {
     boolean dbInit = false;
     Handler handler;
     boolean Running;
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,11 +103,11 @@ public class LocationsActivity extends AppCompatActivity {
         }
 
         LocationsTabsAdapter locationsTabsAdapter = new LocationsTabsAdapter(getSupportFragmentManager(),1);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.locations_view_pager);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.locations_tab_layout);
+        viewPager = (ViewPager) findViewById(R.id.locations_view_pager);
+        tabLayout = (TabLayout) findViewById(R.id.locations_tab_layout);
 
-        locationsTabsAdapter.addFragment(mapsFragment,"Map");
         locationsTabsAdapter.addFragment(timeLineFragment,"TimeLine");
+        locationsTabsAdapter.addFragment(mapsFragment,"Map");
 
         viewPager.setAdapter(locationsTabsAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -182,6 +191,11 @@ public class LocationsActivity extends AppCompatActivity {
                 }).setCancelable(false).show();
             }
         }
+    }
+
+    private void onTLLocationClick(int position) {
+        tabLayout.getTabAt(1).select();
+        mapsFragment.focus(locations.get(position),false);
     }
 
     @Override

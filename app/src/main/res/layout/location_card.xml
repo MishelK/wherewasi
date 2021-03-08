@@ -36,5 +36,11 @@
             android:id="@+id/coordinates_tv"
             android:textSize="15sp"
             />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/show_on_map"
+            android:id="@+id/show_in_map_btn"
+            />
     </LinearLayout>
 </androidx.cardview.widget.CardView>
