@@ -32,7 +32,7 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
         <activity
-            android:name=".LocationsActivity"
+            android:name=".BLEActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             >
@@ -48,6 +48,8 @@
             android:value="@string/google_maps_key" />
 
         <service android:name=".services.LocationService" />
+        <service android:name=".services.BtScannerService" />
+        <service android:name=".services.BtAdvertiserService" />
 
         <service
             android:name=".firebase.MyFirebaseMessagingService">

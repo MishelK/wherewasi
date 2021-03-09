@@ -6,35 +6,29 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.kdkvit.wherewasi.services.BtAdvertiserService;
+import com.kdkvit.wherewasi.services.BtScannerService;
+import com.kdkvit.wherewasi.services.LocationService;
 
-import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat;
-import no.nordicsemi.android.support.v18.scanner.ScanCallback;
-import no.nordicsemi.android.support.v18.scanner.ScanFilter;
-import no.nordicsemi.android.support.v18.scanner.ScanResult;
-import no.nordicsemi.android.support.v18.scanner.ScanSettings;
-
-public class MainActivity extends AppCompatActivity {
+public class BLEActivity extends AppCompatActivity {
 
     static final int BLE_REQ_CODE = 1;
 
-    BLEManager bleManager;
+    boolean isScanning = false;
+    boolean isAdvertising = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_ble);
 
         //Checking for BLE scan required permissions
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -45,17 +39,22 @@ public class MainActivity extends AppCompatActivity {
             //Need to add request to enable location in case it is not enabled
         }
 
-        bleManager = new BLEManager();
         Button btnScan = findViewById(R.id.btnScan);
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(hasBlePermissions()) {
-                    if (bleManager.isScanning()) {
-                        bleManager.stopScan();
+                    if (isScanning) {
+                        isScanning = false;
+                        Intent intent = new Intent(BLEActivity.this, BtScannerService.class);
+                        intent.putExtra("command", "stop");
+                        startService(intent);
                         btnScan.setText("Start Scanning");
                     } else {
-                        bleManager.startScan();
+                        isScanning = true;
+                        Intent intent = new Intent(BLEActivity.this, BtScannerService.class);
+                        intent.putExtra("command", "start");
+                        startService(intent);
                         btnScan.setText("Stop Scanning");
                     }
                 }
@@ -67,11 +66,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(hasBlePermissions()) {
-                    if(bleManager.isAdvertising()){
-                        bleManager.stopAdvertising();
+                    if(isAdvertising){
+                        isAdvertising = false;
+                        Intent intent = new Intent(BLEActivity.this, BtAdvertiserService.class);
+                        intent.putExtra("command", "stop");
+                        startService(intent);
                         btnAdvertise.setText("Start Advertising");
                     } else {
-                        bleManager.startAdvertising();
+                        isAdvertising = true;
+                        Intent intent = new Intent(BLEActivity.this, BtAdvertiserService.class);
+                        intent.putExtra("command", "start");
+                        startService(intent);
                         btnAdvertise.setText("Stop Advertising");
                     }
                 }
