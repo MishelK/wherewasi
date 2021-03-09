@@ -8,4 +8,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="show_on_map">Show in map</string>
+    <string name="app_description">Where Was I is a protected application that helps detecting  who you have been with and where.\nAll the data is stored on your device and won\'t share with others</string>
+    <string name="nickname">Nickname</string>
+    <string name="start">Lets Start</string>
 </resources>

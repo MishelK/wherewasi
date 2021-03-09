@@ -46,6 +46,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
 
     implementation 'com.google.maps.android:android-maps-utils:2.2.0'
+    implementation 'br.com.simplepass:loading-button-android:2.2.0'
 
 
     implementation 'no.nordicsemi.android.support.v18:scanner:1.4.2'
