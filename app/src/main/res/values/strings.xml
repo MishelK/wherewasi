@@ -11,4 +11,7 @@
     <string name="app_description">Where Was I is a protected application that helps detecting  who you have been with and where.\nAll the data is stored on your device and won\'t share with others</string>
     <string name="nickname">Nickname</string>
     <string name="start">Lets Start</string>
+    <string name="hello_name">Hello, </string>
+    <string name="daily_summary">Daily Summary</string>
+    <string name="fourteen_days_summary">14 Days Summary</string>
 </resources>

@@ -16,7 +16,7 @@ import static actions.actions.sendUserToBe;
 
 public class MainActivity extends AppCompatActivity {
 
-    private User user;
+    public static User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
