@@ -1,20 +1,15 @@
 package models;
 
+import androidx.annotation.NonNull;
+
 public class BtDevice {
 
-    private String address;
     private Long firstSeen;
     private Long lastSeen;
+    private String uuid;
+
 
     public BtDevice() {
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public Long getFirstSeen() {
@@ -31,5 +26,20 @@ public class BtDevice {
 
     public void setLastSeen(Long lastSeen) {
         this.lastSeen = lastSeen;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        String string = " UUID : " + this.uuid;
+        return string;
     }
 }
