@@ -12,8 +12,9 @@ public class User implements Serializable {
     private String fcmId;
     private String bleId;
 
-    public User(){
-
+    public User(String name, String deviceId){
+        this.name = name;
+        this.deviceId = deviceId;
     }
 
     public User(int id, String name, String deviceId, String fcmId, String bleId) {

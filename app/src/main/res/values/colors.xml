@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#f95700</color>
+    <color name="colorPrimaryDark">#f95700</color>
+    <color name="colorAccent">#249ff0</color>
+    <color name="colorDarkBackground">#303f46</color>
+    <color name="colorOrange">#ef7f77</color>
+    <color name="textColor">#ffffff</color>
+
+    <color name="white">#ffffff</color>
+    <color name="seek_bar_background">#ababab</color>
+    <color name="seek_bar_progress">@color/colorPrimary</color>
+    <color name="seek_bar_secondary_progress">@color/colorPrimary</color>
+    <color name="lightBlack">#777</color>
+    <color name="colorLightBackground">#fcfcfc</color>
+    <color name="my_message">#25D366</color>
+    <color name="other_message">#34B7F1</color>
+    <color name="red">@android:color/holo_red_light</color>
+    <color name="green">#25D366</color>
+    <color name="light_text">#777</color>
+    <color name="light_black">#333</color>
+    <color name="background_opacity">#DDFFFFFF</color>
 </resources>

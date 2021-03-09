@@ -75,13 +75,7 @@ public class LocationsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locations_layout);
-        User user = SharedPreferencesUtils.getUser(this);
 
-        if(user == null || user.getId()==0){
-            user = new User();
-            user.setDeviceId(UUID.randomUUID().toString());
-            sendUserToBe(this,user);
-        }
         Running = getIntent().getBooleanExtra("working",false);
 
         handler = new Handler();
