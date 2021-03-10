@@ -23,9 +23,6 @@ import static com.kdkvit.wherewasi.MainActivity.user;
 
 public class MainFragment extends Fragment {
 
-    DrawerLayout drawerLayout;
-    NavigationView navigationView;
-
     private View rootView;
 
     public MainFragment() {
@@ -45,27 +42,6 @@ public class MainFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         TextView nameTV = rootView.findViewById(R.id.name_tv);
         nameTV.setText(getResources().getString(R.string.hello_name)+user.getName());
-        drawerLayout = (DrawerLayout) rootView.findViewById(R.id.drawer_layout);
-        navigationView = rootView.findViewById(R.id.navigation_view);
-
-        ImageButton menuBtn = rootView.findViewById(R.id.menu_btn);
-        menuBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                drawerLayout.openDrawer(GravityCompat.START);
-
-            }
-        });
-
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                item.setChecked(true);
-                drawerLayout.closeDrawer(GravityCompat.START);
-                Toast.makeText(getContext(), ""+item.getTitle(), Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
 
         return rootView;
     }
