@@ -2,14 +2,15 @@ package models;
 
 import androidx.annotation.NonNull;
 
-public class BtDevice {
+public class Interaction {
 
+    private String uuid;
     private Long firstSeen;
     private Long lastSeen;
-    private String uuid;
+    private int interactionID;
 
 
-    public BtDevice() {
+    public Interaction() {
     }
 
     public Long getFirstSeen() {
@@ -34,6 +35,14 @@ public class BtDevice {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public int getInteractionID() {
+        return interactionID;
+    }
+
+    public void setInteractionID(int interactionID) {
+        this.interactionID = interactionID;
     }
 
     @NonNull

@@ -19,6 +19,11 @@ import com.kdkvit.wherewasi.services.BtAdvertiserService;
 import com.kdkvit.wherewasi.services.BtScannerService;
 import com.kdkvit.wherewasi.services.LocationService;
 
+import java.util.List;
+
+import models.Interaction;
+import utils.InteractionDatabaseHandler;
+
 public class BLEActivity extends AppCompatActivity {
 
     static final int BLE_REQ_CODE = 1;
