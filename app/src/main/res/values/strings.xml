@@ -2,7 +2,7 @@
     <string name="app_name">Where Was I</string>
     <string name="Stop">Stop</string>
     <string name="close">Close</string>
-    <string name="time">Time: </string>
+    <string name="time">Times: </string>
     <string name="coordinates">Coordinates: </string>
     <string name="address">Address: </string>
     <!-- TODO: Remove or change this placeholder text -->
@@ -16,4 +16,5 @@
     <string name="fourteen_days_summary">14 Days Summary</string>
     <string name="activity">Activity</string>
     <string name="home">Home</string>
+    <string name="interactions">Interactions: </string>
 </resources>
