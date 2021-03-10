@@ -11,12 +11,18 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.kdkvit.wherewasi.services.BtAdvertiserService;
 import com.kdkvit.wherewasi.services.BtScannerService;
 import com.kdkvit.wherewasi.services.LocationService;
+
+import java.util.List;
+
+import models.Interaction;
+import utils.InteractionDatabaseHandler;
 
 public class BLEActivity extends AppCompatActivity {
 
