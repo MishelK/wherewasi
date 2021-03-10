@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -36,14 +37,12 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
 
     public class LocationViewHolder extends RecyclerView.ViewHolder {
         TextView timeTV;
-        TextView coordinatesTV;
         TextView addressTv;
 
         public LocationViewHolder(@NonNull View itemView) {
             super(itemView);
 
             timeTV = itemView.findViewById(R.id.location_time_tv);
-            coordinatesTV = itemView.findViewById(R.id.coordinates_tv);
             addressTv = itemView.findViewById(R.id.location_address_tv);
             Button btn = (Button)itemView.findViewById(R.id.show_in_map_btn);
             btn.setOnClickListener(new View.OnClickListener() {
@@ -69,8 +68,16 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
     @Override
     public void onBindViewHolder(@NonNull LocationViewHolder holder, int position) {
         MyLocation location = locations.get(position);
-        holder.timeTV.setText(String.format("%s %s", holder.itemView.getResources().getString(R.string.time), location.getEndTime().toString()));
-        holder.coordinatesTV.setText(String.format("%s %s,%s", holder.itemView.getResources().getString(R.string.coordinates), df2.format(location.getLatitude()), df2.format(location.getLongitude())));
+        String startTime = new SimpleDateFormat("HH:mm DD-MM").format(location.getStartTime());
+
+        if(position == 0) {
+
+            holder.timeTV.setText(String.format("%s %s", holder.itemView.getResources().getString(R.string.time), startTime));
+        }else{
+            String endTime = new SimpleDateFormat("HH:mm DD-MM").format(location.getEndTime());
+            holder.timeTV.setText(String.format("%s %s - %s", holder.itemView.getResources().getString(R.string.time), startTime,endTime));
+        }
+        //holder.coordinatesTV.setText(String.format("%s %s,%s", holder.itemView.getResources().getString(R.string.coordinates), df2.format(location.getLatitude()), df2.format(location.getLongitude())));
         holder.addressTv.setText(String.format("%s %s",holder.itemView.getResources().getString(R.string.address),location.getAddressLine()));
     }
 
