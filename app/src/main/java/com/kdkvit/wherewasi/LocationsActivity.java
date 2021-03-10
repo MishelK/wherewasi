@@ -96,17 +96,6 @@ public class LocationsActivity extends AppCompatActivity {
                 initService();
         }
 
-        LocationsTabsAdapter locationsTabsAdapter = new LocationsTabsAdapter(getSupportFragmentManager(),1);
-        viewPager = (ViewPager) findViewById(R.id.locations_view_pager);
-        tabLayout = (TabLayout) findViewById(R.id.locations_tab_layout);
-
-        locationsTabsAdapter.addFragment(timeLineFragment,"TimeLine");
-        locationsTabsAdapter.addFragment(mapsFragment,"Map");
-
-        viewPager.setAdapter(locationsTabsAdapter);
-        tabLayout.setupWithViewPager(viewPager);
-
-        getLocationsHistory();
     }
 
     private void initReceiver() {
