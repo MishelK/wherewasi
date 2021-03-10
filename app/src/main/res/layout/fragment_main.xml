@@ -9,33 +9,6 @@
     tools:context=".fragments.MainFragment"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="10dp"
-        >
-
-        <ImageButton
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_baseline_menu"
-            android:scaleType="fitXY"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="15dp"
-            android:id="@+id/menu_btn"
-            android:background="@android:color/transparent"
-            />
-
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="55dp"
-            android:src="@drawable/app_icon"
-            android:scaleType="fitXY"
-            android:layout_centerInParent="true"
-            />
-    </RelativeLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

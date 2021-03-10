@@ -30,7 +30,7 @@ import java.util.List;
 
 import models.MyLocation;
 
-import static com.kdkvit.wherewasi.LocationsActivity.locations;
+import static com.kdkvit.wherewasi.fragments.ActivityFragment.locations;
 
 public class MapsFragment extends Fragment {
 

@@ -1,31 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
-        <item android:id="@+id/item_attachemnt"
+        <item android:id="@+id/home_tab"
             android:checked="true"
-            android:title="Attachment"
-            android:icon="@drawable/ic_baseline_menu"
+            android:title="@string/home"
+            android:icon="@drawable/ic_baseline_home_24"
             />
-        <item android:id="@+id/item_attachemnt2"
-            android:title="Attachment2"
-            android:icon="@drawable/ic_baseline_menu"
+        <item android:id="@+id/activity_Tab"
+            android:title="@string/activity"
+            android:icon="@drawable/ic_baseline_alt_route_24"
             />
-        <item android:id="@+id/item_attachemnt3"
-            android:title="Attachment3"
-            android:icon="@drawable/ic_baseline_menu"
-            />
+
     </group>
-    <item android:id="@+id/submenu"
-        android:title="Sub menu"
-        android:icon="@drawable/ic_baseline_menu"
-        >
-        <menu>
-            <item android:title="item 1"
+<!--    <item android:id="@+id/submenu"-->
+<!--        android:title="Sub menu"-->
+<!--        android:icon="@drawable/ic_baseline_menu"-->
+<!--        >-->
+<!--        <menu>-->
+<!--            <item android:title="item 1"-->
 
-                />
-            <item android:title="item 2"
+<!--                />-->
+<!--            <item android:title="item 2"-->
 
-                />
-        </menu>
-    </item>
+<!--                />-->
+<!--        </menu>-->
+<!--    </item>-->
 </menu>

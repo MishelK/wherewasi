@@ -14,4 +14,6 @@
     <string name="hello_name">Hello, </string>
     <string name="daily_summary">Daily Summary</string>
     <string name="fourteen_days_summary">14 Days Summary</string>
+    <string name="activity">Activity</string>
+    <string name="home">Home</string>
 </resources>
