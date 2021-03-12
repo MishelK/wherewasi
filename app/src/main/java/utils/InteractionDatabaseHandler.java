@@ -11,8 +11,12 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import enums.InteractionsColumn;
@@ -35,8 +39,8 @@ public class InteractionDatabaseHandler extends SQLiteOpenHelper {
         String CREATE_INTERACTIONS_TABLE = "CREATE TABLE " + TABLE_INTERACTIONS + "("
                 + InteractionsColumn.INTERACTION_ID.toString() + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + InteractionsColumn.DEVICE_ID.toString() + " TEXT,"
-                + InteractionsColumn.FIRST_SEEN.toString() + " TEXT,"
-                + InteractionsColumn.LAST_SEEN.toString() + " TEXT "
+                + InteractionsColumn.FIRST_SEEN.toString() + " INTEGER,"
+                + InteractionsColumn.LAST_SEEN.toString() + " INTEGER "
                 + ")";
         db.execSQL(CREATE_INTERACTIONS_TABLE);
     }
@@ -52,8 +56,8 @@ public class InteractionDatabaseHandler extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(InteractionsColumn.DEVICE_ID.toString(), interaction.getUuid());
-        values.put(InteractionsColumn.FIRST_SEEN.toString(), interaction.getFirstSeen().toString());
-        values.put(InteractionsColumn.LAST_SEEN.toString(), interaction.getLastSeen().toString());
+        values.put(InteractionsColumn.FIRST_SEEN.toString(), interaction.getFirstSeen());
+        values.put(InteractionsColumn.LAST_SEEN.toString(), interaction.getLastSeen());
 
         db.insert(TABLE_INTERACTIONS, null, values);
         db.close();
@@ -73,8 +77,55 @@ public class InteractionDatabaseHandler extends SQLiteOpenHelper {
                 Interaction interaction = new Interaction();
                 interaction.setInteractionID(result.getInt(0));
                 interaction.setUuid(result.getString(1));
-                interaction.setFirstSeen(Long.parseLong(result.getString(2)));
-                interaction.setLastSeen(Long.parseLong(result.getString(3)));
+                interaction.setFirstSeen(result.getLong(2));
+                interaction.setLastSeen(result.getLong(3));
+
+                interactions.add(interaction);
+            }
+        }
+        return interactions;
+    }
+
+    public List<Interaction> getInteractionsOnDay(long timeInMillis) { // Returns all interactions that occurred on the day of given timestamp
+        List<Interaction> interactions = new ArrayList<>();
+
+        Long dayStart = timeInMillis - timeInMillis % 86400000; // the remainder of the modulus will be time of day (time since day started)
+        Long dayEnd = dayStart + 86400000;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString()
+                + " < ?", new String[]{dayStart.toString(), dayEnd.toString()}); // Gets all interactions between dates from table
+
+        if(result.getCount() > 0) { // Checking if there are any interactions returned from the database
+            while (result.moveToNext()) { // will be false when we ran out of unchecked results
+
+                Interaction interaction = new Interaction();
+                interaction.setInteractionID(result.getInt(0));
+                interaction.setUuid(result.getString(1));
+                interaction.setFirstSeen(result.getLong(2));
+                interaction.setLastSeen(result.getLong(3));
+
+                interactions.add(interaction);
+            }
+        }
+        return interactions;
+    }
+
+    public List<Interaction> getInteractionsBetweenDates(Long from, Long to) { // Returns all interactions that occurred between given timestamps
+        List<Interaction> interactions = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.LAST_SEEN.toString() + " < ?"
+                , new String[]{from.toString(), to.toString()});
+
+        if(result.getCount() > 0) { // Checking if there are any interactions returned from the database
+            while (result.moveToNext()) { // will be false when we ran out of unchecked results
+
+                Interaction interaction = new Interaction();
+                interaction.setInteractionID(result.getInt(0));
+                interaction.setUuid(result.getString(1));
+                interaction.setFirstSeen(result.getLong(2));
+                interaction.setLastSeen(result.getLong(3));
 
                 interactions.add(interaction);
             }

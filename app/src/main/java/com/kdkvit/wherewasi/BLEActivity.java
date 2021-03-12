@@ -45,6 +45,19 @@ public class BLEActivity extends AppCompatActivity {
             //Need to add request to enable location in case it is not enabled
         }
 
+        // Testing filters
+        InteractionDatabaseHandler db = new InteractionDatabaseHandler(this);
+        List<Interaction> interactions = db.getAllInteractions();
+        Log.i("BLE", "all interactions: " + interactions.toString());
+
+        List<Interaction> interactionsToday = db.getInteractionsOnDay(System.currentTimeMillis());
+        Log.i("BLE", "todays interactions: " + interactionsToday.toString());
+
+        String from = "1615468155000";
+        List<Interaction> interactionsBetweenDates = db.getInteractionsBetweenDates(Long.parseLong(from) ,System.currentTimeMillis());
+        Log.i("BLE", "interactions between dates: " + interactionsToday.toString());
+        // End of testing
+
         Button btnScan = findViewById(R.id.btnScan);
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
