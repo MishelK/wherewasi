@@ -115,7 +115,7 @@ public class InteractionDatabaseHandler extends SQLiteOpenHelper {
         List<Interaction> interactions = new ArrayList<>();
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.LAST_SEEN.toString() + " < ?"
+        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString() + " < ?"
                 , new String[]{from.toString(), to.toString()});
 
         if(result.getCount() > 0) { // Checking if there are any interactions returned from the database
