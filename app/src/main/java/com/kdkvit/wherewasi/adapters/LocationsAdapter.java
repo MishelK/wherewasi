@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kdkvit.wherewasi.R;
 
+import models.LocationsGroup;
 import models.MyLocation;
 
 import static com.kdkvit.wherewasi.fragments.ActivityFragment.locations;
@@ -44,8 +46,8 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
 
             timeTV = itemView.findViewById(R.id.location_time_tv);
             addressTv = itemView.findViewById(R.id.location_address_tv);
-            Button btn = (Button)itemView.findViewById(R.id.show_in_map_btn);
-            btn.setOnClickListener(new View.OnClickListener() {
+            ImageButton btn = (ImageButton)itemView.findViewById(R.id.show_in_map_btn);
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if(listener!=null){
@@ -53,6 +55,7 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
                     }
                 }
             });
+
 
         }
 
@@ -67,7 +70,7 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
 
     @Override
     public void onBindViewHolder(@NonNull LocationViewHolder holder, int position) {
-        MyLocation location = locations.get(position);
+        LocationsGroup location = locations.get(position);
         String startTime = new SimpleDateFormat("HH:mm DD-MM").format(location.getStartTime());
 
         if(position == 0) {
@@ -78,7 +81,7 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
             holder.timeTV.setText(String.format("%s %s - %s", holder.itemView.getResources().getString(R.string.time), startTime,endTime));
         }
         //holder.coordinatesTV.setText(String.format("%s %s,%s", holder.itemView.getResources().getString(R.string.coordinates), df2.format(location.getLatitude()), df2.format(location.getLongitude())));
-        holder.addressTv.setText(String.format("%s %s",holder.itemView.getResources().getString(R.string.address),location.getAddressLine()));
+        holder.addressTv.setText(String.format("%s %s",holder.itemView.getResources().getString(R.string.locations),location.size()));
     }
 
     @Override

@@ -7,11 +7,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import enums.LocationColumn;
+import models.LocationsGroup;
 import models.MyLocation;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.kdkvit.wherewasi.utils.General.getLocationsGroup;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
@@ -21,7 +24,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public enum SORTING_PARAM{
         LastUpdated( " order by " + LocationColumn.UPDATED_TIME.toString() + " desc"),
-        firstUpdate( " order by " + LocationColumn.UPDATED_TIME.toString() + " asc");
+        firstUpdate( " order by " + LocationColumn.UPDATED_TIME.toString() + " asc"),
+        firstStart(" order by " + LocationColumn.START_TIME.toString() + " asc");
 
         private String sorting;
         SORTING_PARAM(String s) {
@@ -110,7 +114,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //    }
 
     // code to get all notes in a list view
-    public List<MyLocation> getAllLocations(SORTING_PARAM sorting) {
+    public List<LocationsGroup> getAllLocations(SORTING_PARAM sorting) {
         List<MyLocation> locations = new ArrayList<>();
         // Select All Query
         String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s ",
@@ -164,8 +168,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         db.close();
-        // return notes list
-        return locations;
+
+        // return locations group list
+        return getLocationsGroup(locations);
     }
 
 //    public boolean removeNotes(List<Integer> selectedNotes) {

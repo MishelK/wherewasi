@@ -17,16 +17,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.tabs.TabLayout;
+import com.kdkvit.wherewasi.MapActivity;
 import com.kdkvit.wherewasi.R;
 import com.kdkvit.wherewasi.adapters.LocationsTabsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import models.LocationsGroup;
 import models.MyLocation;
 import utils.DatabaseHandler;
 
 import static com.kdkvit.wherewasi.services.LocationService.BROADCAST_CHANNEL;
+import static com.kdkvit.wherewasi.utils.General.checkIfLocationInGroup;
 
 
 public class ActivityFragment extends Fragment {
@@ -42,7 +45,7 @@ public class ActivityFragment extends Fragment {
 
     MapsFragment mapsFragment = new MapsFragment();
 
-    public static List<MyLocation> locations = new ArrayList<>();
+    public static List<LocationsGroup> locations = new ArrayList<>();
 
     boolean dbInit = false;
     Handler handler;
@@ -93,7 +96,7 @@ public class ActivityFragment extends Fragment {
             @Override
             public void run() {
                 super.run();
-                locations = db.getAllLocations(DatabaseHandler.SORTING_PARAM.LastUpdated);
+                locations = db.getAllLocations(DatabaseHandler.SORTING_PARAM.firstStart);
 
                 dbInit = true;
                 handler.post(()-> {
@@ -105,8 +108,11 @@ public class ActivityFragment extends Fragment {
     }
 
     private void onTLLocationClick(int position) {
-        tabLayout.getTabAt(1).select();
-        mapsFragment.focus(locations.get(position),false);
+//        tabLayout.getTabAt(1).select();
+//        mapsFragment.focus(locations.get(position).getLocations().get(0),false);
+        Intent intent = new Intent(rootView.getContext(), MapActivity.class);
+        intent.putExtra("locations_group",position);
+        startActivity(intent);
     }
 
     private void initReceiver() {
@@ -120,7 +126,10 @@ public class ActivityFragment extends Fragment {
                         case "new_location":
                             if(dbInit){
                                 MyLocation location = (MyLocation) intent.getSerializableExtra("location");
-                                locations.add(0,location);
+                                if(locations.size() == 0 || !checkIfLocationInGroup(locations.get(0),location)) {
+                                    locations.add(0,new LocationsGroup());
+                                }
+                                locations.get(0).add(location);
                                 timeLineFragment.updateTimeLineAdapter();
                                 mapsFragment.setMapPointers();
                             }
@@ -128,8 +137,8 @@ public class ActivityFragment extends Fragment {
                             if(dbInit) {
                                 MyLocation location = (MyLocation)intent.getSerializableExtra("location");
                                 Log.i("changed","location");
-                                locations.remove(0);
-                                locations.add(0,location);
+                                locations.get(0).getLocations().remove(0);
+                                locations.get(0).getLocations().add(0,location);
                                 timeLineFragment.updateTimeLineAdapter();
                                 mapsFragment.setMapPointers();
                             }
