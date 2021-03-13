@@ -17,4 +17,5 @@
     <string name="activity">Activity</string>
     <string name="home">Home</string>
     <string name="interactions">Interactions: </string>
+    <string name="locations">"Locations: "</string>
 </resources>

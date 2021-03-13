@@ -28,6 +28,7 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+import models.LocationsGroup;
 import models.MyLocation;
 
 import static com.kdkvit.wherewasi.fragments.ActivityFragment.locations;
@@ -123,14 +124,15 @@ public class MapsFragment extends Fragment {
 
             initCluster();
             if (locations.size() > 0) {
-                focus(locations.get(0),true);
+                focus(locations.get(0).getLastLocation(),true);
             }
         }
     }
 
     private void initCluster() {
         mClusterManager.clearItems();
-        mClusterManager.addItems(locations);
+        for(LocationsGroup group:locations)
+        mClusterManager.addItems(group.getLocations());
         mClusterManager.cluster();
     }
 
