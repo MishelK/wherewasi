@@ -1,8 +1,16 @@
 package com.kdkvit.wherewasi;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -11,8 +19,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.ui.IconGenerator;
 
 import models.LocationsGroup;
 import models.MyLocation;
@@ -78,9 +90,29 @@ public class MapActivity extends AppCompatActivity {
             googleMap.clear();
 
             if (group.size() > 0) {
+                PolylineOptions polylineOptions = new PolylineOptions();
+                googleMap.addMarker(new MarkerOptions().position(group.getLastLocation().getLatLng()).title(group.getLastLocation().getAddressLine()));
+                MyLocation firstLocation = null;
+
                 for(MyLocation location : group.getLocations()){
-                    googleMap.addMarker(new MarkerOptions().position(location.getLatLng()).title(location.getAddressLine()));
+                    polylineOptions.add(location.getLatLng());
+                    firstLocation = location;
+                    CircleOptions circleOptions = new CircleOptions()
+                            .center(location.getLatLng())
+                            .radius(0.2) // radius in meters
+                            .fillColor(Color.BLACK); //this is a half transparent blue, change "88" for the transparency
+                    googleMap.addCircle(circleOptions);
                 }
+                if(firstLocation !=null) {
+                    IconGenerator iconGenerator = new IconGenerator(this);
+                    iconGenerator.setBackground(this.getDrawable(R.drawable.map_dot));
+
+                    googleMap.addMarker(new MarkerOptions().position(firstLocation.getLatLng()).title(firstLocation.getAddressLine()));
+                }
+                polylineOptions.color(Color.BLACK);
+                polylineOptions.width(5);
+                polylineOptions.geodesic(true);
+                googleMap.addPolyline(polylineOptions);
                 focus(group.getLastLocation());
             }
         }
@@ -88,7 +120,8 @@ public class MapActivity extends AppCompatActivity {
 
     public void focus(MyLocation myLocation) {
         LatLng mapPoint = new LatLng(myLocation.getLatitude(),myLocation.getLongitude());
-        float zoom = 20.0f;
+        float zoom = 15.0f;
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapPoint,zoom));
     }
+
 }
