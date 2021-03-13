@@ -51,9 +51,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + LocationColumn.ADMIN_AREA.toString() + " TEXT,"
                 + LocationColumn.FEATURE_NAME.toString() + " TEXT,"
                 + LocationColumn.SUB_AREA_NAME.toString() + " TEXT,"
-                + LocationColumn.START_TIME.toString() + " DATETIME DEFAULT CURRENT_TIMESTAMP ,"
-                + LocationColumn.END_TIME.toString() + " DATETIME DEFAULT CURRENT_TIMESTAMP ,"
-                + LocationColumn.UPDATED_TIME.toString() + " DATETIME DEFAULT CURRENT_TIMESTAMP ,"
+                + LocationColumn.START_TIME.toString() + " INTEGER ,"
+                + LocationColumn.END_TIME.toString() + " INTEGER ,"
+                + LocationColumn.UPDATED_TIME.toString() + " INTEGER ,"
                 + LocationColumn.ACCURACY.toString() + " FLOAT "
                 + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
@@ -187,6 +187,196 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //        db.close();
 //        return false;
 //    }
+
+    public List<MyLocation> getLocationsOnDay(SORTING_PARAM sorting, Long time) {
+        List<MyLocation> locations = new ArrayList<>();
+
+        Long dayStart = time - time % 86400000; // the remainder of the modulus will be time of day (time since day started)
+        Long dayEnd = dayStart + 86400000;
+
+        // Select All Query
+        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s WHERE %s > %s AND %s < %s",
+                LocationColumn.LATITUDE.toString(),
+                LocationColumn.LONGITUDE.toString(),
+                LocationColumn.PROVIDER.toString(),
+                LocationColumn.UPDATED_TIME.toString(),
+                LocationColumn.ADDRESS_LINE.toString(),
+                LocationColumn.COUNTRY_CODE.toString(),
+                LocationColumn.ADMIN_AREA.toString(),
+                LocationColumn.FEATURE_NAME.toString(),
+                LocationColumn.SUB_AREA_NAME.toString(),
+                LocationColumn.START_TIME.toString(),
+                LocationColumn.END_TIME.toString(),
+                LocationColumn.ACCURACY.toString(),
+                TABLE_LOCATIONS,
+                LocationColumn.START_TIME.toString(),
+                dayStart.toString(),
+                LocationColumn.START_TIME.toString(),
+                dayEnd.toString());
+
+        if(sorting != null) {
+            selectQuery += sorting.getSorting();
+        }
+
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                double lat = cursor.getDouble(0);
+                double lon = cursor.getDouble(1);
+                String provider = cursor.getString(2);
+                long temp = cursor.getLong(3);
+                Date lastUpdated = new Date(temp);
+
+                MyLocation location = new MyLocation(lat,lon,provider,lastUpdated);
+
+                location.setAddressLine(cursor.getString(4));
+                location.setCountryCode(cursor.getString(5));
+                location.setAdminArea(cursor.getString(6));
+                location.setFeatureName(cursor.getString(7));
+                location.setSubAdminArea(cursor.getString(8));
+
+                temp = cursor.getLong(9);
+                location.setStartTime(new Date(temp));
+
+                temp = cursor.getLong(10);
+                location.setEndTime(new Date(temp));
+                location.setAccuracy(cursor.getFloat(11));
+
+                locations.add(location);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        // return notes list
+        return locations;
+    }
+
+    public List<MyLocation> getLocationsBetweenDates(SORTING_PARAM sorting, Long from, Long to) {
+        List<MyLocation> locations = new ArrayList<>();
+
+        // Select All Query
+        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s WHERE %s > %s AND %s < %s",
+                LocationColumn.LATITUDE.toString(),
+                LocationColumn.LONGITUDE.toString(),
+                LocationColumn.PROVIDER.toString(),
+                LocationColumn.UPDATED_TIME.toString(),
+                LocationColumn.ADDRESS_LINE.toString(),
+                LocationColumn.COUNTRY_CODE.toString(),
+                LocationColumn.ADMIN_AREA.toString(),
+                LocationColumn.FEATURE_NAME.toString(),
+                LocationColumn.SUB_AREA_NAME.toString(),
+                LocationColumn.START_TIME.toString(),
+                LocationColumn.END_TIME.toString(),
+                LocationColumn.ACCURACY.toString(),
+                TABLE_LOCATIONS,
+                LocationColumn.START_TIME.toString(),
+                from.toString(),
+                LocationColumn.START_TIME.toString(),
+                to.toString());
+
+        if(sorting != null) {
+            selectQuery += sorting.getSorting();
+        }
+
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                double lat = cursor.getDouble(0);
+                double lon = cursor.getDouble(1);
+                String provider = cursor.getString(2);
+                long temp = cursor.getLong(3);
+                Date lastUpdated = new Date(temp);
+
+                MyLocation location = new MyLocation(lat,lon,provider,lastUpdated);
+
+                location.setAddressLine(cursor.getString(4));
+                location.setCountryCode(cursor.getString(5));
+                location.setAdminArea(cursor.getString(6));
+                location.setFeatureName(cursor.getString(7));
+                location.setSubAdminArea(cursor.getString(8));
+
+                temp = cursor.getLong(9);
+                location.setStartTime(new Date(temp));
+
+                temp = cursor.getLong(10);
+                location.setEndTime(new Date(temp));
+                location.setAccuracy(cursor.getFloat(11));
+
+                locations.add(location);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        // return notes list
+        return locations;
+    }
+
+    public List<MyLocation> getLocationsByMinDuration(SORTING_PARAM sorting, Long duration) {
+        List<MyLocation> locations = new ArrayList<>();
+        // Select All Query
+        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s WHERE (%s - %s) > %s",
+                LocationColumn.LATITUDE.toString(),
+                LocationColumn.LONGITUDE.toString(),
+                LocationColumn.PROVIDER.toString(),
+                LocationColumn.UPDATED_TIME.toString(),
+                LocationColumn.ADDRESS_LINE.toString(),
+                LocationColumn.COUNTRY_CODE.toString(),
+                LocationColumn.ADMIN_AREA.toString(),
+                LocationColumn.FEATURE_NAME.toString(),
+                LocationColumn.SUB_AREA_NAME.toString(),
+                LocationColumn.START_TIME.toString(),
+                LocationColumn.END_TIME.toString(),
+                LocationColumn.ACCURACY.toString(),
+                TABLE_LOCATIONS,
+                LocationColumn.END_TIME.toString(),
+                LocationColumn.START_TIME.toString(),
+                duration.toString());
+
+        if(sorting != null) {
+            selectQuery += sorting.getSorting();
+        }
+
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                double lat = cursor.getDouble(0);
+                double lon = cursor.getDouble(1);
+                String provider = cursor.getString(2);
+                long temp = cursor.getLong(3);
+                Date lastUpdated = new Date(temp);
+
+                MyLocation location = new MyLocation(lat,lon,provider,lastUpdated);
+
+                location.setAddressLine(cursor.getString(4));
+                location.setCountryCode(cursor.getString(5));
+                location.setAdminArea(cursor.getString(6));
+                location.setFeatureName(cursor.getString(7));
+                location.setSubAdminArea(cursor.getString(8));
+
+                temp = cursor.getLong(9);
+                location.setStartTime(new Date(temp));
+
+                temp = cursor.getLong(10);
+                location.setEndTime(new Date(temp));
+                location.setAccuracy(cursor.getFloat(11));
+
+                locations.add(location);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        // return notes list
+        return locations;
+    }
 
     public int updateLocation(MyLocation location) {
         SQLiteDatabase db = this.getWritableDatabase();
