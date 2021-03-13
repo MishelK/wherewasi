@@ -2,6 +2,8 @@ package models;
 
 import androidx.annotation.NonNull;
 
+import java.util.Date;
+
 public class Interaction {
 
     private String uuid;
@@ -48,7 +50,7 @@ public class Interaction {
     @NonNull
     @Override
     public String toString() {
-        String string = " UUID : " + this.uuid;
+        String string = "ID : " + this.interactionID + " FirstSeen : " + new Date(this.getFirstSeen()).toString();
         return string;
     }
 }
