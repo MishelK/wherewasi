@@ -125,9 +125,9 @@ public class LocationService extends Service {
             return;
         }
 
-        mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5*60*1000, 0, (LocationListener) listener);
+        mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5*60*1000, 10, (LocationListener) listener);
         if(mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5*60*1000, 0, (LocationListener) listener);
+            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5*60*1000, 10, (LocationListener) listener);
         }else{
             //Toast.makeText(this, "Failed to use gps...", Toast.LENGTH_SHORT).show();
         }
