@@ -10,7 +10,7 @@ import models.MyLocation;
 
 public class General {
 
-    private static final int TIME_BETWEEN_NEW_LOCATIONS = 1000 * 60 * 5;
+    private static final int TIME_BETWEEN_NEW_LOCATIONS = 1000 * 60 * 15;
 
     public static List<LocationsGroup> getLocationsGroup(List<MyLocation> locations) {
         List<LocationsGroup> groups = new ArrayList<>();

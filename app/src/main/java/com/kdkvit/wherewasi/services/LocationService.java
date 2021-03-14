@@ -37,7 +37,7 @@ import utils.DatabaseHandler;
 
 public class LocationService extends Service {
     public static final String BROADCAST_CHANNEL = "WhereWasI Broadcast";
-    private static final int SIGNIFICANT_TIME = 1000 * 60 * 15;
+    private static final int SIGNIFICANT_TIME = 1000 * 60 * 30;
     private static final String CHANNEL_NAME = "WhereWasSI Channel";
     private static final int TIME_CHECK_ACTIVE = 11 * 1000* 60;
     public LocationManager mlocManager;
@@ -172,24 +172,18 @@ public class LocationService extends Service {
         // Check whether the new location fix is newer or older
         long timeDelta = location.getEndTime().getTime() - currentBestLocation.getEndTime().getTime();
         boolean isSignificantlyNewer = timeDelta > SIGNIFICANT_TIME;
-        boolean isSignificantlyOlder = timeDelta < -SIGNIFICANT_TIME;
-        boolean isNewer = timeDelta > 0;
+        //boolean isSignificantlyOlder = timeDelta < -SIGNIFICANT_TIME;
+        //boolean isNewer = timeDelta > 0;
 
         // If it's been more than two minutes since the current location, use the new location
         // because the user has likely moved
         if (isSignificantlyNewer) {
             return true;
             // If the new location is more than two minutes older, it must be worse
-        } else if (isSignificantlyOlder) {
-            return false;
         }
 
         double diffInKM = Math.abs(getDistanceFromLatLonInKm(location.getLatitude(),location.getLongitude(),currentBestLocation.getLatitude(),currentBestLocation.getLongitude()));
-        if(diffInKM > 0.15){
-            return true;
-        }
-
-        return false;
+        return diffInKM > 0.10;
     }
 
     public double getDistanceFromLatLonInKm(double lat1,double lon1,double lat2,double lon2) {
@@ -249,7 +243,7 @@ public class LocationService extends Service {
             Date now = new Date();
             MyLocation location = new MyLocation(loc.getLatitude(), loc.getLongitude(),loc.getProvider(),now,now,loc.getAccuracy());
             if (isBetterLocation(location, previousBestLocation)) { //Check if better location; if it is writing new line if not updating current one
-                previousBestLocation=location;
+                previousBestLocation = location;
                 sendLocationEvent(location);
             }else{
 
@@ -258,8 +252,8 @@ public class LocationService extends Service {
                 boolean isMoreAccurate = accuracyDelta > 0;
 
                 // Check if the old and new location are from the same provider
-                boolean isFromSameProvider = isSameProvider(location.getProvider(),
-                        previousBestLocation.getProvider());
+//                boolean isFromSameProvider = isSameProvider(location.getProvider(),
+//                        previousBestLocation.getProvider());
 
                 //Determine location quality using a combination of timeliness and accuracy
                 if (isMoreAccurate) {
