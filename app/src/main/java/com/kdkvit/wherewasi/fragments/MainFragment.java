@@ -16,14 +16,35 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.anychart.AnyChart;
+import com.anychart.AnyChartView;
+import com.anychart.chart.common.dataentry.DataEntry;
+import com.anychart.chart.common.dataentry.ValueDataEntry;
+import com.anychart.charts.Cartesian;
+import com.anychart.core.cartesian.series.Column;
+import com.anychart.enums.Anchor;
+import com.anychart.enums.HoverMode;
+import com.anychart.enums.Position;
+import com.anychart.enums.TooltipPositionMode;
+import com.anychart.graphics.vector.Fill;
 import com.google.android.material.navigation.NavigationView;
 import com.kdkvit.wherewasi.R;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import utils.InteractionDatabaseHandler;
 
 import static com.kdkvit.wherewasi.MainActivity.user;
 
 public class MainFragment extends Fragment {
 
+    public static final long MILLIS_IN_DAY = 86400000;
+
     private View rootView;
+    private AnyChartView anyChartView;
 
     public MainFragment() {
         // Required empty public constructor
@@ -43,8 +64,55 @@ public class MainFragment extends Fragment {
         TextView nameTV = rootView.findViewById(R.id.name_tv);
         nameTV.setText(getResources().getString(R.string.hello_name)+user.getName());
 
+        initSummaryChart();
+
         return rootView;
     }
 
+    public void initSummaryChart() {
+
+        anyChartView = rootView.findViewById(R.id.chart_view);
+        Cartesian cartesian = AnyChart.column();
+
+        List<DataEntry> data = new ArrayList<>();
+        InteractionDatabaseHandler db = new InteractionDatabaseHandler(getContext());
+        // Getting interactions from db and adding to arrayList
+        for (int i = 6; i>=0; i--){
+            long currentTime = System.currentTimeMillis();
+            long dateInMillis = currentTime - (i * MILLIS_IN_DAY);
+            int num = db.getNumOfInteractionsOnDay(dateInMillis);
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(dateInMillis);
+
+            data.add(new ValueDataEntry(calendar.get(Calendar.DAY_OF_MONTH)+"/"+calendar.get(Calendar.MONTH), num));
+        }
+
+        Column column = cartesian.column(data);
+        column.tooltip()
+                .titleFormat("{%X}")
+                .position(Position.CENTER_BOTTOM)
+                .anchor(Anchor.CENTER_BOTTOM)
+                .offsetX(0d)
+                .offsetY(5d)
+                .format("Interactions: {%Value}{groupsSeparator: }");
+        column.color("#f95700");
+
+        cartesian.animation(true);
+        cartesian.title("Interactions last 7 days");
+
+        cartesian.yScale().minimum(0d);
+        cartesian.yAxis(0).labels().format("{%Value}{numDecimals:0}");
+
+
+        cartesian.tooltip().positionMode(TooltipPositionMode.POINT);
+        cartesian.interactivity().hoverMode(HoverMode.BY_X);
+
+        cartesian.xAxis(0).title("Date");
+        cartesian.yAxis(0).title("Interactions");
+
+        anyChartView.setChart(cartesian);
+
+    }
 
 }
