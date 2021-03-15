@@ -2,25 +2,15 @@ package utils;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.view.View;
-import android.widget.RelativeLayout;
 
-import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import enums.InteractionsColumn;
-import enums.LocationColumn;
 import models.Interaction;
 
 public class InteractionDatabaseHandler extends SQLiteOpenHelper {

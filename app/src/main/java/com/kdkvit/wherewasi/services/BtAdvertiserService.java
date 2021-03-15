@@ -15,13 +15,15 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
+
 import java.util.UUID;
+
+import models.User;
 
 public class BtAdvertiserService extends Service {
 
-    private static final String serviceUUID = "00001810-0000-1000-8000-a0805f9b34fb";
     private static final String SERVICE_IDENTIFIER = "wwi";
-    private static final String SP_UUID = "wwi_device_uuid";
 
     private BluetoothLeAdvertiser bluetoothLeAdvertiser;
 
@@ -94,8 +96,6 @@ public class BtAdvertiserService extends Service {
                 AdvertiseData dataUUID = new AdvertiseData.Builder()
                         .setIncludeDeviceName(false)
                         .setIncludeTxPowerLevel(false)
-                        //.addManufacturerData(1,"00001810-0000-1000-80000".getBytes())
-                        //.addServiceUuid(new ParcelUuid(UUID.fromString(serviceUUID)))
                         .addServiceData(new ParcelUuid(getDeviceUUID()) , SERVICE_IDENTIFIER.getBytes())
                         .build();
 
@@ -110,25 +110,19 @@ public class BtAdvertiserService extends Service {
         Log.i("BLE","Advertising Stopped");
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(bluetoothAdapter != null){
-            bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
-            bluetoothLeAdvertiser.stopAdvertising(advertiseCallback);
+            try {
+                bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
+                bluetoothLeAdvertiser.stopAdvertising(advertiseCallback);
+            }catch (Exception e) {
+
+            }
         }
     }
 
     // Returns device's UUID or generates one if there is no UUID stored
     private UUID getDeviceUUID() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String uuid_string = preferences.getString(SP_UUID, null);
-
-        if(uuid_string != null) // Case uuid was already generated before, return it
-            return UUID.fromString(uuid_string);
-
-        // Generating new random UUID and saving it to SP
-        UUID uuid = UUID.randomUUID();
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(SP_UUID, uuid.toString());
-        editor.apply();
-        return  uuid;
+        User user = SharedPreferencesUtils.getUser(this);
+        return UUID.fromString(user.getDeviceId());
     }
 
 }

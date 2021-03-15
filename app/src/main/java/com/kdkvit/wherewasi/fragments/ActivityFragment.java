@@ -43,7 +43,7 @@ public class ActivityFragment extends Fragment {
         }
     });
 
-    MapsFragment mapsFragment = new MapsFragment();
+    //MapsFragment mapsFragment = new MapsFragment();
 
     public static List<LocationsGroup> locations = new ArrayList<>();
 
@@ -79,7 +79,7 @@ public class ActivityFragment extends Fragment {
         tabLayout = (TabLayout) rootView.findViewById(R.id.locations_tab_layout);
 
         locationsTabsAdapter.addFragment(timeLineFragment,"TimeLine");
-        locationsTabsAdapter.addFragment(mapsFragment,"Map");
+        //locationsTabsAdapter.addFragment(mapsFragment,"Map");
 
         viewPager.setAdapter(locationsTabsAdapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -101,7 +101,7 @@ public class ActivityFragment extends Fragment {
                 dbInit = true;
                 handler.post(()-> {
                     timeLineFragment.updateTimeLineAdapter();
-                    mapsFragment.setMapPointers();
+                    //mapsFragment.setMapPointers();
                 });
             }
         }.start();
@@ -129,9 +129,9 @@ public class ActivityFragment extends Fragment {
                                 if(locations.size() == 0 || !checkIfLocationInGroup(locations.get(0),location)) {
                                     locations.add(0,new LocationsGroup());
                                 }
-                                locations.get(0).add(location);
+                                locations.get(0).addLocation(location);
                                 timeLineFragment.updateTimeLineAdapter();
-                                mapsFragment.setMapPointers();
+                                //mapsFragment.setMapPointers();
                             }
                         case "location_changed":
                             if(dbInit) {
@@ -140,7 +140,7 @@ public class ActivityFragment extends Fragment {
                                 locations.get(0).getLocations().remove(0);
                                 locations.get(0).getLocations().add(0,location);
                                 timeLineFragment.updateTimeLineAdapter();
-                                mapsFragment.setMapPointers();
+                                //mapsFragment.setMapPointers();
                             }
                             break;
                         case "close":

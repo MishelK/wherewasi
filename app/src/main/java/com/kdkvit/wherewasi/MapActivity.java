@@ -1,16 +1,9 @@
 package com.kdkvit.wherewasi;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.VectorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -22,7 +15,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.ui.IconGenerator;
 
@@ -89,7 +81,7 @@ public class MapActivity extends AppCompatActivity {
         if (googleMap != null) {
             googleMap.clear();
 
-            if (group.size() > 0) {
+            if (group.locationsSize() > 0) {
                 PolylineOptions polylineOptions = new PolylineOptions();
                 googleMap.addMarker(new MarkerOptions().position(group.getLastLocation().getLatLng()).title(group.getLastLocation().getAddressLine()));
                 MyLocation firstLocation = null;

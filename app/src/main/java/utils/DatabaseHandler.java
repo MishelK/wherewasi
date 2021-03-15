@@ -5,8 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import enums.InteractionsColumn;
 import enums.LocationColumn;
+import models.Interaction;
 import models.LocationsGroup;
 import models.MyLocation;
 
@@ -20,6 +23,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "wherewasi.db";
     private static final String TABLE_LOCATIONS = "locations";
+    private static final String TABLE_INTERACTIONS = "interactions";
+
 
 
     public enum SORTING_PARAM{
@@ -61,6 +66,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + LocationColumn.ACCURACY.toString() + " FLOAT "
                 + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
+
+        String CREATE_INTERACTIONS_TABLE = "CREATE TABLE " + TABLE_INTERACTIONS + "("
+                + InteractionsColumn.INTERACTION_ID.toString() + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + InteractionsColumn.DEVICE_ID.toString() + " TEXT,"
+                + InteractionsColumn.FIRST_SEEN.toString() + " INTEGER,"
+                + InteractionsColumn.LAST_SEEN.toString() + " INTEGER "
+                + ")";
+        db.execSQL(CREATE_INTERACTIONS_TABLE);
     }
 
     // Upgrading database
@@ -68,6 +81,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOCATIONS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_INTERACTIONS);
 
         // Create tables again
         onCreate(db);
@@ -115,6 +129,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // code to get all notes in a list view
     public List<LocationsGroup> getAllLocations(SORTING_PARAM sorting) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        List<MyLocation> locations = getLocations(db,sorting);
+        List<Interaction> interactions = getAllInteractions(db);
+        db.close();
+        // return locations group list
+        return getLocationsGroup(locations,interactions);
+    }
+
+    private List<MyLocation> getLocations(SQLiteDatabase db,SORTING_PARAM sorting){
         List<MyLocation> locations = new ArrayList<>();
         // Select All Query
         String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s ",
@@ -137,7 +160,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
 
-        SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
@@ -167,10 +189,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 locations.add(location);
             } while (cursor.moveToNext());
         }
-        db.close();
-
-        // return locations group list
-        return getLocationsGroup(locations);
+        return locations;
     }
 
 //    public boolean removeNotes(List<Integer> selectedNotes) {
@@ -400,6 +419,100 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return success;
     }
 
+
+
+    public long addInteraction(Interaction interaction) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(InteractionsColumn.DEVICE_ID.toString(), interaction.getUuid());
+        values.put(InteractionsColumn.FIRST_SEEN.toString(), interaction.getFirstSeen());
+        values.put(InteractionsColumn.LAST_SEEN.toString(), interaction.getLastSeen());
+
+        long id = db.insert(TABLE_INTERACTIONS, null, values);
+        db.close();
+
+        return id;
+    }
+
+    public void updateInteraction(Interaction interaction) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(InteractionsColumn.LAST_SEEN.toString(), interaction.getLastSeen());
+        // updating row
+        int success = db.update(TABLE_LOCATIONS, values, LocationColumn.ID.toString() + " = ?",
+                new String[] { String.valueOf(interaction.getInteractionID()) });
+        db.close();
+    }
+
+
+    private List<Interaction> getAllInteractions(SQLiteDatabase db) {
+        List<Interaction> interactions = new ArrayList<>();
+
+        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS, null); // Gets all interactions from table
+
+        if(result.getCount() > 0) { // Checking if there are any interactions returned from the database
+            while (result.moveToNext()) { // will be false when we ran out of unchecked results
+
+                Interaction interaction = new Interaction();
+                interaction.setInteractionID(result.getInt(0));
+                interaction.setUuid(result.getString(1));
+                interaction.setFirstSeen(result.getLong(2));
+                interaction.setLastSeen(result.getLong(3));
+
+                interactions.add(interaction);
+            }
+        }
+        return interactions;
+    }
+
+    public List<Interaction> getInteractionsOnDay(long timeInMillis) { // Returns all interactions that occurred on the day of given timestamp
+        List<Interaction> interactions = new ArrayList<>();
+
+        Long dayStart = timeInMillis - timeInMillis % 86400000; // the remainder of the modulus will be time of day (time since day started)
+        Long dayEnd = dayStart + 86400000;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString()
+                + " < ?", new String[]{dayStart.toString(), dayEnd.toString()}); // Gets all interactions between dates from table
+
+        if(result.getCount() > 0) { // Checking if there are any interactions returned from the database
+            while (result.moveToNext()) { // will be false when we ran out of unchecked results
+
+                Interaction interaction = new Interaction();
+                interaction.setInteractionID(result.getInt(0));
+                interaction.setUuid(result.getString(1));
+                interaction.setFirstSeen(result.getLong(2));
+                interaction.setLastSeen(result.getLong(3));
+
+                interactions.add(interaction);
+            }
+        }
+        return interactions;
+    }
+
+    public List<Interaction> getInteractionsBetweenDates(Long from, Long to) { // Returns all interactions that occurred between given timestamps
+        List<Interaction> interactions = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString() + " < ?"
+                , new String[]{from.toString(), to.toString()});
+
+        if(result.getCount() > 0) { // Checking if there are any interactions returned from the database
+            while (result.moveToNext()) { // will be false when we ran out of unchecked results
+
+                Interaction interaction = new Interaction();
+                interaction.setInteractionID(result.getInt(0));
+                interaction.setUuid(result.getString(1));
+                interaction.setFirstSeen(result.getLong(2));
+                interaction.setLastSeen(result.getLong(3));
+
+                interactions.add(interaction);
+            }
+        }
+        return interactions;
+    }
 
 
     //code to update the single Note
