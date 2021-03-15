@@ -5,8 +5,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -20,7 +22,9 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,17 +36,24 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.kdkvit.wherewasi.MainActivity;
 import com.kdkvit.wherewasi.R;
 
+import models.Interaction;
 import models.MyLocation;
 import utils.DatabaseHandler;
+
+import static com.kdkvit.wherewasi.services.BtScannerService.CONTACT_DURATION;
+import static com.kdkvit.wherewasi.services.BtScannerService.IDLE_DURATION;
 
 public class LocationService extends Service {
     public static final String BROADCAST_CHANNEL = "WhereWasI Broadcast";
     private static final int SIGNIFICANT_TIME = 1000 * 60 * 30;
     private static final String CHANNEL_NAME = "WhereWasSI Channel";
     private static final int TIME_CHECK_ACTIVE = 11 * 1000* 60;
+    private static final long ADVERTISING_DELAY = 30 * 1000;
+    private static final long SCANNING_DELAY = 1 * 60 * 1000;
     public LocationManager mlocManager;
     public MyLocationListener listener;
     public MyLocation previousBestLocation = null;
+    private HashMap<String, Interaction> btInteractions =new HashMap<>();
 
     DatabaseHandler db;
     Geocoder geocoder;
@@ -51,14 +62,16 @@ public class LocationService extends Service {
     NotificationCompat.Builder builder;
     String channelId = "KDKVIT_NOTIF_CHANNEL";
     final int NOTIF_ID = 1;
-    private Timer timer = new Timer();
+    private Timer locationsTimer = new Timer();
+    private Timer advertingTimer = new Timer();
+    private Timer scanningTimer = new Timer();
+    private BroadcastReceiver scannerBroadcast;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationChannel channel = new NotificationChannel(channelId, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
             manager.createNotificationChannel(channel);
@@ -132,7 +145,7 @@ public class LocationService extends Service {
             //Toast.makeText(this, "Failed to use gps...", Toast.LENGTH_SHORT).show();
         }
 
-        timer.schedule(new TimerTask() {
+        locationsTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 Log.i("test","timer test");
@@ -143,9 +156,92 @@ public class LocationService extends Service {
                 }
             }
         }, 0,30*1000);
+
+
+        advertingTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                startBLE();
+                try {
+                    Thread.sleep(ADVERTISING_DELAY);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                stopBLE();
+            }
+        },5000,ADVERTISING_DELAY);
+
+        IntentFilter filter = new IntentFilter(BtScannerService.BLE_SCANNING_CHANNEL);
+        scannerBroadcast = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                ArrayList<Interaction> interactions = intent.getParcelableArrayListExtra("ble_list");
+                Thread thread = new Thread(){
+                    @Override
+                    public void run() {
+                        super.run();
+                        addNewInteractions(interactions);
+                    }
+                };
+                thread.start();
+            }
+        };
+        LocalBroadcastManager.getInstance(this).registerReceiver(scannerBroadcast,filter);
+        scanningTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+
+                startScanning();
+                try {
+                    Thread.sleep(SCANNING_DELAY);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                stopScanning();
+                checkIdleConnections();
+            }
+        },5000,SCANNING_DELAY);
         geocoder = new Geocoder(this);
     }
 
+    private void addNewInteractions(ArrayList<Interaction> interactions) {
+
+        for(Interaction interaction : interactions){
+            Date now = new Date();
+            if(btInteractions.containsKey(interaction.getUuid())){
+                btInteractions.get(interaction.getUuid()).setLastSeen(now.getTime());
+                db.updateInteraction(interaction);
+            }else{
+                interaction.setInteractionID(db.addInteraction(interaction));
+                btInteractions.put(interaction.getUuid(),interaction);
+            }
+        }
+    }
+
+    private void startScanning(){
+        Intent intent = new Intent(this, BtScannerService.class);
+        intent.putExtra("command", "start");
+        startService(intent);
+    }
+
+    private void stopScanning(){
+        Intent intent = new Intent(this, BtScannerService.class);
+        intent.putExtra("command", "stop");
+        startService(intent);
+    }
+
+    private void startBLE() {
+        Intent intent = new Intent(this, BtAdvertiserService.class);
+        intent.putExtra("command", "start");
+        startService(intent);
+    }
+
+
+    private void stopBLE(){
+        Intent intent = new Intent(this, BtAdvertiserService.class);
+        intent.putExtra("command", "stop");
+        startService(intent);
+    }
 
 //    @Override
 //    public void onStart(Intent intent, int startId) {
@@ -215,10 +311,21 @@ public class LocationService extends Service {
     @Override
     public void onDestroy() {
         // handler.removeCallbacks(sendUpdatesToUI);
-        super.onDestroy();
         Log.v("STOP_SERVICE", "DONE");
-        timer.cancel();
-        mlocManager.removeUpdates(listener);
+        try {
+            locationsTimer.cancel();
+            advertingTimer.cancel();
+            scanningTimer.cancel();
+            stopBLE();
+            stopScanning();
+        }catch (Exception e){}
+        try {
+            mlocManager.removeUpdates(listener);
+        }catch (Exception e){
+
+        }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(scannerBroadcast);
+        super.onDestroy();
     }
 
     public static Thread performOnBackgroundThread(final Runnable runnable) {
@@ -240,11 +347,13 @@ public class LocationService extends Service {
 
         public void onLocationChanged(final Location loc) {
             Log.i("*****", "Location changed");
+
             Date now = new Date();
             MyLocation location = new MyLocation(loc.getLatitude(), loc.getLongitude(),loc.getProvider(),now,now,loc.getAccuracy());
             if (isBetterLocation(location, previousBestLocation)) { //Check if better location; if it is writing new line if not updating current one
                 previousBestLocation = location;
                 sendLocationEvent(location);
+
             }else{
 
 //        // Check whether the new location fix is more or less accurate
@@ -302,6 +411,7 @@ public class LocationService extends Service {
                 }
                 boolean isNew = location.getId() == 0;
                 if(isNew) {
+
                     long locationId = db.addLocation(location);
 
                     if (previousBestLocation!=null && previousBestLocation.equals(location)) {
@@ -320,5 +430,25 @@ public class LocationService extends Service {
                 LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(receiverIntent);
             }
         }.start();
+    }
+
+    // Iterates over devices and checks for devices last seen more than 5 minutes ago, in order to close the connection and log duration spent together
+    private void checkIdleConnections() {
+        Long currentTime = System.currentTimeMillis();
+
+        Log.i("BLE", "Checking for idle devices");
+        Log.i("BLE", "Devices in map:" + btInteractions.toString());
+
+        for (Interaction interaction : btInteractions.values()) {
+            if (currentTime - interaction.getLastSeen() >= IDLE_DURATION) { // Case device last seen longer than IDLE_DURATION
+
+                // Here we want to remove device from the map and in case user was in contact for long enough, log contact in database
+                btInteractions.remove(interaction.getUuid());
+                Log.i("BLE", "Removing idle device from map: " + interaction.toString());
+                if (interaction.getLastSeen() - interaction.getFirstSeen() >= CONTACT_DURATION) { // If the interaction lasted for long enough for it to be logged
+                    db.addInteraction(interaction);
+                }
+            }
+        }
     }
 }

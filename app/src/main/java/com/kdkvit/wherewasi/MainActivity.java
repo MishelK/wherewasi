@@ -82,8 +82,9 @@ public class MainActivity extends AppCompatActivity {
     private void initLoggedInUser() {
         if (Build.VERSION.SDK_INT >=23){
             int hasLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
-            if(hasLocationPermission != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
+            int hasBluePermission = checkSelfPermission(Manifest.permission.BLUETOOTH_ADMIN);
+            if(hasLocationPermission != PackageManager.PERMISSION_GRANTED || hasBluePermission != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.BLUETOOTH_ADMIN}, LOCATION_PERMISSION_REQUEST);
             }else{
                 if(!Running)
                     initService();
@@ -138,19 +139,37 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == LOCATION_PERMISSION_REQUEST){
-            if(grantResults[0] != PackageManager.PERMISSION_GRANTED){
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Attention").setMessage("The application must have location permission in order for it to work").setPositiveButton("Settings", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        intent.setData(Uri.parse("package:" + getPackageName()));
-                        startActivity(intent);
-                    }
-                }).setCancelable(false).show();
-            }
+        if(!checkGrantResults(permissions,grantResults)){
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("Attention").setMessage("The application must have location and bluetooth permission in order for it to work").setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    intent.setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(intent);
+                }
+            }).setCancelable(false).show();
         }
+    }
+
+    // This method checks if both location permission were granted in the request, returns true only if both were granted
+    public boolean checkGrantResults(String[] permissions, int[] grantResults) {
+        int granted = 0;
+
+        if (grantResults.length > 0) {
+            for(int i = 0; i < permissions.length ; i++) {
+                String permission = permissions[i];
+                if (permission.equals(Manifest.permission.ACCESS_FINE_LOCATION) ||
+                        permission.equals(Manifest.permission.BLUETOOTH_ADMIN)) {
+                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                        granted++;
+                    }
+                }
+            }
+        } else { // if cancelled
+            return false;
+        }
+        return granted == 2;
     }
 
 }
