@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
@@ -15,13 +16,26 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.kdkvit.wherewasi.MapActivity;
 import com.kdkvit.wherewasi.R;
 import com.kdkvit.wherewasi.adapters.LocationsTabsAdapter;
 
+import org.w3c.dom.Text;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import models.LocationsGroup;
@@ -50,6 +64,9 @@ public class ActivityFragment extends Fragment {
     boolean dbInit = false;
     Handler handler;
     private TabLayout tabLayout;
+
+    private Date startTime;
+    private Date endTime;
 
     private View rootView;
 
@@ -83,6 +100,72 @@ public class ActivityFragment extends Fragment {
 
         viewPager.setAdapter(locationsTabsAdapter);
         tabLayout.setupWithViewPager(viewPager);
+//        TextView tv = rootView.findViewById(R.id.title_test);
+//        tv.setText("hello world");
+
+        LinearLayout startTimeContainer = rootView.findViewById(R.id.filter_start_time_container);
+        final TextView startTimeTV= rootView.findViewById(R.id.filter_start_time);
+        startTimeContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
+                if(startTime!=null) {
+                    builder.setSelection(startTime.getTime());
+                }
+                CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
+                builder.setCalendarConstraints(constraintsBuilder.build());
+
+                MaterialDatePicker<Long> picker = builder.build();
+
+                picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
+                    @Override
+                    public void onPositiveButtonClick(Long selectedDate) {
+                        // user has selected a date
+                        // format the date and set the text of the input box to be the selected date
+                        // right now this format is hard-coded, this will change
+                        ;
+                        // Get the offset from our timezone and UTC.
+                        startTime = new Date(selectedDate);
+                        startTimeTV.setText(new SimpleDateFormat("dd/MM/yyyy").format(startTime));
+                    }
+                });
+
+                picker.show(getFragmentManager(), picker.toString());
+
+            }
+        });
+
+        LinearLayout endTimeContainer = rootView.findViewById(R.id.filter_end_time_container);
+        final TextView endTimeTV= rootView.findViewById(R.id.filter_end_time);
+        endTimeContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
+                if(startTime!=null) {
+                    builder.setSelection(startTime.getTime());
+                }
+                CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
+                builder.setCalendarConstraints(constraintsBuilder.build());
+
+                MaterialDatePicker<Long> picker = builder.build();
+
+                picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
+                    @Override
+                    public void onPositiveButtonClick(Long selectedDate) {
+                        // user has selected a date
+                        // format the date and set the text of the input box to be the selected date
+                        // right now this format is hard-coded, this will change
+                        ;
+                        // Get the offset from our timezone and UTC.
+                        endTime = new Date(selectedDate);
+                        endTimeTV.setText(new SimpleDateFormat("dd/MM/yyyy").format(endTime));
+                    }
+                });
+
+                picker.show(getFragmentManager(), picker.toString());
+
+            }
+        });
 
         initReceiver();
 
