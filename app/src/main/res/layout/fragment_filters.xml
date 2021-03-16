@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context=".fragments.FiltersFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Filters"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:id="@+id/title_test"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="From"
+                android:textSize="16sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/date_picker_background"
+                android:padding="10dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:id="@+id/filter_start_time_container"
+
+                >
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:layout_weight="1"
+                    android:id="@+id/filter_start_time"
+                    />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_calendar"
+                    />
+            </LinearLayout>
+
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="To"
+                android:textSize="16sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"
+                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/date_picker_background"
+                android:padding="10dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:id="@+id/filter_end_time_container"
+
+                >
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:layout_weight="1"
+                    android:id="@+id/filter_end_time"
+                    />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_calendar"
+                    />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Duration (Minutes)"
+                android:textSize="16sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"
+                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/date_picker_background"
+                android:padding="10dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                >
+                <EditText
+                    android:id="@+id/duration_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:background="@android:color/transparent"
+                    />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Interactions"
+                android:textSize="16sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"
+                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/date_picker_background"
+                android:padding="10dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                >
+                <EditText
+                    android:id="@+id/interactions_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:background="@android:color/transparent"
+                    />
+
+            </LinearLayout>
+
+            <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Filter"
+                android:background="@color/colorAccent"
+                android:backgroundTint="@color/colorAccent"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="@color/white"
+                android:id="@+id/filter_btn"
+                />
+
+
+            <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Clear"
+                android:background="@color/colorPrimary"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="@color/white"
+                android:id="@+id/filter_clear_btn"
+                />
+
+        </LinearLayout>
+
+
+    </ScrollView>
+</LinearLayout>
