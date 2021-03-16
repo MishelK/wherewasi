@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 
 import androidx.core.util.Pair;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
@@ -16,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -69,6 +72,7 @@ public class ActivityFragment extends Fragment {
     private Date endTime;
 
     private View rootView;
+    private DrawerLayout drawerLayout;
 
 
     public ActivityFragment() {
@@ -91,17 +95,20 @@ public class ActivityFragment extends Fragment {
         db = new DatabaseHandler(rootView.getContext());
 
         assert getFragmentManager() != null;
-        LocationsTabsAdapter locationsTabsAdapter = new LocationsTabsAdapter(getFragmentManager(),1);
-        ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.locations_view_pager);
-        tabLayout = (TabLayout) rootView.findViewById(R.id.locations_tab_layout);
-
-        locationsTabsAdapter.addFragment(timeLineFragment,"TimeLine");
-        //locationsTabsAdapter.addFragment(mapsFragment,"Map");
-
-        viewPager.setAdapter(locationsTabsAdapter);
-        tabLayout.setupWithViewPager(viewPager);
+//        LocationsTabsAdapter locationsTabsAdapter = new LocationsTabsAdapter(getFragmentManager(),1);
+//        ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.locations_view_pager);
+//        tabLayout = (TabLayout) rootView.findViewById(R.id.locations_tab_layout);
+//
+//        locationsTabsAdapter.addFragment(timeLineFragment,"TimeLine");
+//        //locationsTabsAdapter.addFragment(mapsFragment,"Map");
+//
+//        viewPager.setAdapter(locationsTabsAdapter);
+//        tabLayout.setupWithViewPager(viewPager);
 //        TextView tv = rootView.findViewById(R.id.title_test);
 //        tv.setText("hello world");
+
+
+        getFragmentManager().beginTransaction().replace(R.id.activity_fragment_container, timeLineFragment).commit();
 
         LinearLayout startTimeContainer = rootView.findViewById(R.id.filter_start_time_container);
         final TextView startTimeTV= rootView.findViewById(R.id.filter_start_time);
@@ -169,9 +176,16 @@ public class ActivityFragment extends Fragment {
 
         initReceiver();
 
+        drawerLayout = rootView.findViewById(R.id.activity_filters_drawer);
+        ImageView filterBtn = rootView.findViewById(R.id.header_right_icon);
+
         getLocationsHistory();
 
         return rootView;
+    }
+
+    public void openDrawer(){
+        drawerLayout.openDrawer(GravityCompat.END);
     }
 
     private  void getLocationsHistory(){

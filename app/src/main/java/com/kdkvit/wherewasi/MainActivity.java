@@ -17,7 +17,9 @@ import android.provider.Settings;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
@@ -43,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
     private View headerView;
     private ActivityFragment activityFragment;
     boolean Running;
+    private ImageView headerIcon;
+    private TextView headerText;
+    private ImageView headerRightIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +60,9 @@ public class MainActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.navigation_view);
 
         headerView = findViewById(R.id.main_header);
-
+        headerIcon = findViewById(R.id.header_image);
+        headerText = findViewById(R.id.header_title);
+        headerRightIcon = findViewById(R.id.header_right_icon);
         //Init user from local storage
         user = SharedPreferencesUtils.getUser(this);
         if(user==null){ //User not exists -> welcome page
@@ -118,10 +125,23 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.home_tab:
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, mainFragment).commit();
+                        headerText.setVisibility(View.GONE);
+                        headerRightIcon.setVisibility(View.GONE);
+                        headerIcon.setVisibility(View.VISIBLE);
                         break;
                     case R.id.activity_Tab:
                         activityFragment = new ActivityFragment();
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, activityFragment).commit();
+                        headerText.setVisibility(View.VISIBLE);
+                        headerText.setText(R.string.activity);
+                        headerRightIcon.setVisibility(View.VISIBLE);
+                        headerIcon.setVisibility(View.GONE);
+                        headerRightIcon.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                activityFragment.openDrawer();
+                            }
+                        });
                         break;
                 }
                 return true;
