@@ -55,13 +55,28 @@
                 />
             <include layout="@layout/spacer" />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/fourteen_days_summary"
-                android:textSize="20dp"
-                />
+                android:orientation="horizontal">
+
+                <com.anychart.AnyChartView
+                    android:id="@+id/chart_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="200dp"
+                    android:layout_weight="1"/>
+
+                <com.anychart.AnyChartView
+                    android:id="@+id/chart_view2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="200dp"
+                    android:layout_weight="1"/>
+
+            </LinearLayout>
+
             <include layout="@layout/spacer" />
+
+
 
         </LinearLayout>
     </ScrollView>
