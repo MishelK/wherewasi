@@ -210,9 +210,7 @@ public class LocationService extends Service {
             Date now = new Date();
             if(btInteractions.containsKey(interaction.getUuid())){
                 btInteractions.get(interaction.getUuid()).setLastSeen(now.getTime());
-                db.updateInteraction(interaction);
             }else{
-                interaction.setInteractionID(db.addInteraction(interaction));
                 btInteractions.put(interaction.getUuid(),interaction);
             }
         }
