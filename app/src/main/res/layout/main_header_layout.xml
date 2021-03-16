@@ -30,15 +30,28 @@
         />
 
     <TextView
-        android:layout_width="50dp"
-        android:layout_height="55dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:src="@drawable/app_icon"
         android:scaleType="fitXY"
         android:layout_centerInParent="true"
         android:id="@+id/header_title"
         android:visibility="gone"
+        android:textColor="@color/colorPrimary"
+        android:textSize="22sp"
+        android:textStyle="bold"
         />
 
-
+    <ImageView
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:scaleType="fitXY"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/header_right_icon"
+        android:layout_marginEnd="15dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_filter"
+        />
 </RelativeLayout>
 
