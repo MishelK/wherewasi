@@ -46,7 +46,11 @@
         android:layout_gravity="end"
         android:id="@+id/activity_filter_navigation"
         >
-        <include layout="@layout/drawer_filters_header" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/activity_filters_fragment_container"
+            android:orientation="vertical" />
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

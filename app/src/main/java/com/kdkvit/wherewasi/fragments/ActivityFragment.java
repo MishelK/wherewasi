@@ -68,9 +68,6 @@ public class ActivityFragment extends Fragment {
     Handler handler;
     private TabLayout tabLayout;
 
-    private Date startTime;
-    private Date endTime;
-
     private View rootView;
     private DrawerLayout drawerLayout;
 
@@ -110,69 +107,21 @@ public class ActivityFragment extends Fragment {
 
         getFragmentManager().beginTransaction().replace(R.id.activity_fragment_container, timeLineFragment).commit();
 
-        LinearLayout startTimeContainer = rootView.findViewById(R.id.filter_start_time_container);
-        final TextView startTimeTV= rootView.findViewById(R.id.filter_start_time);
-        startTimeContainer.setOnClickListener(new View.OnClickListener() {
+        final FiltersFragment filtersFragment = new FiltersFragment(new FiltersFragment.FiltersCallback() {
             @Override
-            public void onClick(View view) {
-                MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
-                if(startTime!=null) {
-                    builder.setSelection(startTime.getTime());
-                }
-                CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
-                builder.setCalendarConstraints(constraintsBuilder.build());
-
-                MaterialDatePicker<Long> picker = builder.build();
-
-                picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
-                    @Override
-                    public void onPositiveButtonClick(Long selectedDate) {
-                        // user has selected a date
-                        // format the date and set the text of the input box to be the selected date
-                        // right now this format is hard-coded, this will change
-                        ;
-                        // Get the offset from our timezone and UTC.
-                        startTime = new Date(selectedDate);
-                        startTimeTV.setText(new SimpleDateFormat("dd/MM/yyyy").format(startTime));
-                    }
-                });
-
-                picker.show(getFragmentManager(), picker.toString());
+            public void onClear() {
 
             }
-        });
 
-        LinearLayout endTimeContainer = rootView.findViewById(R.id.filter_end_time_container);
-        final TextView endTimeTV= rootView.findViewById(R.id.filter_end_time);
-        endTimeContainer.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
-                if(startTime!=null) {
-                    builder.setSelection(startTime.getTime());
-                }
-                CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
-                builder.setCalendarConstraints(constraintsBuilder.build());
-
-                MaterialDatePicker<Long> picker = builder.build();
-
-                picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
-                    @Override
-                    public void onPositiveButtonClick(Long selectedDate) {
-                        // user has selected a date
-                        // format the date and set the text of the input box to be the selected date
-                        // right now this format is hard-coded, this will change
-                        ;
-                        // Get the offset from our timezone and UTC.
-                        endTime = new Date(selectedDate);
-                        endTimeTV.setText(new SimpleDateFormat("dd/MM/yyyy").format(endTime));
-                    }
-                });
-
-                picker.show(getFragmentManager(), picker.toString());
+            public void onFilter(Date start, Date end, int minTime, boolean onlyInteractions) {
 
             }
+
         });
+
+        getFragmentManager().beginTransaction().replace(R.id.activity_fragment_container, timeLineFragment).commit();
+        getFragmentManager().beginTransaction().replace(R.id.activity_filters_fragment_container, filtersFragment).commit();
 
         initReceiver();
 
