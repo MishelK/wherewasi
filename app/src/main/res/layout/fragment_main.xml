@@ -55,10 +55,24 @@
                 />
             <include layout="@layout/spacer" />
 
-            <com.anychart.AnyChartView
-                android:id="@+id/chart_view"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp"/>
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.anychart.AnyChartView
+                    android:id="@+id/chart_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="200dp"
+                    android:layout_weight="1"/>
+
+                <com.anychart.AnyChartView
+                    android:id="@+id/chart_view2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="200dp"
+                    android:layout_weight="1"/>
+
+            </LinearLayout>
 
             <include layout="@layout/spacer" />
 
