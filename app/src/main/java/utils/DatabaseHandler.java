@@ -212,7 +212,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //        return false;
 //    }
 
-    public List<MyLocation> getLocationsOnDay(SORTING_PARAM sorting, Long time) {
+    public List<MyLocation> getLocationsOnDay2(SORTING_PARAM sorting, Long time) {
         List<MyLocation> locations = new ArrayList<>();
 
         Long dayStart = time - time % 86400000; // the remainder of the modulus will be time of day (time since day started)
@@ -276,6 +276,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         // return notes list
         return locations;
+    }
+
+    public int getLocationsOnDay(Long time) {
+        List<MyLocation> locations = new ArrayList<>();
+        Date date = new Date();
+
+        Long dayStart = time - time % 86400000; // the remainder of the modulus will be time of day (time since day started)
+        Long dayEnd = dayStart + 86400000;
+
+        // Select All Query
+        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s WHERE %s between %s and %s",
+                LocationColumn.LATITUDE.toString(),
+                LocationColumn.LONGITUDE.toString(),
+                LocationColumn.PROVIDER.toString(),
+                LocationColumn.UPDATED_TIME.toString(),
+                LocationColumn.ADDRESS_LINE.toString(),
+                LocationColumn.COUNTRY_CODE.toString(),
+                LocationColumn.ADMIN_AREA.toString(),
+                LocationColumn.FEATURE_NAME.toString(),
+                LocationColumn.SUB_AREA_NAME.toString(),
+                LocationColumn.START_TIME.toString(),
+                LocationColumn.END_TIME.toString(),
+                LocationColumn.ACCURACY.toString(),
+                TABLE_LOCATIONS,
+                LocationColumn.START_TIME.toString(),
+                dayStart.toString(),
+                dayEnd.toString());
+
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // return notes list
+        return cursor.getCount();
     }
 
     public List<MyLocation> getLocationsBetweenDates(SORTING_PARAM sorting, Long from, Long to) {
