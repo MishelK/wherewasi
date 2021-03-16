@@ -101,6 +101,19 @@ public class InteractionDatabaseHandler extends SQLiteOpenHelper {
         return interactions;
     }
 
+    public int getNumOfInteractionsOnDay(long timeInMillis) { // Returns all interactions that occurred on the day of given timestamp
+
+        Long dayStart = timeInMillis - timeInMillis % 86400000; // the remainder of the modulus will be time of day (time since day started)
+        Long dayEnd = dayStart + 86400000;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString()
+                + " < ?", new String[]{dayStart.toString(), dayEnd.toString()}); // Gets all interactions between dates from table
+
+
+        return result.getCount();
+    }
+
     public List<Interaction> getInteractionsBetweenDates(Long from, Long to) { // Returns all interactions that occurred between given timestamps
         List<Interaction> interactions = new ArrayList<>();
 
