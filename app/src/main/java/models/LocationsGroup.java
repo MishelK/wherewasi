@@ -30,14 +30,18 @@ public class LocationsGroup {
     public Date getStartTime(){
         int size;
         if((size = this.locationsSize())>0) {
-            return locations.get(size - 1).getStartTime();
+            Date date = new Date();
+            date.setTime(locations.get(size - 1).getStartTime());
+            return date;
         }
         return null;
     }
 
     public Date getEndTime(){
         if(this.locationsSize()>0) {
-            return locations.get(0).getEndTime();
+            Date date = new Date();
+            date.setTime(locations.get(0).getEndTime());
+            return date;
         }
         return null;
     }

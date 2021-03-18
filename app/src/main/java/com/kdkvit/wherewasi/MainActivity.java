@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -27,9 +28,13 @@ import com.kdkvit.wherewasi.fragments.WelcomeFragment;
 import com.kdkvit.wherewasi.services.LocationService;
 import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
 
+import java.util.List;
 import java.util.UUID;
 
+import models.Interaction;
 import models.User;
+import utils.DatabaseHandler;
+import utils.InteractionDatabaseHandler;
 
 import static actions.actions.sendUserToBe;
 
@@ -48,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         Running = getIntent().getBooleanExtra("working",false);
 

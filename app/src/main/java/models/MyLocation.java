@@ -16,9 +16,9 @@ public class MyLocation implements Serializable, ClusterItem {
     private double latitude;
     private double longitude;
     private String provider;
-    private Date startTime;
-    private Date endTime;
-    private Date updateTime;
+    private long startTime;
+    private long endTime;
+    private long updateTime;
     private float accuracy;
 
     private LatLng latLng;
@@ -36,23 +36,23 @@ public class MyLocation implements Serializable, ClusterItem {
         this.latitude = latitude;
         this.longitude = longitude;
         this.provider = provider;
-        this.updateTime = new Date();
+        this.updateTime = System.currentTimeMillis();
         this.accuracy = accuracy;
         initLatLang();
     }
 
-    public MyLocation(double latitude, double longitude, String provider,Date startTime,Date endTime,float accuracy){
+    public MyLocation(double latitude, double longitude, String provider,long startTime,long endTime,float accuracy){
         this.latitude = latitude;
         this.longitude = longitude;
         this.provider = provider;
-        this.updateTime = new Date();
+        this.updateTime = System.currentTimeMillis();
         this.startTime = startTime;
         this.endTime = endTime;
         this.accuracy = accuracy;
         initLatLang();
     }
 
-    public MyLocation(double latitude, double longitude, String provider,Date updateTime){
+    public MyLocation(double latitude, double longitude, String provider,long updateTime){
         this.latitude = latitude;
         this.longitude = longitude;
         this.provider = provider;
@@ -90,11 +90,11 @@ public class MyLocation implements Serializable, ClusterItem {
         this.provider = provider;
     }
 
-    public Date getUpdateTime() {
+    public long getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public void setUpdateTime(long updateTime) {
         this.updateTime = updateTime;
     }
 
@@ -154,19 +154,19 @@ public class MyLocation implements Serializable, ClusterItem {
         this.id = id;
     }
 
-    public Date getStartTime() {
+    public long getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(long startTime) {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public long getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(long endTime) {
         this.endTime = endTime;
     }
 
