@@ -221,8 +221,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<MyLocation> getLocationsOnDay2(SORTING_PARAM sorting, Long time) {
         List<MyLocation> locations = new ArrayList<>();
 
-        Long dayStart = time - time % 86400000; // the remainder of the modulus will be time of day (time since day started)
-        Long dayEnd = dayStart + 86400000;
+        TimeZone timeZone = TimeZone.getDefault();
+        long offset = timeZone.getOffset(time);
+
+        Long dayStart = time - time % 86400000 - offset; // the remainder of the modulus will be time of day (time since day started)
+        Long dayEnd = dayStart + 86400000 - offset;
 
         // Select All Query
         String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s WHERE %s > %s AND %s < %s",
@@ -321,6 +324,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<MyLocation> getLocationsBetweenDates(SORTING_PARAM sorting, Long from, Long to) {
         List<MyLocation> locations = new ArrayList<>();
 
+        TimeZone timeZone =TimeZone.getDefault();
+        long offset = timeZone.getOffset(from);
+        Long fromLocal = from - offset;
+        Long toLocal = to - offset;
+
         // Select All Query
         String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s WHERE %s > %s AND %s < %s",
                 LocationColumn.LATITUDE.toString(),
@@ -337,9 +345,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 LocationColumn.ACCURACY.toString(),
                 TABLE_LOCATIONS,
                 LocationColumn.START_TIME.toString(),
-                from.toString(),
+                fromLocal.toString(),
                 LocationColumn.START_TIME.toString(),
-                to.toString());
+                toLocal.toString());
 
         if(sorting != null) {
             selectQuery += sorting.getSorting();
@@ -513,8 +521,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<Interaction> getInteractionsOnDay(long timeInMillis) { // Returns all interactions that occurred on the day of given timestamp
         List<Interaction> interactions = new ArrayList<>();
 
-        Long dayStart = timeInMillis - timeInMillis % 86400000; // the remainder of the modulus will be time of day (time since day started)
-        Long dayEnd = dayStart + 86400000;
+        TimeZone timeZone =TimeZone.getDefault();
+        long offset = timeZone.getOffset(timeInMillis);
+
+        Long dayStart = timeInMillis - timeInMillis % 86400000 - offset; // the remainder of the modulus will be time of day (time since day started)
+        Long dayEnd = dayStart + 86400000 - offset;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString()
@@ -554,9 +565,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<Interaction> getInteractionsBetweenDates(Long from, Long to) { // Returns all interactions that occurred between given timestamps
         List<Interaction> interactions = new ArrayList<>();
 
+        TimeZone timeZone =TimeZone.getDefault();
+        long offset = timeZone.getOffset(from);
+        Long fromLocal = from - offset;
+        Long toLocal = to - offset;
+
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString() + " < ?"
-                , new String[]{from.toString(), to.toString()});
+                , new String[]{fromLocal.toString(), toLocal.toString()});
 
         if(result.getCount() > 0) { // Checking if there are any interactions returned from the database
             while (result.moveToNext()) { // will be false when we ran out of unchecked results
