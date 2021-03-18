@@ -16,6 +16,7 @@ import models.MyLocation;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import static com.kdkvit.wherewasi.utils.General.getLocationsGroup;
 
@@ -25,6 +26,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_LOCATIONS = "locations";
     private static final String TABLE_INTERACTIONS = "interactions";
 
+    SQLiteDatabase database;
 
 
     public enum SORTING_PARAM{
@@ -44,12 +46,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        database = getWritableDatabase();
         //3rd argument to be passed is CursorFactory instance
     }
 
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.i("BLE", "OnCreate");
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_LOCATIONS + "("
                 + LocationColumn.ID.toString() + " INTEGER PRIMARY KEY,"
                 + LocationColumn.LATITUDE.toString() + " DOUBLE,"
@@ -82,14 +86,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOCATIONS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_INTERACTIONS);
-
+        Log.i("BLE", "OnUpgrade");
         // Create tables again
         onCreate(db);
     }
 
     // code to add the new note
     public long addLocation(MyLocation location) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
+
+        Log.i("BLE", "Adding location to db, start time: " + location.getStartTime() + "end time: " + location.getEndTime());
 
         ContentValues values = new ContentValues();
         values.put(LocationColumn.LATITUDE.toString(), location.getLatitude());
@@ -100,9 +106,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(LocationColumn.ADMIN_AREA.toString(), location.getAdminArea());
         values.put(LocationColumn.FEATURE_NAME.toString(), location.getFeatureName());
         values.put(LocationColumn.SUB_AREA_NAME.toString(), location.getSubAdminArea());
-        values.put(LocationColumn.START_TIME.toString(),location.getStartTime().getTime());
-        values.put(LocationColumn.END_TIME.toString(),location.getEndTime().getTime());
-        values.put(LocationColumn.UPDATED_TIME.toString(),location.getUpdateTime().getTime());
+        values.put(LocationColumn.START_TIME.toString(),location.getStartTime());
+        values.put(LocationColumn.END_TIME.toString(),location.getEndTime());
+        values.put(LocationColumn.UPDATED_TIME.toString(),location.getUpdateTime());
         values.put(LocationColumn.ACCURACY.toString(),location.getAccuracy());
         // Inserting Row
         long id = db.insert(TABLE_LOCATIONS, null, values);
@@ -129,7 +135,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // code to get all notes in a list view
     public List<LocationsGroup> getAllLocations(SORTING_PARAM sorting) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
         List<MyLocation> locations = getLocations(db,sorting);
         List<Interaction> interactions = getAllInteractions(db);
         db.close();
@@ -169,9 +175,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 double lon = cursor.getDouble(1);
                 String provider = cursor.getString(2);
                 long temp = cursor.getLong(3);
-                Date lastUpdated = new Date(temp);
 
-                MyLocation location = new MyLocation(lat,lon,provider,lastUpdated);
+
+                MyLocation location = new MyLocation(lat,lon,provider,temp);
 
                 location.setAddressLine(cursor.getString(4));
                 location.setCountryCode(cursor.getString(5));
@@ -180,10 +186,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 location.setSubAdminArea(cursor.getString(8));
 
                 temp = cursor.getLong(9);
-                location.setStartTime(new Date(temp));
+                location.setStartTime(temp);
 
                 temp = cursor.getLong(10);
-                location.setEndTime(new Date(temp));
+                location.setEndTime(temp);
                 location.setAccuracy(cursor.getFloat(11));
 
                 locations.add(location);
@@ -253,9 +259,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 double lon = cursor.getDouble(1);
                 String provider = cursor.getString(2);
                 long temp = cursor.getLong(3);
-                Date lastUpdated = new Date(temp);
 
-                MyLocation location = new MyLocation(lat,lon,provider,lastUpdated);
+                MyLocation location = new MyLocation(lat,lon,provider,temp);
 
                 location.setAddressLine(cursor.getString(4));
                 location.setCountryCode(cursor.getString(5));
@@ -264,10 +269,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 location.setSubAdminArea(cursor.getString(8));
 
                 temp = cursor.getLong(9);
-                location.setStartTime(new Date(temp));
+                location.setStartTime(temp);
 
                 temp = cursor.getLong(10);
-                location.setEndTime(new Date(temp));
+                location.setEndTime(temp);
                 location.setAccuracy(cursor.getFloat(11));
 
                 locations.add(location);
@@ -279,11 +284,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public int getLocationsOnDay(Long time) {
-        List<MyLocation> locations = new ArrayList<>();
-        Date date = new Date();
+        SQLiteDatabase db = getWritableDatabase();
 
-        Long dayStart = time - time % 86400000; // the remainder of the modulus will be time of day (time since day started)
-        Long dayEnd = dayStart + 86400000;
+        TimeZone timeZone =TimeZone.getDefault();
+        long offset = timeZone.getOffset(time);
+
+        Long dayStart = time - time % 86400000 - offset; // the remainder of the modulus will be time of day (time since day started)
+        Long dayEnd = dayStart + 86400000 - offset;
 
         // Select All Query
         String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s WHERE %s between %s and %s",
@@ -305,7 +312,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 dayEnd.toString());
 
 
-        SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         // return notes list
@@ -350,9 +356,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 double lon = cursor.getDouble(1);
                 String provider = cursor.getString(2);
                 long temp = cursor.getLong(3);
-                Date lastUpdated = new Date(temp);
 
-                MyLocation location = new MyLocation(lat,lon,provider,lastUpdated);
+
+                MyLocation location = new MyLocation(lat,lon,provider,temp);
 
                 location.setAddressLine(cursor.getString(4));
                 location.setCountryCode(cursor.getString(5));
@@ -361,10 +367,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 location.setSubAdminArea(cursor.getString(8));
 
                 temp = cursor.getLong(9);
-                location.setStartTime(new Date(temp));
+                location.setStartTime(temp);
 
                 temp = cursor.getLong(10);
-                location.setEndTime(new Date(temp));
+                location.setEndTime(temp);
                 location.setAccuracy(cursor.getFloat(11));
 
                 locations.add(location);
@@ -411,9 +417,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 double lon = cursor.getDouble(1);
                 String provider = cursor.getString(2);
                 long temp = cursor.getLong(3);
-                Date lastUpdated = new Date(temp);
 
-                MyLocation location = new MyLocation(lat,lon,provider,lastUpdated);
+                MyLocation location = new MyLocation(lat,lon,provider,temp);
 
                 location.setAddressLine(cursor.getString(4));
                 location.setCountryCode(cursor.getString(5));
@@ -422,10 +427,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 location.setSubAdminArea(cursor.getString(8));
 
                 temp = cursor.getLong(9);
-                location.setStartTime(new Date(temp));
+                location.setStartTime(temp);
 
                 temp = cursor.getLong(10);
-                location.setEndTime(new Date(temp));
+                location.setEndTime(temp);
                 location.setAccuracy(cursor.getFloat(11));
 
                 locations.add(location);
@@ -439,9 +444,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public int updateLocation(MyLocation location) {
         SQLiteDatabase db = this.getWritableDatabase();
 
+        Log.i("BLE", "Updating location in db, end time: " + location.getEndTime());
+
         ContentValues values = new ContentValues();
-        values.put(LocationColumn.END_TIME.toString(), location.getEndTime().getTime());
-        values.put(LocationColumn.UPDATED_TIME.toString(), location.getEndTime().getTime());
+        values.put(LocationColumn.END_TIME.toString(), location.getEndTime());
+        values.put(LocationColumn.UPDATED_TIME.toString(), location.getUpdateTime());
         values.put(LocationColumn.ACCURACY.toString(), location.getAccuracy());
         values.put(LocationColumn.LATITUDE.toString(),location.getLatitude());
         values.put(LocationColumn.LONGITUDE.toString(),location.getLongitude());
@@ -466,6 +473,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long id = db.insert(TABLE_INTERACTIONS, null, values);
         db.close();
 
+        Log.i("BLE","Interaction with device : " + interaction.getUuid() + " Added to DB");
+
         return id;
     }
 
@@ -481,7 +490,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    private List<Interaction> getAllInteractions(SQLiteDatabase db) {
+    public List<Interaction> getAllInteractions(SQLiteDatabase db) {
         List<Interaction> interactions = new ArrayList<>();
 
         Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS, null); // Gets all interactions from table
@@ -524,6 +533,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
         }
         return interactions;
+    }
+
+    public int getNumOfInteractionsOnDay(long timeInMillis) { // Returns all interactions that occurred on the day of given timestamp
+
+        TimeZone timeZone =TimeZone.getDefault();
+        long offset = timeZone.getOffset(timeInMillis);
+
+        Long dayStart = timeInMillis - timeInMillis % 86400000 - offset; // the remainder of the modulus will be time of day (time since day started)
+        Long dayEnd = dayStart + 86400000 - offset;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString()
+                + " < ?", new String[]{dayStart.toString(), dayEnd.toString()}); // Gets all interactions between dates from table
+
+
+        return result.getCount();
     }
 
     public List<Interaction> getInteractionsBetweenDates(Long from, Long to) { // Returns all interactions that occurred between given timestamps

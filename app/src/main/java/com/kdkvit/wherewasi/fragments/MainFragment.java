@@ -7,6 +7,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import android.provider.ContactsContract;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -78,7 +79,7 @@ public class MainFragment extends Fragment {
         Cartesian cartesian = AnyChart.column();
 
         List<DataEntry> data = new ArrayList<>();
-        InteractionDatabaseHandler db = new InteractionDatabaseHandler(getContext());
+        DatabaseHandler db = new DatabaseHandler(getContext());
         // Getting interactions from db and adding to arrayList
         for (int i = 6; i>=0; i--){
             long currentTime = System.currentTimeMillis();
