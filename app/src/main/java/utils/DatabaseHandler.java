@@ -198,6 +198,63 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return locations;
     }
 
+    public List<MyLocation> getAllMyLocations(SORTING_PARAM sorting){
+        List<MyLocation> locations = new ArrayList<>();
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Select All Query
+        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s ",
+                LocationColumn.LATITUDE.toString(),
+                LocationColumn.LONGITUDE.toString(),
+                LocationColumn.PROVIDER.toString(),
+                LocationColumn.UPDATED_TIME.toString(),
+                LocationColumn.ADDRESS_LINE.toString(),
+                LocationColumn.COUNTRY_CODE.toString(),
+                LocationColumn.ADMIN_AREA.toString(),
+                LocationColumn.FEATURE_NAME.toString(),
+                LocationColumn.SUB_AREA_NAME.toString(),
+                LocationColumn.START_TIME.toString(),
+                LocationColumn.END_TIME.toString(),
+                LocationColumn.ACCURACY.toString(),
+                TABLE_LOCATIONS);
+
+        if(sorting != null) {
+            selectQuery += sorting.getSorting();
+        }
+
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                double lat = cursor.getDouble(0);
+                double lon = cursor.getDouble(1);
+                String provider = cursor.getString(2);
+                long temp = cursor.getLong(3);
+
+
+                MyLocation location = new MyLocation(lat,lon,provider,temp);
+
+                location.setAddressLine(cursor.getString(4));
+                location.setCountryCode(cursor.getString(5));
+                location.setAdminArea(cursor.getString(6));
+                location.setFeatureName(cursor.getString(7));
+                location.setSubAdminArea(cursor.getString(8));
+
+                temp = cursor.getLong(9);
+                location.setStartTime(temp);
+
+                temp = cursor.getLong(10);
+                location.setEndTime(temp);
+                location.setAccuracy(cursor.getFloat(11));
+
+                locations.add(location);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return locations;
+    }
+
 //    public boolean removeNotes(List<Integer> selectedNotes) {
 //        SQLiteDatabase db = this.getWritableDatabase();
 //        StringBuilder ids = new StringBuilder();
