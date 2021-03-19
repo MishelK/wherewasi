@@ -20,6 +20,7 @@ public class MyLocation implements Serializable, ClusterItem {
     private long endTime;
     private long updateTime;
     private float accuracy;
+    private int numOfInteractions;
 
     private LatLng latLng;
 
@@ -176,6 +177,14 @@ public class MyLocation implements Serializable, ClusterItem {
 
     public void setAccuracy(float accuracy) {
         this.accuracy = accuracy;
+    }
+
+    public int getNumOfInteractions() {
+        return numOfInteractions;
+    }
+
+    public void setNumOfInteractions(int numOfInteractions) {
+        this.numOfInteractions = numOfInteractions;
     }
 
     @Override
