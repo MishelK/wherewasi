@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -110,11 +112,24 @@ public class FiltersFragment extends Fragment {
             }
         });
 
+        final EditText durationEditText = rootView.findViewById(R.id.duration_input);
+        final CheckBox interactionsCB = rootView.findViewById(R.id.interactions_checkbox);
 
         Button filterBtn = rootView.findViewById(R.id.filter_btn);
         filterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String duration = durationEditText.getText().toString().trim();
+                if(!duration.isEmpty()){
+                    try{
+                        minDuration = Integer.parseInt(duration);
+                    }catch (NumberFormatException e){
+                        durationEditText.setText("");
+                    }
+                }
+
+                interactions = interactionsCB.isChecked();
+
                 callback.onFilter(startTime, endTime, minDuration, interactions);
             }
         });

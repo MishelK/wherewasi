@@ -12,7 +12,7 @@ public class General {
     private static final int TIME_BETWEEN_NEW_LOCATIONS = 1000 * 60 * 15;
     private static final int TIME_BETWEEN_LOCATION_AND_INTERACTION = 1000 * 60 * 10;
 
-    public static List<LocationsGroup> getLocationsGroup(List<MyLocation> locations, List<Interaction> interactions) {
+    public static List<LocationsGroup> getLocationsGroup(List<MyLocation> locations, List<Interaction> interactions, int minTime, boolean onlyInteractions) {
         List<LocationsGroup> groups = new ArrayList<>();
         if (locations.size() == 0) return groups;
         MyLocation lastLocation = null;
@@ -34,6 +34,19 @@ public class General {
                 }
             }
         }
+
+        //Filter if needed
+        if(minTime>0 || onlyInteractions){
+            List<LocationsGroup> temp = new ArrayList<>();
+            for(LocationsGroup locationsGroup: groups) {
+                boolean enoughTime = (locationsGroup.getEndTime().getTime() - locationsGroup.getStartTime().getTime()) >= minTime * 1000 * 60;
+                if (enoughTime && (!onlyInteractions || locationsGroup.interactionsSize() > 0)) {
+                    temp.add(locationsGroup);
+                }
+            }
+            groups = temp;
+        }
+
         return groups;
     }
 
