@@ -17,7 +17,7 @@ public class General {
         if (locations.size() == 0) return groups;
         MyLocation lastLocation = null;
         for (MyLocation location : locations) {
-            if (lastLocation == null || (location.getStartTime().getTime() - lastLocation.getStartTime().getTime()) > TIME_BETWEEN_NEW_LOCATIONS) {
+            if (lastLocation == null || (location.getStartTime() - lastLocation.getStartTime()) > TIME_BETWEEN_NEW_LOCATIONS) {
                 groups.add(0, new LocationsGroup()); //Insert on top of the list
             }
             groups.get(0).addLocation(location); //Add location to the top of the group
@@ -52,7 +52,7 @@ public class General {
 
     public static boolean checkIfLocationInGroup(LocationsGroup group,MyLocation location){
         if(group.locationsSize()==0) return true;
-        return (location.getStartTime().getTime() - group.getLastLocation().getStartTime().getTime() <= TIME_BETWEEN_NEW_LOCATIONS);
+        return (location.getStartTime() - group.getLastLocation().getStartTime() <= TIME_BETWEEN_NEW_LOCATIONS);
     }
 }
 
