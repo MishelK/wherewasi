@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import enums.InteractionsColumn;
 import enums.LocationColumn;
@@ -24,8 +23,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "wherewasi.db";
     private static final String TABLE_LOCATIONS = "locations";
     private static final String TABLE_INTERACTIONS = "interactions";
-
-
 
     public enum SORTING_PARAM{
         LastUpdated( " order by " + LocationColumn.UPDATED_TIME.toString() + " desc"),
@@ -128,37 +125,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //    }
 
     // code to get all notes in a list view
-    public List<LocationsGroup> getAllLocations(SORTING_PARAM sorting) {
+    public List<LocationsGroup> getAllLocations(Date start, Date end, int minTime, boolean onlyInteractions) {
         SQLiteDatabase db = this.getWritableDatabase();
-        List<MyLocation> locations = getLocations(db,sorting);
-        List<Interaction> interactions = getAllInteractions(db);
+        List<MyLocation> locations = getLocations(db,start,end);
+        List<Interaction> interactions = getAllInteractions(db,start,end);
         db.close();
         // return locations group list
-        return getLocationsGroup(locations,interactions);
+        return getLocationsGroup(locations,interactions,minTime,onlyInteractions);
     }
 
-    private List<MyLocation> getLocations(SQLiteDatabase db,SORTING_PARAM sorting){
+    private List<MyLocation> getLocations(SQLiteDatabase db, Date start, Date end){
         List<MyLocation> locations = new ArrayList<>();
         // Select All Query
-        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s ",
-                LocationColumn.LATITUDE.toString(),
-                LocationColumn.LONGITUDE.toString(),
-                LocationColumn.PROVIDER.toString(),
-                LocationColumn.UPDATED_TIME.toString(),
-                LocationColumn.ADDRESS_LINE.toString(),
-                LocationColumn.COUNTRY_CODE.toString(),
-                LocationColumn.ADMIN_AREA.toString(),
-                LocationColumn.FEATURE_NAME.toString(),
-                LocationColumn.SUB_AREA_NAME.toString(),
-                LocationColumn.START_TIME.toString(),
-                LocationColumn.END_TIME.toString(),
-                LocationColumn.ACCURACY.toString(),
-                TABLE_LOCATIONS);
+        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s WHERE 1=1 ",
+            LocationColumn.LATITUDE.toString(),
+            LocationColumn.LONGITUDE.toString(),
+            LocationColumn.PROVIDER.toString(),
+            LocationColumn.UPDATED_TIME.toString(),
+            LocationColumn.ADDRESS_LINE.toString(),
+            LocationColumn.COUNTRY_CODE.toString(),
+            LocationColumn.ADMIN_AREA.toString(),
+            LocationColumn.FEATURE_NAME.toString(),
+            LocationColumn.SUB_AREA_NAME.toString(),
+            LocationColumn.START_TIME.toString(),
+            LocationColumn.END_TIME.toString(),
+            LocationColumn.ACCURACY.toString(),
+            TABLE_LOCATIONS
+        );
 
-        if(sorting != null) {
-            selectQuery += sorting.getSorting();
+        if(start!=null){
+            selectQuery+= " AND " +LocationColumn.START_TIME.toString() + " >= "+start.getTime();
+
+        }
+        if(end !=null){
+            selectQuery+= " AND " +LocationColumn.END_TIME.toString() + " <= " + end.getTime();
         }
 
+        selectQuery += " " + SORTING_PARAM.firstStart.getSorting();
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -447,10 +450,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    private List<Interaction> getAllInteractions(SQLiteDatabase db) {
+    private List<Interaction> getAllInteractions(SQLiteDatabase db,Date start,Date end) {
         List<Interaction> interactions = new ArrayList<>();
 
-        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS, null); // Gets all interactions from table
+        String query = "SELECT * FROM " + TABLE_INTERACTIONS + " WHERE 1=1 ";
+        if(start!=null){
+            query += " AND "+ InteractionsColumn.FIRST_SEEN.toString() + " >= " + start.getTime();
+        }
+        if(end !=null){
+            query += " AND "+ InteractionsColumn.LAST_SEEN.toString() + " <= " + end.getTime();
+        }
+
+        Cursor result = db.rawQuery(query, null); // Gets all interactions from table
 
         if(result.getCount() > 0) { // Checking if there are any interactions returned from the database
             while (result.moveToNext()) { // will be false when we ran out of unchecked results

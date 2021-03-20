@@ -18,4 +18,5 @@
     <string name="home">Home</string>
     <string name="interactions">Interactions: </string>
     <string name="locations">"Locations: "</string>
+    <string name="only_with_interactions">Only With Interactions</string>
 </resources>

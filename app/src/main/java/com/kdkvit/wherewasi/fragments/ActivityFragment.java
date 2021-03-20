@@ -115,7 +115,23 @@ public class ActivityFragment extends Fragment {
 
             @Override
             public void onFilter(Date start, Date end, int minTime, boolean onlyInteractions) {
+                drawerLayout.closeDrawer(GravityCompat.END);
+                new Thread(){
+                    @Override
+                    public void run() {
+                        super.run();
+                        if(end!=null){
+                            end.setTime(end.getTime() + 24 * 60 * 60 * 1000); //Add 24 hours to include the day
+                        }
+                        locations = db.getAllLocations(start,end,minTime,onlyInteractions);
 
+                        dbInit = true;
+                        handler.post(()-> {
+                            timeLineFragment.updateTimeLineAdapter();
+                            //mapsFragment.setMapPointers();
+                        });
+                    }
+                }.start();
             }
 
         });
@@ -142,7 +158,7 @@ public class ActivityFragment extends Fragment {
             @Override
             public void run() {
                 super.run();
-                locations = db.getAllLocations(DatabaseHandler.SORTING_PARAM.firstStart);
+                locations = db.getAllLocations(null,null,0,false);
 
                 dbInit = true;
                 handler.post(()-> {
@@ -171,21 +187,21 @@ public class ActivityFragment extends Fragment {
                     switch (command) {
                         case "new_location":
                             if(dbInit){
-                                MyLocation location = (MyLocation) intent.getSerializableExtra("location");
-                                if(locations.size() == 0 || !checkIfLocationInGroup(locations.get(0),location)) {
-                                    locations.add(0,new LocationsGroup());
-                                }
-                                locations.get(0).addLocation(location);
-                                timeLineFragment.updateTimeLineAdapter();
+//                                MyLocation location = (MyLocation) intent.getSerializableExtra("location");
+//                                if(locations.size() == 0 || !checkIfLocationInGroup(locations.get(0),location)) {
+//                                    locations.add(0,new LocationsGroup());
+//                                }
+//                                locations.get(0).addLocation(location);
+//                                timeLineFragment.updateTimeLineAdapter();
                                 //mapsFragment.setMapPointers();
                             }
                         case "location_changed":
                             if(dbInit) {
-                                MyLocation location = (MyLocation)intent.getSerializableExtra("location");
-                                Log.i("changed","location");
-                                locations.get(0).getLocations().remove(0);
-                                locations.get(0).getLocations().add(0,location);
-                                timeLineFragment.updateTimeLineAdapter();
+//                                MyLocation location = (MyLocation)intent.getSerializableExtra("location");
+//                                Log.i("changed","location");
+//                                locations.get(0).getLocations().remove(0);
+//                                locations.get(0).getLocations().add(0,location);
+//                                timeLineFragment.updateTimeLineAdapter();
                                 //mapsFragment.setMapPointers();
                             }
                             break;

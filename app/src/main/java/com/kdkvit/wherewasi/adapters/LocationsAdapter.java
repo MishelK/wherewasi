@@ -71,13 +71,9 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
         LocationsGroup location = locations.get(position);
         String startTime = new SimpleDateFormat("HH:mm dd-MM").format(location.getStartTime());
 
-        if (position == 0) {
+        String endTime = new SimpleDateFormat("HH:mm dd-MM").format(location.getEndTime());
+        holder.timeTV.setText(String.format("%s %s - %s", holder.itemView.getResources().getString(R.string.time), startTime, endTime));
 
-            holder.timeTV.setText(String.format("%s %s", holder.itemView.getResources().getString(R.string.time), startTime));
-        } else {
-            String endTime = new SimpleDateFormat("HH:mm dd-MM").format(location.getEndTime());
-            holder.timeTV.setText(String.format("%s %s - %s", holder.itemView.getResources().getString(R.string.time), startTime, endTime));
-        }
         //holder.coordinatesTV.setText(String.format("%s %s,%s", holder.itemView.getResources().getString(R.string.coordinates), df2.format(location.getLatitude()), df2.format(location.getLongitude())));
         holder.locationsTV.setText(String.format("%s %s", holder.itemView.getResources().getString(R.string.locations), location.locationsSize()));
 
