@@ -7,6 +7,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import android.provider.ContactsContract;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -36,6 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import utils.DatabaseHandler;
 import utils.InteractionDatabaseHandler;
 
 import static com.kdkvit.wherewasi.MainActivity.user;
@@ -77,7 +79,7 @@ public class MainFragment extends Fragment {
         Cartesian cartesian = AnyChart.column();
 
         List<DataEntry> data = new ArrayList<>();
-        InteractionDatabaseHandler db = new InteractionDatabaseHandler(getContext());
+        DatabaseHandler db = new DatabaseHandler(getContext());
         // Getting interactions from db and adding to arrayList
         for (int i = 6; i>=0; i--){
             long currentTime = System.currentTimeMillis();
@@ -127,12 +129,12 @@ public class MainFragment extends Fragment {
         Cartesian cartesian = AnyChart.column();
 
         List<DataEntry> data = new ArrayList<>();
-        InteractionDatabaseHandler db = new InteractionDatabaseHandler(getContext());
+        DatabaseHandler db = new DatabaseHandler(getContext());
         // Getting interactions from db and adding to arrayList
         for (int i = 6; i>=0; i--){
-            long currentTime = System.currentTimeMillis();
+            long currentTime = (new Date()).getTime();
             long dateInMillis = currentTime - (i * MILLIS_IN_DAY);
-            int num = db.getNumOfInteractionsOnDay(dateInMillis);
+            int num = db.getLocationsOnDay(dateInMillis);
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(dateInMillis);

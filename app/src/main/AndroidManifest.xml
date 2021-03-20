@@ -31,8 +31,17 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
 
-
         <activity android:name=".MapActivity" android:launchMode="singleInstance" android:screenOrientation="portrait"/>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.kdkvit.wherewasi.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/files_dir" />
+        </provider>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

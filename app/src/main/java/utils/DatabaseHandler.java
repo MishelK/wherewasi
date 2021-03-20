@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import enums.InteractionsColumn;
 import enums.LocationColumn;
@@ -15,6 +16,7 @@ import models.MyLocation;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import static com.kdkvit.wherewasi.utils.General.getLocationsGroup;
 
@@ -41,12 +43,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        SQLiteDatabase database = getWritableDatabase();
         //3rd argument to be passed is CursorFactory instance
     }
 
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.i("BLE", "OnCreate");
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_LOCATIONS + "("
                 + LocationColumn.ID.toString() + " INTEGER PRIMARY KEY,"
                 + LocationColumn.LATITUDE.toString() + " DOUBLE,"
@@ -79,14 +83,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOCATIONS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_INTERACTIONS);
-
+        Log.i("BLE", "OnUpgrade");
         // Create tables again
         onCreate(db);
     }
 
     // code to add the new note
     public long addLocation(MyLocation location) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
+
+        Log.i("BLE", "Adding location to db, start time: " + location.getStartTime() + "end time: " + location.getEndTime());
 
         ContentValues values = new ContentValues();
         values.put(LocationColumn.LATITUDE.toString(), location.getLatitude());
@@ -97,9 +103,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(LocationColumn.ADMIN_AREA.toString(), location.getAdminArea());
         values.put(LocationColumn.FEATURE_NAME.toString(), location.getFeatureName());
         values.put(LocationColumn.SUB_AREA_NAME.toString(), location.getSubAdminArea());
-        values.put(LocationColumn.START_TIME.toString(),location.getStartTime().getTime());
-        values.put(LocationColumn.END_TIME.toString(),location.getEndTime().getTime());
-        values.put(LocationColumn.UPDATED_TIME.toString(),location.getUpdateTime().getTime());
+        values.put(LocationColumn.START_TIME.toString(),location.getStartTime());
+        values.put(LocationColumn.END_TIME.toString(),location.getEndTime());
+        values.put(LocationColumn.UPDATED_TIME.toString(),location.getUpdateTime());
         values.put(LocationColumn.ACCURACY.toString(),location.getAccuracy());
         // Inserting Row
         long id = db.insert(TABLE_LOCATIONS, null, values);
@@ -125,10 +131,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //    }
 
     // code to get all notes in a list view
+
     public List<LocationsGroup> getAllLocations(Date start, Date end, int minTime, boolean onlyInteractions) {
         SQLiteDatabase db = this.getWritableDatabase();
         List<MyLocation> locations = getLocations(db,start,end);
         List<Interaction> interactions = getAllInteractions(db,start,end);
+
         db.close();
         // return locations group list
         return getLocationsGroup(locations,interactions,minTime,onlyInteractions);
@@ -172,9 +180,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 double lon = cursor.getDouble(1);
                 String provider = cursor.getString(2);
                 long temp = cursor.getLong(3);
-                Date lastUpdated = new Date(temp);
 
-                MyLocation location = new MyLocation(lat,lon,provider,lastUpdated);
+
+                MyLocation location = new MyLocation(lat,lon,provider,temp);
 
                 location.setAddressLine(cursor.getString(4));
                 location.setCountryCode(cursor.getString(5));
@@ -183,15 +191,72 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 location.setSubAdminArea(cursor.getString(8));
 
                 temp = cursor.getLong(9);
-                location.setStartTime(new Date(temp));
+                location.setStartTime(temp);
 
                 temp = cursor.getLong(10);
-                location.setEndTime(new Date(temp));
+                location.setEndTime(temp);
                 location.setAccuracy(cursor.getFloat(11));
 
                 locations.add(location);
             } while (cursor.moveToNext());
         }
+        return locations;
+    }
+
+    public List<MyLocation> getAllMyLocations(SORTING_PARAM sorting){
+        List<MyLocation> locations = new ArrayList<>();
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Select All Query
+        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s ",
+                LocationColumn.LATITUDE.toString(),
+                LocationColumn.LONGITUDE.toString(),
+                LocationColumn.PROVIDER.toString(),
+                LocationColumn.UPDATED_TIME.toString(),
+                LocationColumn.ADDRESS_LINE.toString(),
+                LocationColumn.COUNTRY_CODE.toString(),
+                LocationColumn.ADMIN_AREA.toString(),
+                LocationColumn.FEATURE_NAME.toString(),
+                LocationColumn.SUB_AREA_NAME.toString(),
+                LocationColumn.START_TIME.toString(),
+                LocationColumn.END_TIME.toString(),
+                LocationColumn.ACCURACY.toString(),
+                TABLE_LOCATIONS);
+
+        if(sorting != null) {
+            selectQuery += sorting.getSorting();
+        }
+
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                double lat = cursor.getDouble(0);
+                double lon = cursor.getDouble(1);
+                String provider = cursor.getString(2);
+                long temp = cursor.getLong(3);
+
+
+                MyLocation location = new MyLocation(lat,lon,provider,temp);
+
+                location.setAddressLine(cursor.getString(4));
+                location.setCountryCode(cursor.getString(5));
+                location.setAdminArea(cursor.getString(6));
+                location.setFeatureName(cursor.getString(7));
+                location.setSubAdminArea(cursor.getString(8));
+
+                temp = cursor.getLong(9);
+                location.setStartTime(temp);
+
+                temp = cursor.getLong(10);
+                location.setEndTime(temp);
+                location.setAccuracy(cursor.getFloat(11));
+
+                locations.add(location);
+            } while (cursor.moveToNext());
+        }
+        db.close();
         return locations;
     }
 
@@ -215,11 +280,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //        return false;
 //    }
 
-    public List<MyLocation> getLocationsOnDay(SORTING_PARAM sorting, Long time) {
+    public List<MyLocation> getLocationsOnDay2(SORTING_PARAM sorting, Long time) {
         List<MyLocation> locations = new ArrayList<>();
 
-        Long dayStart = time - time % 86400000; // the remainder of the modulus will be time of day (time since day started)
-        Long dayEnd = dayStart + 86400000;
+        TimeZone timeZone = TimeZone.getDefault();
+        long offset = timeZone.getOffset(time);
+
+        Long dayStart = time - time % 86400000 - offset; // the remainder of the modulus will be time of day (time since day started)
+        Long dayEnd = dayStart + 86400000 - offset;
 
         // Select All Query
         String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s WHERE %s > %s AND %s < %s",
@@ -256,9 +324,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 double lon = cursor.getDouble(1);
                 String provider = cursor.getString(2);
                 long temp = cursor.getLong(3);
-                Date lastUpdated = new Date(temp);
 
-                MyLocation location = new MyLocation(lat,lon,provider,lastUpdated);
+                MyLocation location = new MyLocation(lat,lon,provider,temp);
 
                 location.setAddressLine(cursor.getString(4));
                 location.setCountryCode(cursor.getString(5));
@@ -267,10 +334,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 location.setSubAdminArea(cursor.getString(8));
 
                 temp = cursor.getLong(9);
-                location.setStartTime(new Date(temp));
+                location.setStartTime(temp);
 
                 temp = cursor.getLong(10);
-                location.setEndTime(new Date(temp));
+                location.setEndTime(temp);
                 location.setAccuracy(cursor.getFloat(11));
 
                 locations.add(location);
@@ -281,8 +348,48 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return locations;
     }
 
+    public int getLocationsOnDay(Long time) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        TimeZone timeZone =TimeZone.getDefault();
+        long offset = timeZone.getOffset(time);
+
+        Long dayStart = time - time % 86400000 - offset; // the remainder of the modulus will be time of day (time since day started)
+        Long dayEnd = dayStart + 86400000 - offset;
+
+        // Select All Query
+        String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s WHERE %s between %s and %s",
+                LocationColumn.LATITUDE.toString(),
+                LocationColumn.LONGITUDE.toString(),
+                LocationColumn.PROVIDER.toString(),
+                LocationColumn.UPDATED_TIME.toString(),
+                LocationColumn.ADDRESS_LINE.toString(),
+                LocationColumn.COUNTRY_CODE.toString(),
+                LocationColumn.ADMIN_AREA.toString(),
+                LocationColumn.FEATURE_NAME.toString(),
+                LocationColumn.SUB_AREA_NAME.toString(),
+                LocationColumn.START_TIME.toString(),
+                LocationColumn.END_TIME.toString(),
+                LocationColumn.ACCURACY.toString(),
+                TABLE_LOCATIONS,
+                LocationColumn.START_TIME.toString(),
+                dayStart.toString(),
+                dayEnd.toString());
+
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // return notes list
+        return cursor.getCount();
+    }
+
     public List<MyLocation> getLocationsBetweenDates(SORTING_PARAM sorting, Long from, Long to) {
         List<MyLocation> locations = new ArrayList<>();
+
+        TimeZone timeZone =TimeZone.getDefault();
+        long offset = timeZone.getOffset(from);
+        Long fromLocal = from - offset;
+        Long toLocal = to - offset;
 
         // Select All Query
         String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s WHERE %s > %s AND %s < %s",
@@ -300,9 +407,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 LocationColumn.ACCURACY.toString(),
                 TABLE_LOCATIONS,
                 LocationColumn.START_TIME.toString(),
-                from.toString(),
+                fromLocal.toString(),
                 LocationColumn.START_TIME.toString(),
-                to.toString());
+                toLocal.toString());
 
         if(sorting != null) {
             selectQuery += sorting.getSorting();
@@ -319,9 +426,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 double lon = cursor.getDouble(1);
                 String provider = cursor.getString(2);
                 long temp = cursor.getLong(3);
-                Date lastUpdated = new Date(temp);
 
-                MyLocation location = new MyLocation(lat,lon,provider,lastUpdated);
+
+                MyLocation location = new MyLocation(lat,lon,provider,temp);
 
                 location.setAddressLine(cursor.getString(4));
                 location.setCountryCode(cursor.getString(5));
@@ -330,10 +437,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 location.setSubAdminArea(cursor.getString(8));
 
                 temp = cursor.getLong(9);
-                location.setStartTime(new Date(temp));
+                location.setStartTime(temp);
 
                 temp = cursor.getLong(10);
-                location.setEndTime(new Date(temp));
+                location.setEndTime(temp);
                 location.setAccuracy(cursor.getFloat(11));
 
                 locations.add(location);
@@ -380,9 +487,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 double lon = cursor.getDouble(1);
                 String provider = cursor.getString(2);
                 long temp = cursor.getLong(3);
-                Date lastUpdated = new Date(temp);
 
-                MyLocation location = new MyLocation(lat,lon,provider,lastUpdated);
+                MyLocation location = new MyLocation(lat,lon,provider,temp);
 
                 location.setAddressLine(cursor.getString(4));
                 location.setCountryCode(cursor.getString(5));
@@ -391,10 +497,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 location.setSubAdminArea(cursor.getString(8));
 
                 temp = cursor.getLong(9);
-                location.setStartTime(new Date(temp));
+                location.setStartTime(temp);
 
                 temp = cursor.getLong(10);
-                location.setEndTime(new Date(temp));
+                location.setEndTime(temp);
                 location.setAccuracy(cursor.getFloat(11));
 
                 locations.add(location);
@@ -408,9 +514,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public int updateLocation(MyLocation location) {
         SQLiteDatabase db = this.getWritableDatabase();
 
+        Log.i("BLE", "Updating location in db, end time: " + location.getEndTime());
+
         ContentValues values = new ContentValues();
-        values.put(LocationColumn.END_TIME.toString(), location.getEndTime().getTime());
-        values.put(LocationColumn.UPDATED_TIME.toString(), location.getEndTime().getTime());
+        values.put(LocationColumn.END_TIME.toString(), location.getEndTime());
+        values.put(LocationColumn.UPDATED_TIME.toString(), location.getUpdateTime());
         values.put(LocationColumn.ACCURACY.toString(), location.getAccuracy());
         values.put(LocationColumn.LATITUDE.toString(),location.getLatitude());
         values.put(LocationColumn.LONGITUDE.toString(),location.getLongitude());
@@ -435,6 +543,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long id = db.insert(TABLE_INTERACTIONS, null, values);
         db.close();
 
+        Log.i("BLE","Interaction with device : " + interaction.getUuid() + " Added to DB");
+
         return id;
     }
 
@@ -450,7 +560,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
+
     private List<Interaction> getAllInteractions(SQLiteDatabase db,Date start,Date end) {
+
         List<Interaction> interactions = new ArrayList<>();
 
         String query = "SELECT * FROM " + TABLE_INTERACTIONS + " WHERE 1=1 ";
@@ -481,8 +593,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<Interaction> getInteractionsOnDay(long timeInMillis) { // Returns all interactions that occurred on the day of given timestamp
         List<Interaction> interactions = new ArrayList<>();
 
-        Long dayStart = timeInMillis - timeInMillis % 86400000; // the remainder of the modulus will be time of day (time since day started)
-        Long dayEnd = dayStart + 86400000;
+        TimeZone timeZone =TimeZone.getDefault();
+        long offset = timeZone.getOffset(timeInMillis);
+
+        Long dayStart = timeInMillis - timeInMillis % 86400000 - offset; // the remainder of the modulus will be time of day (time since day started)
+        Long dayEnd = dayStart + 86400000 - offset;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString()
@@ -503,12 +618,33 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return interactions;
     }
 
+    public int getNumOfInteractionsOnDay(long timeInMillis) { // Returns all interactions that occurred on the day of given timestamp
+
+        TimeZone timeZone =TimeZone.getDefault();
+        long offset = timeZone.getOffset(timeInMillis);
+
+        Long dayStart = timeInMillis - timeInMillis % 86400000 - offset; // the remainder of the modulus will be time of day (time since day started)
+        Long dayEnd = dayStart + 86400000 - offset;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString()
+                + " < ?", new String[]{dayStart.toString(), dayEnd.toString()}); // Gets all interactions between dates from table
+
+
+        return result.getCount();
+    }
+
     public List<Interaction> getInteractionsBetweenDates(Long from, Long to) { // Returns all interactions that occurred between given timestamps
         List<Interaction> interactions = new ArrayList<>();
 
+        TimeZone timeZone =TimeZone.getDefault();
+        long offset = timeZone.getOffset(from);
+        Long fromLocal = from - offset;
+        Long toLocal = to - offset;
+
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString() + " < ?"
-                , new String[]{from.toString(), to.toString()});
+                , new String[]{fromLocal.toString(), toLocal.toString()});
 
         if(result.getCount() > 0) { // Checking if there are any interactions returned from the database
             while (result.moveToNext()) { // will be false when we ran out of unchecked results

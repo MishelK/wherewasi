@@ -2,11 +2,13 @@ package com.kdkvit.wherewasi;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,6 +16,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -29,9 +32,17 @@ import com.kdkvit.wherewasi.fragments.WelcomeFragment;
 import com.kdkvit.wherewasi.services.LocationService;
 import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.List;
 import java.util.UUID;
 
+import models.Interaction;
+import models.MyLocation;
 import models.User;
+import utils.CSVManager;
+import utils.DatabaseHandler;
+import utils.InteractionDatabaseHandler;
 
 import static actions.actions.sendUserToBe;
 

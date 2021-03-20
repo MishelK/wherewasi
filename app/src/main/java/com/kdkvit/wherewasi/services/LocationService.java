@@ -150,8 +150,8 @@ public class LocationService extends Service {
             public void run() {
                 Log.i("test","timer test");
                 if(previousBestLocation!=null && previousBestLocation.getId() > 0){
-                    previousBestLocation.setEndTime(new Date());
-                    previousBestLocation.setUpdateTime(new Date());
+                    previousBestLocation.setEndTime(System.currentTimeMillis());
+                    previousBestLocation.setUpdateTime(System.currentTimeMillis());
                     sendLocationEvent(previousBestLocation);
                 }
             }
@@ -180,6 +180,7 @@ public class LocationService extends Service {
                     @Override
                     public void run() {
                         super.run();
+                        Log.i("BLE", "Received interactions list from service : " + interactions);
                         addNewInteractions(interactions);
                     }
                 };
@@ -207,9 +208,9 @@ public class LocationService extends Service {
     private void addNewInteractions(ArrayList<Interaction> interactions) {
 
         for(Interaction interaction : interactions){
-            Date now = new Date();
+
             if(btInteractions.containsKey(interaction.getUuid())){
-                btInteractions.get(interaction.getUuid()).setLastSeen(now.getTime());
+                btInteractions.get(interaction.getUuid()).setLastSeen(System.currentTimeMillis());
             }else{
                 btInteractions.put(interaction.getUuid(),interaction);
             }
@@ -264,7 +265,7 @@ public class LocationService extends Service {
         }
 
         // Check whether the new location fix is newer or older
-        long timeDelta = location.getEndTime().getTime() - currentBestLocation.getEndTime().getTime();
+        long timeDelta = location.getEndTime() - currentBestLocation.getEndTime();
         boolean isSignificantlyNewer = timeDelta > SIGNIFICANT_TIME;
         //boolean isSignificantlyOlder = timeDelta < -SIGNIFICANT_TIME;
         //boolean isNewer = timeDelta > 0;
@@ -346,7 +347,7 @@ public class LocationService extends Service {
         public void onLocationChanged(final Location loc) {
             Log.i("*****", "Location changed");
 
-            Date now = new Date();
+            long now = System.currentTimeMillis();
             MyLocation location = new MyLocation(loc.getLatitude(), loc.getLongitude(),loc.getProvider(),now,now,loc.getAccuracy());
             if (isBetterLocation(location, previousBestLocation)) { //Check if better location; if it is writing new line if not updating current one
                 previousBestLocation = location;
@@ -370,7 +371,7 @@ public class LocationService extends Service {
                 }
 
                 previousBestLocation.setEndTime(location.getEndTime());
-                previousBestLocation.setUpdateTime(new Date());
+                previousBestLocation.setUpdateTime(System.currentTimeMillis());
                 sendLocationEvent(previousBestLocation);
             }
         }
