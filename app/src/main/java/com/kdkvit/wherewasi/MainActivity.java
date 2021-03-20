@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
+import com.kdkvit.wherewasi.firebase.MyFirebaseMessagingService;
 import com.kdkvit.wherewasi.fragments.ActivityFragment;
 import com.kdkvit.wherewasi.fragments.MainFragment;
 import com.kdkvit.wherewasi.fragments.WelcomeFragment;
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Running = getIntent().getBooleanExtra("working",false);
+        Running = getIntent().getBooleanExtra("working", false);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
@@ -76,10 +77,12 @@ public class MainActivity extends AppCompatActivity {
         headerRightIcon = findViewById(R.id.header_right_icon);
         //Init user from local storage
         user = SharedPreferencesUtils.getUser(this);
-        if(user==null){ //User not exists -> welcome page
+        String fcmId = MyFirebaseMessagingService.getToken(this);
+        if (user == null) { //User not exists -> welcome page
             WelcomeFragment welcomeFragment = new WelcomeFragment(name -> {
                 user = new User(name, UUID.randomUUID().toString());
-                sendUserToBe(MainActivity.this,user);
+                user.setFcmId(fcmId);
+                sendUserToBe(MainActivity.this, user);
                 initLoggedInUser();
             });
             getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, welcomeFragment).commit();
@@ -87,14 +90,17 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             navigationView.setVisibility(View.GONE);
 
-        }else{ //User exists -> Main Page
-            if(user.getId() == 0) { //User want not created in DB
+        } else { //User exists -> Main Page
+            if (user.getId() == 0) { //User want not created in DB
+                sendUserToBe(this, user);
+            }
+            String userFcmId = user.getFcmId();
+            if (!fcmId.isEmpty() && (userFcmId == null || !userFcmId.equals(fcmId))) {
+                user.setFcmId(fcmId);
                 sendUserToBe(this, user);
             }
             initLoggedInUser();
         }
-
-
     }
 
     private void initLoggedInUser() {
