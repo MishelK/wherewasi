@@ -9,6 +9,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
+
+import models.User;
+
+import static actions.actions.sendUserToBe;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -22,6 +27,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onNewToken(@NonNull String s) {
         super.onNewToken(s);
         getSharedPreferences("_", MODE_PRIVATE).edit().putString("fb", s).apply();
+        User user = SharedPreferencesUtils.getUser(this);
+        user.setFcmId(s);
+        sendUserToBe(this,user);
     }
 
     @Override
@@ -56,6 +64,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     public static String getToken(Context context) {
-        return context.getSharedPreferences("_", MODE_PRIVATE).getString("fb", "empty");
+        return context.getSharedPreferences("_", MODE_PRIVATE).getString("fb", "");
     }
 }
