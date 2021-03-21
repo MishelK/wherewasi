@@ -3,6 +3,7 @@ package com.kdkvit.wherewasi.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -38,6 +39,7 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
         TextView timeTV;
         TextView locationsTV;
         TextView interactionsTV;
+        LinearLayout statusCircleView;
 
         public LocationViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -45,6 +47,7 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
             timeTV = itemView.findViewById(R.id.location_time_tv);
             locationsTV = itemView.findViewById(R.id.location_locations_tv);
             interactionsTV = itemView.findViewById(R.id.location_interactions_tv);
+            statusCircleView = itemView.findViewById(R.id.status_circle_view);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -78,6 +81,15 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
         holder.locationsTV.setText(String.format("%s %s", holder.itemView.getResources().getString(R.string.locations), location.locationsSize()));
 
         holder.interactionsTV.setText(String.format("%s %s", holder.itemView.getResources().getString(R.string.interactions), location.interactionsSize()));
+
+        if(location.getPositiveInteractions().size()>0){
+            holder.statusCircleView.setBackgroundResource(R.drawable.circle_dra_orange);
+        }else {
+            holder.statusCircleView.setBackgroundResource(R.drawable.circle_dra_gren);
+        }
+
+        //todo: mark in red
+
     }
 
     @Override

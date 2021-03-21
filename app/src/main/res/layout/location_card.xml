@@ -24,8 +24,8 @@
                 android:layout_height="18dp"
                 android:background="@drawable/circle_dra"
                 android:layout_gravity="center"
-                android:backgroundTint="@android:color/holo_green_light"
-            />
+                android:id="@+id/status_circle_view"
+                android:orientation="vertical" />
         </LinearLayout>
 
         <LinearLayout
