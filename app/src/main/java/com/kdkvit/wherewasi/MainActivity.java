@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
             WelcomeFragment welcomeFragment = new WelcomeFragment(name -> {
                 user = new User(name, UUID.randomUUID().toString());
                 user.setFcmId(fcmId);
+                SharedPreferencesUtils.setUser(this, user);
                 sendUserToBe(MainActivity.this, user);
                 initLoggedInUser();
             });
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             navigationView.setVisibility(View.GONE);
 
         } else { //User exists -> Main Page
-            if (user.getId() == 0) { //User want not created in DB
+            if (user.getId() == 0) { //User was not created in DB
                 sendUserToBe(this, user);
             }
             String userFcmId = user.getFcmId();
