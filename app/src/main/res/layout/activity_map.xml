@@ -21,23 +21,93 @@
             />
 
     </LinearLayout>
-    <LinearLayout
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:id="@+id/info_container"
-        android:visibility="visible"
-        android:background="@color/white"
-        android:orientation="vertical" >
-        <TextView
+        android:layout_height="200dp">
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/location_name_tv"/>
+            android:id="@+id/info_container"
+            android:visibility="visible"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:padding="10dp"
+            >
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/location_num_tv"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="15dp"
+                >
 
-    </LinearLayout>
+                <LinearLayout
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:background="@drawable/circle_dra"
+                    android:gravity="center"
+                    >
+                    <LinearLayout
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:background="@drawable/circle_dra"
+                        android:layout_gravity="center"
+                        android:id="@+id/status_circle_view"
+                        android:orientation="vertical" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/location_time_tv"
+                    android:layout_marginStart="10dp"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    />
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="40dp"
+                >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/location_num_tv"
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/alerted_interactions_tv"
+                android:textSize="18sp"
+
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/total_interactions_tv"
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/max_interaction_time"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/avg_interaction_time"
+                />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

@@ -19,4 +19,5 @@
     <string name="interactions">Interactions: </string>
     <string name="locations">"Locations: "</string>
     <string name="only_with_interactions">Only With Interactions</string>
+    <string name="positives">"Alerted Interactions: "</string>
 </resources>
