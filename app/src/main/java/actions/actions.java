@@ -24,8 +24,8 @@ import models.User;
 
 public class actions {
 
-//    static final String BE_URL = "https://wherewasi-be.herokuapp.com/";
-    static final String BE_URL = "http://192.168.1.178:3030/";
+    static final String BE_URL = "https://wherewasi-be.herokuapp.com/";
+//    static final String BE_URL = "http://192.168.1.178:3030/";
     static final String USERS_URL = BE_URL + "api/users/";
 
     public static void sendUserToBe(Context context, User user){
