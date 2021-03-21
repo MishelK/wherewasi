@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.kdkvit.wherewasi.firebase.MyFirebaseMessagingService;
 import com.kdkvit.wherewasi.fragments.ActivityFragment;
 import com.kdkvit.wherewasi.fragments.MainFragment;
@@ -99,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
                 user.setFcmId(fcmId);
                 sendUserToBe(this, user);
             }
+            FirebaseMessaging.getInstance().subscribeToTopic("positives");
+
             initLoggedInUser();
         }
     }

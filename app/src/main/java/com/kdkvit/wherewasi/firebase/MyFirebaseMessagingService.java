@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
@@ -26,10 +27,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String s) {
         super.onNewToken(s);
-        getSharedPreferences("_", MODE_PRIVATE).edit().putString("fb", s).apply();
-        User user = SharedPreferencesUtils.getUser(this);
-        user.setFcmId(s);
-        sendUserToBe(this,user);
+        FirebaseMessaging.getInstance().subscribeToTopic("positives");
     }
 
     @Override
