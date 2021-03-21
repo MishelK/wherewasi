@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
-        
 
         headerView = findViewById(R.id.main_header);
         headerIcon = findViewById(R.id.header_image);
