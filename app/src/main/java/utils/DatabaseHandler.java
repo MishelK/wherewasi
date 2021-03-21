@@ -52,7 +52,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Log.i("BLE", "OnCreate");
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_LOCATIONS + "("
-                + LocationColumn.ID.toString() + " INTEGER PRIMARY KEY,"
+                + LocationColumn.ID.toString() + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + LocationColumn.LATITUDE.toString() + " DOUBLE,"
                 + LocationColumn.LONGITUDE.toString() + " DOUBLE,"
                 + LocationColumn.PROVIDER.toString() + " TEXT,"
