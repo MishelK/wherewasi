@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -17,6 +19,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.ui.IconGenerator;
+
+import org.w3c.dom.Text;
+
+import java.text.SimpleDateFormat;
 
 import models.LocationsGroup;
 import models.MyLocation;
@@ -48,14 +54,43 @@ public class MapActivity extends AppCompatActivity {
 
         group = locations.get(groupNum);
 
-        infoContainer = findViewById(R.id.info_container);
-        infoContainer.setVisibility(View.GONE);
 
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
+
+        initData(group);
+    }
+
+    private void initData(LocationsGroup location) {
+
+        String startTime = new SimpleDateFormat("HH:mm dd-MM").format(location.getStartTime());
+
+        String endTime = new SimpleDateFormat("HH:mm dd-MM").format(location.getEndTime());
+        TextView timeTV = findViewById(R.id.location_time_tv);
+        timeTV.setText(String.format("%s %s - %s", getResources().getString(R.string.time), startTime, endTime));
+
+        //holder.coordinatesTV.setText(String.format("%s %s,%s", holder.itemView.getResources().getString(R.string.coordinates), df2.format(location.getLatitude()), df2.format(location.getLongitude())));
+        TextView locationsTV = findViewById(R.id.location_num_tv);
+        locationsTV.setText(String.format("%s %s", getResources().getString(R.string.locations), location.locationsSize()));
+
+        TextView interactionsTV = findViewById(R.id.total_interactions_tv);
+        interactionsTV.setText(String.format("%s %s", getResources().getString(R.string.interactions), location.interactionsSize()));
+
+        LinearLayout statusCircleView = findViewById(R.id.status_circle_view);
+        int positives = location.getPositiveInteractions().size();
+        if(positives > 0){
+            statusCircleView.setBackgroundResource(R.drawable.circle_dra_orange);
+        }else {
+            statusCircleView.setBackgroundResource(R.drawable.circle_dra_gren);
+        }
+
+        TextView positivesTV = findViewById(R.id.alerted_interactions_tv);
+        positivesTV.setText(String.format("%s %s", getResources().getString(R.string.positives),positives));
+
+        positivesTV.setText(String.format("%s %s", getResources().getString(R.string.positives),positives));
     }
 
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
