@@ -58,7 +58,7 @@ public class Interaction implements Parcelable {
     @NonNull
     @Override
     public String toString() {
-        String string = "ID : " + this.interactionID + " FirstSeen : " + new Date(this.getFirstSeen()).toString();
+        String string = "UUID : " + this.uuid + " FirstSeen : " + new Date(this.getFirstSeen()).toString();
         return string;
     }
 

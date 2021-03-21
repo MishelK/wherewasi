@@ -661,6 +661,49 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return interactions;
     }
 
+    public List<Interaction> getInteractionsWithUuid(String uuid) {
+        List<Interaction> interactions = new ArrayList<>();
+        SQLiteDatabase db = getWritableDatabase();
+
+        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.DEVICE_ID.toString() + " = ?"
+                , new String[]{uuid});
+
+        if(result.getCount() > 0) { // Checking if there are any interactions returned from the database
+            while (result.moveToNext()) { // will be false when we ran out of unchecked results
+
+                Interaction interaction = new Interaction();
+                interaction.setInteractionID(result.getInt(0));
+                interaction.setUuid(result.getString(1));
+                interaction.setFirstSeen(result.getLong(2));
+                interaction.setLastSeen(result.getLong(3));
+
+                interactions.add(interaction);
+            }
+        }
+        return interactions;
+    }
+
+    public List<Interaction> getAllInteractions() {
+        List<Interaction> interactions = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS, null); // Gets all interactions from table
+
+        if(result.getCount() > 0) { // Checking if there are any interactions returned from the database
+            while (result.moveToNext()) { // will be false when we ran out of unchecked results
+
+                Interaction interaction = new Interaction();
+                interaction.setInteractionID(result.getInt(0));
+                interaction.setUuid(result.getString(1));
+                interaction.setFirstSeen(result.getLong(2));
+                interaction.setLastSeen(result.getLong(3));
+
+                interactions.add(interaction);
+            }
+        }
+        return interactions;
+    }
+
 
     //code to update the single Note
 //    public int updateNote(Note note) {
