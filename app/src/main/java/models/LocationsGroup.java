@@ -69,4 +69,14 @@ public class LocationsGroup {
     public int interactionsSize(){
         return interactions.size();
     }
+
+    public List<Interaction> getPositiveInteractions() {
+        List<Interaction> positives = new ArrayList<>();
+        for (int i=0;i<this.interactionsSize();i++){
+            if(this.interactions.get(i).isPositive()){
+                positives.add(interactions.get(i));
+            }
+        }
+        return positives;
+    }
 }
