@@ -23,7 +23,6 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
@@ -58,12 +57,14 @@ public class LocationService extends Service {
     DatabaseHandler db;
     Geocoder geocoder;
 
+    boolean isScanning, isAdvertising = false;
+
     NotificationManager manager;
     NotificationCompat.Builder builder;
     String channelId = "KDKVIT_NOTIF_CHANNEL";
     final int NOTIF_ID = 1;
     private Timer locationsTimer = new Timer();
-    private Timer advertingTimer = new Timer();
+    private Timer advertisingTimer = new Timer();
     private Timer scanningTimer = new Timer();
     private BroadcastReceiver scannerBroadcast;
 
@@ -158,16 +159,17 @@ public class LocationService extends Service {
         }, 0,30*1000);
 
 
-        advertingTimer.schedule(new TimerTask() {
+        advertisingTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                startBLE();
-                try {
-                    Thread.sleep(ADVERTISING_DELAY);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if(isAdvertising){
+                    stopBLE();
+                    isAdvertising = false;
                 }
-                stopBLE();
+                else{
+                    startBLE();
+                    isAdvertising = true;
+                }
             }
         },5000,ADVERTISING_DELAY);
 
@@ -191,17 +193,18 @@ public class LocationService extends Service {
         scanningTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-
-                startScanning();
-                try {
-                    Thread.sleep(SCANNING_DELAY);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if(isScanning) {
+                    stopScanning();
+                    checkIdleConnections();
+                    isScanning = false;
                 }
-                stopScanning();
-                checkIdleConnections();
+                else {
+                    startScanning();
+                    isScanning = true;
+                }
             }
         },5000,SCANNING_DELAY);
+
         geocoder = new Geocoder(this);
     }
 
@@ -313,7 +316,7 @@ public class LocationService extends Service {
         Log.v("STOP_SERVICE", "DONE");
         try {
             locationsTimer.cancel();
-            advertingTimer.cancel();
+            advertisingTimer.cancel();
             scanningTimer.cancel();
             stopBLE();
             stopScanning();
