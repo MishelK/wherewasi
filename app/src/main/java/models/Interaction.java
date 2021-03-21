@@ -13,6 +13,7 @@ public class Interaction implements Parcelable {
     private Long firstSeen;
     private Long lastSeen;
     private long interactionID;
+    private boolean positive;
 
     public Interaction(){}
 
@@ -86,4 +87,12 @@ public class Interaction implements Parcelable {
             return new Interaction[size];
         }
     };
+
+    public boolean isPositive() {
+        return positive;
+    }
+
+    public void setPositive(boolean positive) {
+        this.positive = positive;
+    }
 }
