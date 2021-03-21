@@ -16,6 +16,7 @@ import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,6 +53,57 @@ public class actions {
                     }else{
                       //Something went wrong
                     }
+                    } catch (JSONException e) {
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.i("testrecording","error when sending recording "+error.toString());
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    return headers;
+                }
+
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    return rootObject.toString().getBytes();
+                }
+            };
+            queue.add(request);
+        }catch (JSONException e){
+
+        }
+    }
+
+
+    public static void sendPositive(Context context, User user, Long date){
+        final JSONObject rootObject = new JSONObject();
+        try{
+            RequestQueue queue = Volley.newRequestQueue(context);
+            rootObject.put("device_id", user.getDeviceId());
+            rootObject.put("mark_time", date);
+            String url = USERS_URL+"mark_positive";
+            Log.i("url",url);
+            StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    JSONObject obj = null;
+                    try {
+                        obj = new JSONObject(response);
+
+                        int failure = obj.optInt("failure");
+                        if (failure == 0){
+                            //Do nothing?
+                            //parse obj
+                            // obj.getString("insertion_time")
+                        }else{
+                            //Something went wrong
+                        }
                     } catch (JSONException e) {
                     }
                 }
