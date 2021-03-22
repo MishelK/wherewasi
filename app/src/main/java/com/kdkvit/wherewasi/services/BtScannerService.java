@@ -97,6 +97,9 @@ public class BtScannerService extends Service {
                     interaction.setUuid(device_uuid);
                     Log.i("BLE", "Adding device to btInteractions : " + interaction.getUuid());
                     btInteractions.add(interaction);
+                int rssi = result.getRssi();
+                int txPow = result.getTxPower();
+                RssiTest(rssi, txPow);
             }
 
             sendListInBroadcast(btInteractions);
@@ -132,6 +135,9 @@ public class BtScannerService extends Service {
                     interaction.setUuid(device_uuid);
                     Log.i("BLE", "Adding device to btInteractions : " + interaction.getUuid());
                     btInteractions.add(interaction);
+                    int rssi = results.get(i).getRssi();
+                    int txPow = results.get(i).getTxPower();
+                    RssiTest(rssi, txPow);
                 }
             }
             sendListInBroadcast(btInteractions);
@@ -178,4 +184,15 @@ public class BtScannerService extends Service {
         Log.i("BLE","Stop Scan");
 
     }
+
+    public void RssiTest(int rssi, int txPow) {
+        Log.i("rssi", "Rssi: " + rssi + "");
+        Log.i("rssi", "TxPow: " + txPow + "");
+
+        double arg = (-69 - (rssi)) / (10 * 4);
+        double dist = Math.pow(10, arg);
+        Log.i("rssi", "Distance: " + dist);
+    }
+    
+
 }

@@ -10,7 +10,7 @@ import models.MyLocation;
 public class General {
 
     private static final int TIME_BETWEEN_NEW_LOCATIONS = 1000 * 60 * 15;
-    private static final int TIME_BETWEEN_LOCATION_AND_INTERACTION = 1000 * 60 * 10;
+    private static final int TIME_BETWEEN_LOCATION_AND_INTERACTION = 0;
 
     public static List<LocationsGroup> getLocationsGroup(List<MyLocation> locations, List<Interaction> interactions, int minTime, boolean onlyInteractions) {
         List<LocationsGroup> groups = new ArrayList<>();
