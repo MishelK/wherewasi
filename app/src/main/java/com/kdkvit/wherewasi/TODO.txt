@@ -1,11 +1,14 @@
 
- // Update interaction model to include positive boolean variable // Mishel
-
- // Upon receiving UUID of positive user, update interaction database accordingly // Mishel
-
  // Upon confirming interaction with positive device, notify user // TODO
 
  // Mark interactions with positive user in timeline // Kobi
 
  // Notify user in notification center about positive interactions // TODO
 
+
+
+
+// Completed Tasks
+
+ // Update interaction model to include positive boolean variable // Mishel
+ // Upon receiving UUID of positive user, update interaction database accordingly // Mishel
