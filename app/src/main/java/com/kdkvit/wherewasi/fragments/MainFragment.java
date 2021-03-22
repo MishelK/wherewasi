@@ -8,6 +8,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -71,6 +72,7 @@ public class MainFragment extends Fragment {
 
         return rootView;
     }
+
 
     public void initInteractionChart() {
 

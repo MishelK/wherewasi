@@ -13,7 +13,7 @@ public class Interaction implements Parcelable {
     private Long firstSeen;
     private Long lastSeen;
     private long interactionID;
-    private boolean positive;
+    private boolean positive = false;
 
     public Interaction(){}
 
@@ -59,7 +59,7 @@ public class Interaction implements Parcelable {
     @NonNull
     @Override
     public String toString() {
-        String string = "UUID : " + this.uuid + " FirstSeen : " + new Date(this.getFirstSeen()).toString();
+        String string = "UUID : " + this.uuid + " FirstSeen : " + new Date(this.getFirstSeen()).toString() + "IsPositive : " + this.positive;
         return string;
     }
 
