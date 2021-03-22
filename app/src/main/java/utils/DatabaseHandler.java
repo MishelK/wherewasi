@@ -72,7 +72,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + InteractionsColumn.INTERACTION_ID.toString() + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + InteractionsColumn.DEVICE_ID.toString() + " TEXT,"
                 + InteractionsColumn.FIRST_SEEN.toString() + " INTEGER,"
-                + InteractionsColumn.LAST_SEEN.toString() + " INTEGER "
+                + InteractionsColumn.LAST_SEEN.toString() + " INTEGER,"
+                + InteractionsColumn.POSITIVE.toString() + " INTEGER "
                 + ")";
         db.execSQL(CREATE_INTERACTIONS_TABLE);
     }
@@ -539,6 +540,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(InteractionsColumn.DEVICE_ID.toString(), interaction.getUuid());
         values.put(InteractionsColumn.FIRST_SEEN.toString(), interaction.getFirstSeen());
         values.put(InteractionsColumn.LAST_SEEN.toString(), interaction.getLastSeen());
+        if (interaction.isPositive())
+            values.put(InteractionsColumn.POSITIVE.toString(), 1);
+        else
+            values.put(InteractionsColumn.POSITIVE.toString(), 0);
 
         long id = db.insert(TABLE_INTERACTIONS, null, values);
         db.close();
@@ -552,9 +557,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put(InteractionsColumn.DEVICE_ID.toString(), interaction.getUuid());
+        values.put(InteractionsColumn.FIRST_SEEN.toString(), interaction.getFirstSeen());
         values.put(InteractionsColumn.LAST_SEEN.toString(), interaction.getLastSeen());
+        if (interaction.isPositive())
+            values.put(InteractionsColumn.POSITIVE.toString(), 1);
+        else
+            values.put(InteractionsColumn.POSITIVE.toString(), 0);
+
         // updating row
-        int success = db.update(TABLE_LOCATIONS, values, LocationColumn.ID.toString() + " = ?",
+        db.update(TABLE_LOCATIONS, values, LocationColumn.ID.toString() + " = ?",
                 new String[] { String.valueOf(interaction.getInteractionID()) });
         db.close();
     }
@@ -583,6 +595,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 interaction.setUuid(result.getString(1));
                 interaction.setFirstSeen(result.getLong(2));
                 interaction.setLastSeen(result.getLong(3));
+                interaction.setPositive(result.getInt(4) == 1);
 
                 interactions.add(interaction);
             }
@@ -611,6 +624,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 interaction.setUuid(result.getString(1));
                 interaction.setFirstSeen(result.getLong(2));
                 interaction.setLastSeen(result.getLong(3));
+                interaction.setPositive(result.getInt(4) == 1);
 
                 interactions.add(interaction);
             }
@@ -654,6 +668,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 interaction.setUuid(result.getString(1));
                 interaction.setFirstSeen(result.getLong(2));
                 interaction.setLastSeen(result.getLong(3));
+                interaction.setPositive(result.getInt(4) == 1);
 
                 interactions.add(interaction);
             }
@@ -676,6 +691,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 interaction.setUuid(result.getString(1));
                 interaction.setFirstSeen(result.getLong(2));
                 interaction.setLastSeen(result.getLong(3));
+                interaction.setPositive(result.getInt(4) == 1);
 
                 interactions.add(interaction);
             }
@@ -697,6 +713,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 interaction.setUuid(result.getString(1));
                 interaction.setFirstSeen(result.getLong(2));
                 interaction.setLastSeen(result.getLong(3));
+                interaction.setPositive(result.getInt(4) == 1);
 
                 interactions.add(interaction);
             }
