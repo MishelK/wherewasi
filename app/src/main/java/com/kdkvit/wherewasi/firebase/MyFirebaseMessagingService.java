@@ -13,6 +13,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
 
 import models.User;
+import utils.DatabaseHandler;
 
 import static actions.actions.sendUserToBe;
 
@@ -42,12 +43,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
-
             // In case application is in foreground
             Intent intent = new Intent(FCM_MESSAGE_RECEIVER);
-            intent.putExtra("message",remoteMessage.getData().get("message"));
-            intent.putExtra("sender_id",remoteMessage.getData().get("sender_id"));
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            String uuid = remoteMessage.getData().get("user_id");
+            Long markTime = Long.parseLong(remoteMessage.getData().get("mark_time"));
+            Long insTime = Long.parseLong(remoteMessage.getData().get("insertion_time"));
+            DatabaseHandler db = new DatabaseHandler(getApplicationContext());
+            db.updateInteractionsToPositive(uuid, markTime, insTime);
 
             // If application is not in foreground then post notification
 
