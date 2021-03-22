@@ -553,7 +553,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return id;
     }
 
-    public void updateInteraction(Interaction interaction) {
+    public int updateInteraction(Interaction interaction) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -566,9 +566,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(InteractionsColumn.POSITIVE.toString(), 0);
 
         // updating row
-        db.update(TABLE_LOCATIONS, values, LocationColumn.ID.toString() + " = ?",
+        int updated = db.update(TABLE_INTERACTIONS, values, InteractionsColumn.INTERACTION_ID.toString() + " = ?",
                 new String[] { String.valueOf(interaction.getInteractionID()) });
         db.close();
+        return updated;
     }
 
 
@@ -578,10 +579,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         List<Interaction> interactions = new ArrayList<>();
 
         String query = "SELECT * FROM " + TABLE_INTERACTIONS + " WHERE 1=1 ";
-        if(start!=null){
+        if(start != null){
             query += " AND "+ InteractionsColumn.FIRST_SEEN.toString() + " >= " + start.getTime();
         }
-        if(end !=null){
+        if(end != null){
             query += " AND "+ InteractionsColumn.LAST_SEEN.toString() + " <= " + end.getTime();
         }
 
@@ -606,7 +607,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<Interaction> getInteractionsOnDay(long timeInMillis) { // Returns all interactions that occurred on the day of given timestamp
         List<Interaction> interactions = new ArrayList<>();
 
-        TimeZone timeZone =TimeZone.getDefault();
+        TimeZone timeZone = TimeZone.getDefault();
         long offset = timeZone.getOffset(timeInMillis);
 
         Long dayStart = timeInMillis - timeInMillis % 86400000 - offset; // the remainder of the modulus will be time of day (time since day started)
@@ -653,12 +654,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         TimeZone timeZone =TimeZone.getDefault();
         long offset = timeZone.getOffset(from);
-        Long fromLocal = from - offset;
-        Long toLocal = to - offset;
+        from = from - offset;
+        to = to - offset;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString() + " < ?"
-                , new String[]{fromLocal.toString(), toLocal.toString()});
+                , new String[]{from.toString(), to.toString()});
 
         if(result.getCount() > 0) { // Checking if there are any interactions returned from the database
             while (result.moveToNext()) { // will be false when we ran out of unchecked results
@@ -676,12 +677,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return interactions;
     }
 
-    public List<Interaction> getInteractionsWithUuid(String uuid) {
+    public List<Interaction> getInteractionsWithUuid(String uuid, Long from, Long to) {
         List<Interaction> interactions = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
 
-        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.DEVICE_ID.toString() + " = ?"
-                , new String[]{uuid});
+        TimeZone timeZone =TimeZone.getDefault();
+        //long offset = timeZone.getOffset(from);
+        //from = from - offset;
+        //to = to - offset;
+
+        String query = "SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.DEVICE_ID.toString() + " = '" + uuid + "'";
+        if(from != null){
+            query += " AND "+ InteractionsColumn.FIRST_SEEN.toString() + " >= " + from;
+        }
+        if(to != null){
+            query += " AND "+ InteractionsColumn.LAST_SEEN.toString() + " <= " + to;
+        }
+
+        Cursor result = db.rawQuery(query, null); // Gets all interactions from table
 
         if(result.getCount() > 0) { // Checking if there are any interactions returned from the database
             while (result.moveToNext()) { // will be false when we ran out of unchecked results
@@ -696,6 +709,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 interactions.add(interaction);
             }
         }
+        result.close();
         return interactions;
     }
 
@@ -718,7 +732,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 interactions.add(interaction);
             }
         }
+        result.close();
         return interactions;
+    }
+
+    // Gets uuid and duration start and end, sets all interactions during provided duration to positive, returns number of affected rows
+    public int updateInteractionsToPositive(String uuid, Long from, Long to) {
+        List<Interaction> interactionsWithUuid = getInteractionsWithUuid(uuid, from, to);
+        int affectedRows = 0;
+
+        for (Interaction interaction : interactionsWithUuid) {
+            interaction.setPositive(true);
+            affectedRows += updateInteraction(interaction);
+        }
+        return affectedRows;
     }
 
 
