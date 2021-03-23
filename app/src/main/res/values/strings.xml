@@ -20,4 +20,7 @@
     <string name="locations">"Locations: "</string>
     <string name="only_with_interactions">Only With Interactions</string>
     <string name="positives">"Alerted Interactions: "</string>
+    <string name="export_data">Export Data</string>
+    <string name="mark_as_positive">Mark as Positive</string>
+    <string name="export">Export</string>
 </resources>

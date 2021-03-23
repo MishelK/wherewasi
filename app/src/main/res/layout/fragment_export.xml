@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.ExportFragment"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/export_data"
+        android:background="@color/colorAccent"
+        android:backgroundTint="@color/colorAccent"
+        android:layout_marginBottom="10dp"
+        android:textColor="@color/white"
+        android:id="@+id/export_data"
+        android:layout_margin="30dp"
+        app:spinning_bar_color="@color/white"
+        />
+
+    <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/mark_as_positive"
+        android:background="@color/colorAccent"
+        android:backgroundTint="@color/colorAccent"
+        android:layout_margin="30dp"
+        android:layout_marginBottom="10dp"
+        android:textColor="@color/white"
+        android:id="@+id/mark_positive_btn"
+        app:spinning_bar_color="@color/white"
+
+        />
+
+</LinearLayout>

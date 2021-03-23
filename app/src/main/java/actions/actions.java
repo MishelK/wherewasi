@@ -24,8 +24,8 @@ import models.User;
 
 public class actions {
 
-    static final String BE_URL = "https://wherewasi-be.herokuapp.com/";
-//    static final String BE_URL = "http://192.168.1.178:3030/";
+//    static final String BE_URL = "https://wherewasi-be.herokuapp.com/";
+    static final String BE_URL = "http://172.18.100.81:3030/";
     static final String USERS_URL = BE_URL + "api/users/";
 
     public static void sendUserToBe(Context context, User user){
@@ -81,7 +81,13 @@ public class actions {
     }
 
 
-    public static void sendPositive(Context context, User user, Long date){
+    public interface ActionsCallback{
+        void onSuccess();
+        void onFailure();
+    }
+
+    public static void sendPositive(Context context, Long date,ActionsCallback callback){
+        User user = SharedPreferencesUtils.getUser(context);
         final JSONObject rootObject = new JSONObject();
         try{
             RequestQueue queue = Volley.newRequestQueue(context);
@@ -98,11 +104,9 @@ public class actions {
 
                         int failure = obj.optInt("failure");
                         if (failure == 0){
-                            //Do nothing?
-                            //parse obj
-                            // obj.getString("insertion_time")
+                            callback.onSuccess();
                         }else{
-                            //Something went wrong
+                            callback.onFailure();
                         }
                     } catch (JSONException e) {
                     }
@@ -127,7 +131,7 @@ public class actions {
             };
             queue.add(request);
         }catch (JSONException e){
-
+            callback.onFailure();
         }
     }
 
