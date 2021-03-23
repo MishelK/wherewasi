@@ -19,6 +19,7 @@
         android:id="@+id/export_data"
         android:layout_margin="30dp"
         app:spinning_bar_color="@color/white"
+
         />
 
     <br.com.simplepass.loadingbutton.customViews.CircularProgressButton

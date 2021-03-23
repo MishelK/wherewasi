@@ -1,8 +1,18 @@
 package com.kdkvit.wherewasi.fragments;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import actions.actions;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 import models.User;
@@ -49,7 +59,12 @@ public class ExportFragment extends Fragment {
         exportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //todo export data
+                Drawable d = getContext().getDrawable(R.drawable.ic_done);
+
+                Bitmap icon = drawableToBitmap(d);
+
+                exportBtn.startAnimation();
+                exportBtn.doneLoadingAnimation(Color.parseColor("#249ff0"),icon);
             }
         });
 
@@ -78,14 +93,18 @@ public class ExportFragment extends Fragment {
                             public void onSuccess() {
                                 if(getContext()!=null) {
                                     Toast.makeText(getContext(), "Thank you for reporting!", Toast.LENGTH_SHORT).show();
-                                    markPositiveBtn.stopAnimation();
+                                    Drawable d = getContext().getDrawable(R.drawable.ic_done);
+
+                                    Bitmap icon = drawableToBitmap(d);
+
+                                    markPositiveBtn.doneLoadingAnimation(Color.parseColor("#249ff0"),icon);
                                 }
                             }
 
                             @Override
                             public void onFailure() {
                                 Toast.makeText(getContext(), "Something went wrong, please try again...", Toast.LENGTH_SHORT).show();
-                                markPositiveBtn.stopAnimation();
+                                markPositiveBtn.revertAnimation();
                             }
                         });
                     }
@@ -96,5 +115,21 @@ public class ExportFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    private static Bitmap drawableToBitmap (Drawable drawable) {
+
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_4444);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+
+
+        return bitmap;
     }
 }
