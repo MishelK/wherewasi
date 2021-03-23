@@ -87,8 +87,8 @@ public class FiltersFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
-                if(startTime!=null) {
-                    builder.setSelection(startTime.getTime());
+                if(endTime!=null) {
+                    builder.setSelection(endTime.getTime());
                 }
                 CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
                 builder.setCalendarConstraints(constraintsBuilder.build());

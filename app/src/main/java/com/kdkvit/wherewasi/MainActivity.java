@@ -30,6 +30,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kdkvit.wherewasi.firebase.MyFirebaseMessagingService;
 import com.kdkvit.wherewasi.fragments.ActivityFragment;
+import com.kdkvit.wherewasi.fragments.ExportFragment;
 import com.kdkvit.wherewasi.fragments.MainFragment;
 import com.kdkvit.wherewasi.fragments.WelcomeFragment;
 import com.kdkvit.wherewasi.services.LocationService;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     NavigationView navigationView;
     MainFragment mainFragment;
+    private ExportFragment exportFragment;
     private View headerView;
     private ActivityFragment activityFragment;
     boolean Running;
@@ -164,6 +166,14 @@ public class MainActivity extends AppCompatActivity {
                                 activityFragment.openDrawer();
                             }
                         });
+                        break;
+                    case R.id.export_tab:
+                        exportFragment = new ExportFragment();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, exportFragment).commit();
+                        headerText.setVisibility(View.VISIBLE);
+                        headerText.setText(R.string.export);
+                        headerRightIcon.setVisibility(View.GONE);
+                        headerIcon.setVisibility(View.GONE);
                         break;
                 }
                 return true;
