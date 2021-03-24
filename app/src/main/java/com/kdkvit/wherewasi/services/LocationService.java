@@ -105,16 +105,18 @@ public class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String command = intent.getStringExtra("command");
-        if (command != null) {
-            switch (command) {
-                case "app_created":
-                    initLocation();
+        if(intent != null) {
+            String command = intent.getStringExtra("command");
+            if (command != null) {
+                switch (command) {
+                    case "app_created":
+                        initLocation();
 //                return START_STICKY;
-                    break;
-                case "close":
-                    close();
-                    break;
+                        break;
+                    case "close":
+                        close();
+                        break;
+                }
             }
         }
         return super.onStartCommand(intent, flags, startId);
