@@ -7,8 +7,6 @@
 
  // Implement user confirming he was positive in given time frame
 
- // Fill notification center
-
  // Loaders
 
 // Completed Tasks
@@ -16,3 +14,5 @@
  // Update interaction model to include positive boolean variable // Mishel
  // Upon receiving UUID of positive user, update interaction database accordingly // Mishel
  // Mark interactions with positive user in timeline // Kobi
+ // Fill notification center // Mishel
+

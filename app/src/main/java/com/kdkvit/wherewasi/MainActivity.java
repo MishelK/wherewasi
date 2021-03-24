@@ -2,6 +2,7 @@ package com.kdkvit.wherewasi;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -47,6 +48,7 @@ import models.User;
 import utils.CSVManager;
 import utils.DatabaseHandler;
 import utils.InteractionDatabaseHandler;
+import utils.NotificationCenter;
 
 import static actions.actions.sendUserToBe;
 
