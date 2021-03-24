@@ -49,9 +49,12 @@ public class WelcomeFragment extends Fragment {
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startBtn.startAnimation();
-                if(listener!=null){
-                    listener.onStartClick(nicknameTI.getText().toString());
+                String name = nicknameTI.getText().toString().trim();
+                if(!name.isEmpty()) {
+                    startBtn.startAnimation();
+                    if (listener != null) {
+                        listener.onStartClick(name);
+                    }
                 }
             }
         });
