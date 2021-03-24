@@ -389,8 +389,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         TimeZone timeZone =TimeZone.getDefault();
         long offset = timeZone.getOffset(from);
-        Long fromLocal = from - offset;
-        Long toLocal = to - offset;
+
+        Long fromLocal = from - from % 86400000 - offset;
+        Long toLocal = to - to % 86400000 - offset + 86400000;
+
 
         // Select All Query
         String selectQuery = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s FROM %s WHERE %s > %s AND %s < %s",

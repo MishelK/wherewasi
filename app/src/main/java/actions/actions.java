@@ -86,7 +86,7 @@ public class actions {
         void onFailure();
     }
 
-    public static void sendPositive(Context context, Long date,ActionsCallback callback){
+    public static void sendPositive(Context context, Long date, ActionsCallback callback){
         User user = SharedPreferencesUtils.getUser(context);
         final JSONObject rootObject = new JSONObject();
         try{

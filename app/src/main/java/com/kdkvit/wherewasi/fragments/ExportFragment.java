@@ -8,16 +8,22 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 
 import actions.actions;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
+import models.MyLocation;
 import models.User;
+import utils.CSVManager;
+import utils.DatabaseHandler;
 
 import android.transition.CircularPropagation;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +36,9 @@ import com.kdkvit.wherewasi.R;
 import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static actions.actions.sendPositive;
 
@@ -60,8 +68,24 @@ public class ExportFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Drawable d = getContext().getDrawable(R.drawable.ic_done);
-
                 Bitmap icon = drawableToBitmap(d);
+
+                MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
+                CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
+                MaterialDatePicker<Pair<Long, Long>> picker = builder.build();
+                picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Pair<Long, Long>>() {
+                    @Override
+                    public void onPositiveButtonClick(Pair<Long, Long> selection) {
+                        List<MyLocation> locations = new ArrayList<>();
+                        DatabaseHandler db = new DatabaseHandler(getContext());
+                        locations = db.getLocationsBetweenDates(DatabaseHandler.SORTING_PARAM.firstStart, selection.first, selection.second);
+                        Log.i("BLE", "From: " + selection.first + " To: " + selection.second);
+
+                        CSVManager csvManager = new CSVManager(getContext());
+                        csvManager.exportLocations(locations);
+                    }
+                });
+                picker.show(getFragmentManager(), picker.toString());
 
                 exportBtn.startAnimation();
                 exportBtn.doneLoadingAnimation(Color.parseColor("#249ff0"),icon);
@@ -127,8 +151,6 @@ public class ExportFragment extends Fragment {
         Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
-
-
 
         return bitmap;
     }
