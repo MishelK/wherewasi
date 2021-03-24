@@ -88,7 +88,7 @@ public class ExportFragment extends Fragment {
                 picker.show(getFragmentManager(), picker.toString());
 
                 exportBtn.startAnimation();
-                exportBtn.doneLoadingAnimation(Color.parseColor("#249ff0"),icon);
+                exportBtn.doneLoadingAnimation(Color.parseColor("#f95700"),icon);
             }
         });
 
@@ -121,7 +121,7 @@ public class ExportFragment extends Fragment {
 
                                     Bitmap icon = drawableToBitmap(d);
 
-                                    markPositiveBtn.doneLoadingAnimation(Color.parseColor("#249ff0"),icon);
+                                    markPositiveBtn.doneLoadingAnimation(Color.parseColor("#f95700"),icon);
                                 }
                             }
 
