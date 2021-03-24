@@ -20,12 +20,14 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.kdkvit.wherewasi.MainActivity;
 import com.kdkvit.wherewasi.R;
+import com.kdkvit.wherewasi.services.LocationService;
 import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
 
 import models.User;
 import utils.DatabaseHandler;
 
 import static actions.actions.sendUserToBe;
+import static utils.NotificationCenter.NOTIFICATIONS_RECEIVER;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -55,7 +57,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (remoteMessage.getData().size() > 0) {
             // In case application is in foreground
             try {
-                Intent intent = new Intent(FCM_MESSAGE_RECEIVER);
                 String uuid = remoteMessage.getData().get("user_id");
                 Long markTime = Long.parseLong(remoteMessage.getData().get("mark_time"));
                 Long insTime = Long.parseLong(remoteMessage.getData().get("insertion_time"));
@@ -63,6 +64,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
                 if (db.updateInteractionsToPositive(uuid, markTime, insTime) > 0) {
                     showNotification();
+                    Intent receiverIntent = new Intent(NOTIFICATIONS_RECEIVER);
+                    receiverIntent.putExtra("new_notification", true);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(receiverIntent);
                 }
 
             }catch (Exception e){

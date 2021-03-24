@@ -13,6 +13,8 @@ public class NotificationCenter {
 
     public static final long MILLIS_IN_DAY = 86400000;
 
+    public static final String NOTIFICATIONS_RECEIVER = "WWI_NOTIFICATIONS_RECEIVER";
+
     public static List<MyNotification> generateDailyNotifications(Context context) {
         List<MyNotification> notifList = new ArrayList<>();
 
