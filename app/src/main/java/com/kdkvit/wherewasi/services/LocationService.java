@@ -96,7 +96,7 @@ public class LocationService extends Service {
 
         builder.setContentIntent(pendingIntent);
 
-        builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
+        builder.setSmallIcon(R.mipmap.ic_stat_app_icon);
 
         startForeground(NOTIF_ID, builder.build());
 
