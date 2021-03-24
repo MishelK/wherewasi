@@ -7,6 +7,8 @@ import android.os.IBinder;
 import android.os.ParcelUuid;
 import android.util.Log;
 
+import com.kdkvit.wherewasi.BuildConfig;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -28,9 +30,9 @@ import utils.DatabaseHandler;
 public class BtScannerService extends Service {
 
     private static final String SERVICE_IDENTIFIER = "wwi";
-    public static final int IDLE_DURATION = 1000 * 60 * 15; // If a bluetooth device has not been seen for longer than this value, interaction will be closed
+    public static final int IDLE_DURATION = BuildConfig.IDLE_DURATION; // If a bluetooth device has not been seen for longer than this value, interaction will be closed
     public static final int CHECK_IDLE_DELAY = 1000; // Delay for interval checking for idle devices
-    public static final int CONTACT_DURATION = 1000 * 60 * 15; // Upon closing an interaction, if the interaction lasted longer than this value, it will be logged in the database
+    public static final int CONTACT_DURATION = BuildConfig.CONTACT_DURATION; // Upon closing an interaction, if the interaction lasted longer than this value, it will be logged in the database
     public static final String BLE_SCANNING_CHANNEL = "wwiblescanning";
 
 

@@ -34,7 +34,7 @@ public class MapActivity extends AppCompatActivity {
     private View infoContainer;
     private GoogleMap googleMap;
     LocationsGroup group;
-    private long TIME_STAYED = 1000 * 60 * 10;
+    private long TIME_STAYED = BuildConfig.TIME_STAYED;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

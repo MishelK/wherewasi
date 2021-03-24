@@ -1,7 +1,16 @@
 package com.kdkvit.wherewasi.utils;
 
+import android.content.Context;
+import android.content.res.Resources;
+
+import com.kdkvit.wherewasi.BuildConfig;
+import com.kdkvit.wherewasi.R;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import models.Interaction;
 import models.LocationsGroup;
@@ -9,8 +18,8 @@ import models.MyLocation;
 
 public class General {
 
-    private static final int TIME_BETWEEN_NEW_LOCATIONS = 1000 * 60 * 15;
-    private static final int TIME_BETWEEN_LOCATION_AND_INTERACTION = 1000 * 60 * 15;
+    private static final int TIME_BETWEEN_NEW_LOCATIONS = BuildConfig.TIME_BETWEEN_NEW_LOCATIONS;
+    private static final int TIME_BETWEEN_LOCATION_AND_INTERACTION = BuildConfig.TIME_BETWEEN_LOCATION_AND_INTERACTION;
 
     public static List<LocationsGroup> getLocationsGroup(List<MyLocation> locations, List<Interaction> interactions, int minTime, boolean onlyInteractions) {
         List<LocationsGroup> groups = new ArrayList<>();
@@ -54,5 +63,6 @@ public class General {
         if(group.locationsSize()==0) return true;
         return (location.getStartTime() - group.getLastLocation().getStartTime() <= TIME_BETWEEN_NEW_LOCATIONS);
     }
+
 }
 
