@@ -5,9 +5,10 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:id="@+id/activity_filters_drawer"
-
     android:layout_marginTop="20dp"
     >
+
+    <include layout="@layout/spinning_loader"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,6 +16,7 @@
         android:orientation="vertical"
         android:layout_margin="10dp"
         >
+
 
 <!--        <com.google.android.material.tabs.TabLayout-->
 <!--            android:id="@+id/locations_tab_layout"-->

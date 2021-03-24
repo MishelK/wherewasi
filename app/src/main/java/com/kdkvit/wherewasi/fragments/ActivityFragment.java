@@ -18,8 +18,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.material.datepicker.CalendarConstraints;
@@ -70,6 +72,8 @@ public class ActivityFragment extends Fragment {
 
     private View rootView;
     private DrawerLayout drawerLayout;
+    ProgressBar progressBar;
+    private FrameLayout loaderLayout;
 
 
     public ActivityFragment() {
@@ -142,7 +146,8 @@ public class ActivityFragment extends Fragment {
         initReceiver();
 
         drawerLayout = rootView.findViewById(R.id.activity_filters_drawer);
-        ImageView filterBtn = rootView.findViewById(R.id.header_right_icon);
+
+        loaderLayout = rootView.findViewById(R.id.spinning_loader);
 
         getLocationsHistory();
 
@@ -154,6 +159,7 @@ public class ActivityFragment extends Fragment {
     }
 
     private  void getLocationsHistory(){
+        loaderLayout.setVisibility(View.VISIBLE);
         new Thread(){
             @Override
             public void run() {
@@ -163,6 +169,7 @@ public class ActivityFragment extends Fragment {
                 dbInit = true;
                 handler.post(()-> {
                     timeLineFragment.updateTimeLineAdapter();
+                    loaderLayout.setVisibility(View.GONE);
                     //mapsFragment.setMapPointers();
                 });
             }
