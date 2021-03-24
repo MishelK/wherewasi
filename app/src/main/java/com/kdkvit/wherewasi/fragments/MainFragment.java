@@ -65,7 +65,7 @@ public class MainFragment extends Fragment {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         TextView nameTV = rootView.findViewById(R.id.name_tv);
-        nameTV.setText(getResources().getString(R.string.hello_name)+user.getName());
+        nameTV.setText(getResources().getString(R.string.hello_name)+ " " +user.getName());
 
         initInteractionChart();
         initLocationChart();
