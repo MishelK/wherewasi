@@ -1,22 +1,17 @@
 package com.kdkvit.wherewasi.fragments;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import android.provider.ContactsContract;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.anychart.APIlib;
 import com.anychart.AnyChart;
@@ -29,8 +24,6 @@ import com.anychart.enums.Anchor;
 import com.anychart.enums.HoverMode;
 import com.anychart.enums.Position;
 import com.anychart.enums.TooltipPositionMode;
-import com.anychart.graphics.vector.Fill;
-import com.google.android.material.navigation.NavigationView;
 import com.kdkvit.wherewasi.R;
 import com.kdkvit.wherewasi.adapters.NotificationsAdapter;
 
@@ -39,24 +32,26 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 import models.MyNotification;
 import utils.DatabaseHandler;
-import utils.InteractionDatabaseHandler;
 import utils.NotificationCenter;
 
 import static com.kdkvit.wherewasi.MainActivity.user;
+import static utils.NotificationCenter.NOTIFICATIONS_RECEIVER;
 
 public class MainFragment extends Fragment {
 
     public static final long MILLIS_IN_DAY = 86400000;
     public static List<MyNotification> notifications = new ArrayList<>();
+    BroadcastReceiver receiver;
 
     private View rootView;
-
+    NotificationsAdapter adapter = new NotificationsAdapter(getContext());
 
 
     public MainFragment() {
@@ -66,7 +61,6 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -90,11 +84,33 @@ public class MainFragment extends Fragment {
         SnapHelper snapHelper = new PagerSnapHelper();
         recyclerView.setLayoutManager(layoutManager);
         snapHelper.attachToRecyclerView(recyclerView);
+
+        initReceiver();
+
         return rootView;
+    }
+
+    private void initReceiver() {
+        IntentFilter filter = new IntentFilter(NOTIFICATIONS_RECEIVER);
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                boolean command = intent.getBooleanExtra("new_notification",false);
+                if(command){
+                    initNotifications();
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        };
+
+        LocalBroadcastManager.getInstance(rootView.getContext()).registerReceiver(receiver, filter);
     }
 
     private void initNotifications() {
         notifications =  NotificationCenter.generateDailyNotifications(getContext());
+        if(notifications.size() == 0){
+            notifications.add(new MyNotification(0, getString(R.string.no_notifications)));
+        }
     }
 
 
@@ -195,4 +211,9 @@ public class MainFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDestroyView() {
+        LocalBroadcastManager.getInstance(rootView.getContext()).unregisterReceiver(receiver);
+        super.onDestroyView();
+    }
 }
