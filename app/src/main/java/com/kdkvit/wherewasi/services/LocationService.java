@@ -88,10 +88,10 @@ public class LocationService extends Service {
 
         RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notif_layout);
 
-        Intent closeIntent = new Intent(this, LocationService.class);
-        closeIntent.putExtra("command", "close");
-        PendingIntent closePendingIntent = PendingIntent.getService(this, 1, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        remoteViews.setOnClickPendingIntent(R.id.stop_service_btn, closePendingIntent);
+//        Intent closeIntent = new Intent(this, LocationService.class);
+//        closeIntent.putExtra("command", "close");
+//        PendingIntent closePendingIntent = PendingIntent.getService(this, 1, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        remoteViews.setOnClickPendingIntent(R.id.stop_service_btn, closePendingIntent);
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("working", true);

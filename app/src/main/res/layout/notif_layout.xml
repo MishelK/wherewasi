@@ -1,19 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:background="#f4f4f4"
+    >
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="25dp"
+            android:src="@drawable/notif_image"
+            android:scaleType="fitXY"
+            android:layout_marginEnd="5dp"
+            />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/app_name"
-        android:textAlignment="center"
-        android:textSize="24sp"
+        android:textSize="13sp"
+        android:textColor="@color/light_black"
         />
-    <Button
-        android:text="@string/close"
-        android:layout_height="wrap_content"
+    </LinearLayout>
+
+    <TextView
         android:layout_width="match_parent"
-        android:id="@+id/stop_service_btn"
+        android:layout_height="wrap_content"
+        android:text="@string/running"
+        android:textSize="16sp"
+        android:layout_marginTop="5dp"
         />
 </LinearLayout>
