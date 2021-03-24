@@ -98,7 +98,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         intent.putExtra("bla", true);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
-        builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
+        builder.setSmallIcon(R.mipmap.ic_stat_app_icon);
 
         builder.setContentText(getString(R.string.you_have_been_expose));
 
