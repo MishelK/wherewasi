@@ -12,8 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/export_data"
-        android:background="@color/colorAccent"
-        android:backgroundTint="@color/colorAccent"
+        android:background="@color/colorPrimary"
+        android:backgroundTint="@color/colorPrimary"
         android:layout_marginBottom="10dp"
         android:textColor="@color/white"
         android:id="@+id/export_data"
@@ -26,8 +26,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/mark_as_positive"
-        android:background="@color/colorAccent"
-        android:backgroundTint="@color/colorAccent"
+        android:background="@color/colorPrimary"
+        android:backgroundTint="@color/colorPrimary"
         android:layout_margin="30dp"
         android:layout_marginBottom="10dp"
         android:textColor="@color/white"
@@ -35,5 +35,6 @@
         app:spinning_bar_color="@color/white"
 
         />
+
 
 </LinearLayout>
