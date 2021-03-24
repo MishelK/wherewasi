@@ -635,17 +635,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return interactions;
     }
 
-    public int getNumOfInteractionsOnDay(long timeInMillis) { // Returns all interactions that occurred on the day of given timestamp
+    public int getNumOfInteractionsOnDay(long timeInMillis,boolean onlyPositives) { // Returns all interactions that occurred on the day of given timestamp
 
         TimeZone timeZone =TimeZone.getDefault();
         long offset = timeZone.getOffset(timeInMillis);
 
         Long dayStart = timeInMillis - timeInMillis % 86400000 - offset; // the remainder of the modulus will be time of day (time since day started)
         Long dayEnd = dayStart + 86400000 - offset;
-
+        String sql = "SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString()
+                + " < ? \n";
+        if(onlyPositives){
+            sql += " AND " + InteractionsColumn.POSITIVE.toString();
+        }
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString()
-                + " < ?", new String[]{dayStart.toString(), dayEnd.toString()}); // Gets all interactions between dates from table
+        Cursor result = db.rawQuery(sql, new String[]{dayStart.toString(), dayEnd.toString()}); // Gets all interactions between dates from table
 
 
         return result.getCount();
