@@ -123,7 +123,7 @@ public class MainFragment extends Fragment {
         List<DataEntry> data = new ArrayList<>();
         DatabaseHandler db = new DatabaseHandler(getContext());
         // Getting interactions from db and adding to arrayList
-        for (int i = 6; i>=0; i--){
+        for (int i = 13; i>=0; i--){
             long currentTime = System.currentTimeMillis();
             long dateInMillis = currentTime - (i * MILLIS_IN_DAY);
             int num = db.getNumOfInteractionsOnDay(dateInMillis,false);
@@ -145,7 +145,7 @@ public class MainFragment extends Fragment {
         column.color("#f95700");
 
         cartesian.animation(true);
-        cartesian.title("Weekly Interactions");
+        cartesian.title("14 day Interactions");
         
 
         cartesian.yScale().minimum(0d);
@@ -157,7 +157,6 @@ public class MainFragment extends Fragment {
 
         cartesian.xAxis(0).title("Date");
         //cartesian.yAxis(0).title("Interactions");
-
 
         anyChartView.setChart(cartesian);
 
@@ -173,7 +172,7 @@ public class MainFragment extends Fragment {
         List<DataEntry> data = new ArrayList<>();
         DatabaseHandler db = new DatabaseHandler(getContext());
         // Getting interactions from db and adding to arrayList
-        for (int i = 6; i>=0; i--){
+        for (int i = 13; i>=0; i--){
             long currentTime = (new Date()).getTime();
             long dateInMillis = currentTime - (i * MILLIS_IN_DAY);
             int num = db.getLocationsOnDay(dateInMillis);
@@ -195,7 +194,7 @@ public class MainFragment extends Fragment {
         column.color("#f95700");
 
         cartesian.animation(true);
-        cartesian.title("Weekly Locations");
+        cartesian.title("14 day Locations");
 
         cartesian.yScale().minimum(0d);
         cartesian.yAxis(0).labels().format("{%Value}{numDecimals:0}");
@@ -210,6 +209,7 @@ public class MainFragment extends Fragment {
         anyChartView.setChart(cartesian);
 
     }
+
 
     @Override
     public void onDestroyView() {
