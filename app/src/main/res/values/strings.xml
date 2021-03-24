@@ -30,4 +30,5 @@
     <string name="yestrday">Yestrday</string>
     <string name="days_ago">Days ago</string>
     <string name="no_notifications">No Notifications Found</string>
+    <string name="running">Active</string>
 </resources>
