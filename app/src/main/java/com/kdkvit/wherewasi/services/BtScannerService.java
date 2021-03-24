@@ -28,9 +28,9 @@ import utils.DatabaseHandler;
 public class BtScannerService extends Service {
 
     private static final String SERVICE_IDENTIFIER = "wwi";
-    public static final int IDLE_DURATION = 10000; // If a bluetooth device has not been seen for longer than this value, interaction will be closed
+    public static final int IDLE_DURATION = 1000 * 60 * 15; // If a bluetooth device has not been seen for longer than this value, interaction will be closed
     public static final int CHECK_IDLE_DELAY = 1000; // Delay for interval checking for idle devices
-    public static final int CONTACT_DURATION = 1000; // Upon closing an interaction, if the interaction lasted longer than this value, it will be logged in the database
+    public static final int CONTACT_DURATION = 1000 * 60 * 15; // Upon closing an interaction, if the interaction lasted longer than this value, it will be logged in the database
     public static final String BLE_SCANNING_CHANNEL = "wwiblescanning";
 
 
@@ -97,9 +97,6 @@ public class BtScannerService extends Service {
                     interaction.setUuid(device_uuid);
                     Log.i("BLE", "Adding device to btInteractions : " + interaction.getUuid());
                     btInteractions.add(interaction);
-                int rssi = result.getRssi();
-                int txPow = result.getTxPower();
-                RssiTest(rssi, txPow);
             }
 
             sendListInBroadcast(btInteractions);
@@ -135,9 +132,6 @@ public class BtScannerService extends Service {
                     interaction.setUuid(device_uuid);
                     Log.i("BLE", "Adding device to btInteractions : " + interaction.getUuid());
                     btInteractions.add(interaction);
-                    int rssi = results.get(i).getRssi();
-                    int txPow = results.get(i).getTxPower();
-                    RssiTest(rssi, txPow);
                 }
             }
             sendListInBroadcast(btInteractions);
