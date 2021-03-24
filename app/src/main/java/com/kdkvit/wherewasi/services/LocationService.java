@@ -35,6 +35,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.kdkvit.wherewasi.BuildConfig;
 import com.kdkvit.wherewasi.MainActivity;
 import com.kdkvit.wherewasi.R;
+import com.kdkvit.wherewasi.utils.Configs;
 
 import models.Interaction;
 import models.MyLocation;
@@ -45,12 +46,12 @@ import static com.kdkvit.wherewasi.services.BtScannerService.IDLE_DURATION;
 
 public class LocationService extends Service {
     public static final String BROADCAST_CHANNEL = "WhereWasI Broadcast";
-    private final int SIGNIFICANT_TIME = BuildConfig.SIGNIFICANT_TIME;
+    private final int SIGNIFICANT_TIME = Configs.SIGNIFICANT_TIME;
     private static final String CHANNEL_NAME = "WhereWasSI Channel";
-    private final long ADVERTISING_DELAY = BuildConfig.ADVERTISING_DELAY;
-    private final long SCANNING_DELAY = BuildConfig.SCANNING_DELAY;
-    private final long TIME_BETWEEN_CHECKING_LOCATIONS = BuildConfig.TIME_BETWEEN_CHECKING_LOCATIONS;
-    private final double KM_BETWEEN_LOCATIONS = BuildConfig.KM_BETWEEN_LOCATIONS;
+    private final long ADVERTISING_DELAY = Configs.ADVERTISING_DELAY;
+    private final long SCANNING_DELAY = Configs.SCANNING_DELAY;
+    private final long TIME_BETWEEN_CHECKING_LOCATIONS = Configs.TIME_BETWEEN_CHECKING_LOCATIONS;
+    private final double KM_BETWEEN_LOCATIONS = Configs.KM_BETWEEN_LOCATIONS;
 
     public LocationManager mlocManager;
     public MyLocationListener listener;

@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.ui.IconGenerator;
+import com.kdkvit.wherewasi.utils.Configs;
 
 import org.w3c.dom.Text;
 
@@ -34,7 +35,7 @@ public class MapActivity extends AppCompatActivity {
     private View infoContainer;
     private GoogleMap googleMap;
     LocationsGroup group;
-    private long TIME_STAYED = BuildConfig.TIME_STAYED;
+    private long TIME_STAYED = Configs.TIME_STAYED;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

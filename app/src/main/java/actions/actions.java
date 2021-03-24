@@ -12,6 +12,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.kdkvit.wherewasi.BuildConfig;
+import com.kdkvit.wherewasi.utils.Configs;
 import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
 
 import org.json.JSONException;
@@ -25,7 +26,7 @@ import models.User;
 
 public class actions {
 
-    static final String BE_URL = BuildConfig.server_url;
+    static final String BE_URL = Configs.server_url;
 //    static final String BE_URL = "http://192.168.1.178:3030/";
     static final String USERS_URL = BE_URL + "api/users/";
 

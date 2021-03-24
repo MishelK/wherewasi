@@ -18,8 +18,8 @@ import models.MyLocation;
 
 public class General {
 
-    private static final int TIME_BETWEEN_NEW_LOCATIONS = BuildConfig.TIME_BETWEEN_NEW_LOCATIONS;
-    private static final int TIME_BETWEEN_LOCATION_AND_INTERACTION = BuildConfig.TIME_BETWEEN_LOCATION_AND_INTERACTION;
+    private static final int TIME_BETWEEN_NEW_LOCATIONS = Configs.TIME_BETWEEN_NEW_LOCATIONS;
+    private static final int TIME_BETWEEN_LOCATION_AND_INTERACTION = Configs.TIME_BETWEEN_LOCATION_AND_INTERACTION;
 
     public static List<LocationsGroup> getLocationsGroup(List<MyLocation> locations, List<Interaction> interactions, int minTime, boolean onlyInteractions) {
         List<LocationsGroup> groups = new ArrayList<>();
