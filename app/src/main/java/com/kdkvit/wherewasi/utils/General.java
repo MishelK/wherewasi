@@ -29,6 +29,8 @@ public class General {
                 if (((interaction.getLastSeen() - groups.get(j).getStartTime().getTime()) >= TIME_BETWEEN_LOCATION_AND_INTERACTION)
                         && (interaction.getLastSeen() - groups.get(j).getEndTime().getTime() < 0)) {
                     groups.get(j).addInteraction(interaction);
+                }else if(interaction.getFirstSeen() - groups.get(j).getEndTime().getTime() > 0) {
+                    break;
                 }
             }
         }
