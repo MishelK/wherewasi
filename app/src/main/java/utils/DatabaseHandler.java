@@ -654,7 +654,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<Interaction> getInteractionsBetweenDates(Long from, Long to) { // Returns all interactions that occurred between given timestamps
         List<Interaction> interactions = new ArrayList<>();
 
-        TimeZone timeZone =TimeZone.getDefault();
+        TimeZone timeZone = TimeZone.getDefault();
         long offset = timeZone.getOffset(from);
         from = from - offset;
         to = to - offset;
@@ -748,6 +748,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             affectedRows += updateInteraction(interaction);
         }
         return affectedRows;
+    }
+
+    public int getNumOfPositivesBetweenDates(Long from, Long to) {
+        TimeZone timeZone = TimeZone.getDefault();
+        long offset = timeZone.getOffset(from);
+        from = from - offset;
+        to = to - offset;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.FIRST_SEEN.toString() + " > ? AND " + InteractionsColumn.FIRST_SEEN.toString() + " < ? AND + " +
+                        InteractionsColumn.POSITIVE.toString() + " = 1"
+                , new String[]{from.toString(), to.toString()});
+
+        return result.getCount();
+    }
+
+    public int getNumOfPositivesSoFar() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor result = db.rawQuery("SELECT * FROM " + TABLE_INTERACTIONS + " WHERE " + InteractionsColumn.POSITIVE.toString() + " = 1", null);
+        return result.getCount();
     }
 
 
