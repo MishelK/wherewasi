@@ -67,6 +67,7 @@ public class BtScannerService extends Service {
         super.onDestroy();
     }
 
+
     ScanCallback scanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, @NonNull ScanResult result) {
@@ -84,7 +85,7 @@ public class BtScannerService extends Service {
                     if (uuidsMap.containsKey(uuid)) {
                         String serviceData = new String(uuidsMap.get(uuid), StandardCharsets.UTF_8);
                         if (serviceData.equals(SERVICE_IDENTIFIER)) // Checking if included service data matches our identifier "wwi"
-                            device_uuid = uuid.toString();
+                            device_uuid = uuid.getUuid().toString();
                     }
                 }
             }
@@ -119,7 +120,7 @@ public class BtScannerService extends Service {
                         if (uuidsMap.containsKey(uuid)) {
                             String serviceData = new String(uuidsMap.get(uuid), StandardCharsets.UTF_8);
                             if (serviceData.equals(SERVICE_IDENTIFIER))
-                                device_uuid = uuid.toString();
+                                device_uuid = uuid.getUuid().toString();
                         }
                     }
                 }
