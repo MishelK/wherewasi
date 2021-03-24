@@ -34,6 +34,7 @@ public class MapActivity extends AppCompatActivity {
     private View infoContainer;
     private GoogleMap googleMap;
     LocationsGroup group;
+    private long TIME_STAYED = 1000 * 60 * 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,23 +120,21 @@ public class MapActivity extends AppCompatActivity {
             if (group.locationsSize() > 0) {
                 PolylineOptions polylineOptions = new PolylineOptions();
                 googleMap.addMarker(new MarkerOptions().position(group.getLastLocation().getLatLng()).title(group.getLastLocation().getAddressLine()));
-                MyLocation firstLocation = null;
+
 
                 for(MyLocation location : group.getLocations()){
                     polylineOptions.add(location.getLatLng());
-                    firstLocation = location;
-                    CircleOptions circleOptions = new CircleOptions()
-                            .center(location.getLatLng())
-                            .radius(0.2) // radius in meters
-                            .fillColor(Color.BLACK); //this is a half transparent blue, change "88" for the transparency
-                    googleMap.addCircle(circleOptions);
+                    if(location.getEndTime() - location.getStartTime() >= TIME_STAYED) {
+                        googleMap.addMarker(new MarkerOptions().position(location.getLatLng()).title(location.getAddressLine()));
+                    }else {
+                        CircleOptions circleOptions = new CircleOptions()
+                                .center(location.getLatLng())
+                                .radius(0.2) // radius in meters
+                                .fillColor(Color.BLACK); //this is a half transparent blue, change "88" for the transparency
+                        googleMap.addCircle(circleOptions);
+                    }
                 }
-                if(firstLocation !=null) {
-                    IconGenerator iconGenerator = new IconGenerator(this);
-                    iconGenerator.setBackground(this.getDrawable(R.drawable.map_dot));
 
-                    googleMap.addMarker(new MarkerOptions().position(firstLocation.getLatLng()).title(firstLocation.getAddressLine()));
-                }
                 polylineOptions.color(Color.BLACK);
                 polylineOptions.width(5);
                 polylineOptions.geodesic(true);
