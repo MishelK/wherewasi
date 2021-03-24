@@ -36,7 +36,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
 
         // ...
-
+        Log.i("BLE", "RECEIVED POSITIVE");
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
 

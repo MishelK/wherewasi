@@ -3,10 +3,6 @@
 
  // Debug timeline showing 0 interactions
 
- // Notify user in notification center about positive interactions // TODO
-
- // Implement user confirming he was positive in given time frame
-
  // Loaders
 
 // Completed Tasks
@@ -15,4 +11,5 @@
  // Upon receiving UUID of positive user, update interaction database accordingly // Mishel
  // Mark interactions with positive user in timeline // Kobi
  // Fill notification center // Mishel
+ // Implement user confirming he was positive in given time frame
 
