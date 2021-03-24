@@ -32,6 +32,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.kdkvit.wherewasi.BuildConfig;
 import com.kdkvit.wherewasi.MainActivity;
 import com.kdkvit.wherewasi.R;
 
@@ -44,11 +45,13 @@ import static com.kdkvit.wherewasi.services.BtScannerService.IDLE_DURATION;
 
 public class LocationService extends Service {
     public static final String BROADCAST_CHANNEL = "WhereWasI Broadcast";
-    private static final int SIGNIFICANT_TIME = 1000 * 60 * 30;
+    private final int SIGNIFICANT_TIME = BuildConfig.SIGNIFICANT_TIME;
     private static final String CHANNEL_NAME = "WhereWasSI Channel";
-    private static final int TIME_CHECK_ACTIVE = 11 * 1000* 60;
-    private static final long ADVERTISING_DELAY = 30 * 1000;
-    private static final long SCANNING_DELAY = 1 * 60 * 1000;
+    private final long ADVERTISING_DELAY = BuildConfig.ADVERTISING_DELAY;
+    private final long SCANNING_DELAY = BuildConfig.SCANNING_DELAY;
+    private final long TIME_BETWEEN_CHECKING_LOCATIONS = BuildConfig.TIME_BETWEEN_CHECKING_LOCATIONS;
+    private final double KM_BETWEEN_LOCATIONS = BuildConfig.KM_BETWEEN_LOCATIONS;
+
     public LocationManager mlocManager;
     public MyLocationListener listener;
     public MyLocation previousBestLocation = null;
@@ -67,6 +70,7 @@ public class LocationService extends Service {
     private Timer advertisingTimer = new Timer();
     private Timer scanningTimer = new Timer();
     private BroadcastReceiver scannerBroadcast;
+
 
     @Override
     public void onCreate() {
@@ -141,11 +145,9 @@ public class LocationService extends Service {
             return;
         }
 
-        mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5*60*1000, 0, (LocationListener) listener);
+        mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, TIME_BETWEEN_CHECKING_LOCATIONS, 0, (LocationListener) listener);
         if(mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5*60*1000, 0, (LocationListener) listener);
-        }else{
-            //Toast.makeText(this, "Failed to use gps...", Toast.LENGTH_SHORT).show();
+            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME_BETWEEN_CHECKING_LOCATIONS, 0, (LocationListener) listener);
         }
 
         locationsTimer.schedule(new TimerTask() {
@@ -283,7 +285,7 @@ public class LocationService extends Service {
         }
 
         double diffInKM = Math.abs(getDistanceFromLatLonInKm(location.getLatitude(),location.getLongitude(),currentBestLocation.getLatitude(),currentBestLocation.getLongitude()));
-        return diffInKM > 0.10;
+        return diffInKM >= KM_BETWEEN_LOCATIONS;
     }
 
     public double getDistanceFromLatLonInKm(double lat1,double lon1,double lat2,double lon2) {
