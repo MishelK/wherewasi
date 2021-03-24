@@ -32,22 +32,32 @@ import com.anychart.enums.TooltipPositionMode;
 import com.anychart.graphics.vector.Fill;
 import com.google.android.material.navigation.NavigationView;
 import com.kdkvit.wherewasi.R;
+import com.kdkvit.wherewasi.adapters.NotificationsAdapter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.PagerSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SnapHelper;
+import models.MyNotification;
 import utils.DatabaseHandler;
 import utils.InteractionDatabaseHandler;
+import utils.NotificationCenter;
 
 import static com.kdkvit.wherewasi.MainActivity.user;
 
 public class MainFragment extends Fragment {
 
     public static final long MILLIS_IN_DAY = 86400000;
+    public static List<MyNotification> notifications = new ArrayList<>();
 
     private View rootView;
+
+
 
     public MainFragment() {
         // Required empty public constructor
@@ -67,10 +77,24 @@ public class MainFragment extends Fragment {
         TextView nameTV = rootView.findViewById(R.id.name_tv);
         nameTV.setText(getResources().getString(R.string.hello_name)+user.getName());
 
+        initNotifications();
         initInteractionChart();
         initLocationChart();
 
+        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.notifications_recycler);
+        NotificationsAdapter adapter = new NotificationsAdapter(getContext());
+
+        recyclerView.setAdapter(adapter);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        SnapHelper snapHelper = new PagerSnapHelper();
+        recyclerView.setLayoutManager(layoutManager);
+        snapHelper.attachToRecyclerView(recyclerView);
         return rootView;
+    }
+
+    private void initNotifications() {
+        notifications =  NotificationCenter.generateDailyNotifications(getContext());
     }
 
 
@@ -86,7 +110,7 @@ public class MainFragment extends Fragment {
         for (int i = 6; i>=0; i--){
             long currentTime = System.currentTimeMillis();
             long dateInMillis = currentTime - (i * MILLIS_IN_DAY);
-            int num = db.getNumOfInteractionsOnDay(dateInMillis);
+            int num = db.getNumOfInteractionsOnDay(dateInMillis,false);
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(dateInMillis);
