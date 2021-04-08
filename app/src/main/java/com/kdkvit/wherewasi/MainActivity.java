@@ -133,7 +133,9 @@ public class MainActivity extends AppCompatActivity {
 
         navigationView.setVisibility(View.VISIBLE);
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        TextView headerUserName = navigationView.getHeaderView(0).findViewById(R.id.drawer_header_user_name_tv);
 
+        headerUserName.setText(user.getName());
 
         ImageButton menuBtn = findViewById(R.id.menu_btn);
         menuBtn.setOnClickListener(new View.OnClickListener() {

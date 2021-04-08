@@ -20,4 +20,5 @@
     <color name="light_text">#777</color>
     <color name="light_black">#333</color>
     <color name="background_opacity">#DDFFFFFF</color>
+    <color name="primaryLight">#AAF95700</color>
 </resources>
