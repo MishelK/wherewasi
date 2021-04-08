@@ -88,8 +88,6 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
             holder.statusCircleView.setBackgroundResource(R.drawable.circle_dra_gren);
         }
 
-        //todo: mark in red
-
     }
 
     @Override

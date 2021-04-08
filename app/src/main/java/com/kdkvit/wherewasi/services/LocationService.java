@@ -88,11 +88,6 @@ public class LocationService extends Service {
 
         RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notif_layout);
 
-//        Intent closeIntent = new Intent(this, LocationService.class);
-//        closeIntent.putExtra("command", "close");
-//        PendingIntent closePendingIntent = PendingIntent.getService(this, 1, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        remoteViews.setOnClickPendingIntent(R.id.stop_service_btn, closePendingIntent);
-
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("working", true);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -116,7 +111,6 @@ public class LocationService extends Service {
                 switch (command) {
                     case "app_created":
                         initLocation();
-//                return START_STICKY;
                         break;
                     case "close":
                         close();
@@ -250,16 +244,6 @@ public class LocationService extends Service {
         startService(intent);
     }
 
-//    @Override
-//    public void onStart(Intent intent, int startId) {
-//        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//        listener = new MyLocationListener();
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        }
-//        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 4000, 0, (LocationListener) listener);
-//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 4000, 0, listener);
-//    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -367,9 +351,7 @@ public class LocationService extends Service {
                 int accuracyDelta = (int) (location.getAccuracy() - previousBestLocation.getAccuracy());
                 boolean isMoreAccurate = accuracyDelta > 0;
 
-                // Check if the old and new location are from the same provider
-//                boolean isFromSameProvider = isSameProvider(location.getProvider(),
-//                        previousBestLocation.getProvider());
+
 
                 //Determine location quality using a combination of timeliness and accuracy
                 if (isMoreAccurate) {

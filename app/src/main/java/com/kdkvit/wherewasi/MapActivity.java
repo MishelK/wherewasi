@@ -74,7 +74,6 @@ public class MapActivity extends AppCompatActivity {
         TextView timeTV = findViewById(R.id.location_time_tv);
         timeTV.setText(String.format("%s %s - %s", getResources().getString(R.string.time), startTime, endTime));
 
-        //holder.coordinatesTV.setText(String.format("%s %s,%s", holder.itemView.getResources().getString(R.string.coordinates), df2.format(location.getLatitude()), df2.format(location.getLongitude())));
         TextView locationsTV = findViewById(R.id.location_num_tv);
         locationsTV.setText(String.format("%s %s", getResources().getString(R.string.locations), location.locationsSize()));
 

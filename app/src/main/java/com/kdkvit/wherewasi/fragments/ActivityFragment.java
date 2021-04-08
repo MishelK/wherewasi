@@ -62,8 +62,6 @@ public class ActivityFragment extends Fragment {
         }
     });
 
-    //MapsFragment mapsFragment = new MapsFragment();
-
     public static List<LocationsGroup> locations = new ArrayList<>();
 
     boolean dbInit = false;
@@ -96,18 +94,6 @@ public class ActivityFragment extends Fragment {
         db = new DatabaseHandler(rootView.getContext());
 
         assert getFragmentManager() != null;
-//        LocationsTabsAdapter locationsTabsAdapter = new LocationsTabsAdapter(getFragmentManager(),1);
-//        ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.locations_view_pager);
-//        tabLayout = (TabLayout) rootView.findViewById(R.id.locations_tab_layout);
-//
-//        locationsTabsAdapter.addFragment(timeLineFragment,"TimeLine");
-//        //locationsTabsAdapter.addFragment(mapsFragment,"Map");
-//
-//        viewPager.setAdapter(locationsTabsAdapter);
-//        tabLayout.setupWithViewPager(viewPager);
-//        TextView tv = rootView.findViewById(R.id.title_test);
-//        tv.setText("hello world");
-
 
         getFragmentManager().beginTransaction().replace(R.id.activity_fragment_container, timeLineFragment).commit();
 
@@ -177,8 +163,6 @@ public class ActivityFragment extends Fragment {
     }
 
     private void onTLLocationClick(int position) {
-//        tabLayout.getTabAt(1).select();
-//        mapsFragment.focus(locations.get(position).getLocations().get(0),false);
         Intent intent = new Intent(rootView.getContext(), MapActivity.class);
         intent.putExtra("locations_group",position);
         startActivity(intent);
@@ -194,22 +178,11 @@ public class ActivityFragment extends Fragment {
                     switch (command) {
                         case "new_location":
                             if(dbInit){
-//                                MyLocation location = (MyLocation) intent.getSerializableExtra("location");
-//                                if(locations.size() == 0 || !checkIfLocationInGroup(locations.get(0),location)) {
-//                                    locations.add(0,new LocationsGroup());
-//                                }
-//                                locations.get(0).addLocation(location);
-//                                timeLineFragment.updateTimeLineAdapter();
-                                //mapsFragment.setMapPointers();
+
                             }
                         case "location_changed":
                             if(dbInit) {
-//                                MyLocation location = (MyLocation)intent.getSerializableExtra("location");
-//                                Log.i("changed","location");
-//                                locations.get(0).getLocations().remove(0);
-//                                locations.get(0).getLocations().add(0,location);
-//                                timeLineFragment.updateTimeLineAdapter();
-                                //mapsFragment.setMapPointers();
+
                             }
                             break;
                         case "close":

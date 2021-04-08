@@ -168,11 +168,9 @@ public class BtScannerService extends Service {
         List<ScanFilter> filters = new ArrayList<>();
 
         scanner.startScan(filters, settings, scanCallback);
-        //scanner.startScan(scanCallback);
 
         Log.i("BLE","Start Scan");
 
-        //Schedule checkIdleConnections
     }
 
     public void stopScan() {
