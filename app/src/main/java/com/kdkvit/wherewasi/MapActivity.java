@@ -56,7 +56,6 @@ public class MapActivity extends AppCompatActivity {
 
         group = locations.get(groupNum);
 
-
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
