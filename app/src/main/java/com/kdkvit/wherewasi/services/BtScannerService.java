@@ -54,7 +54,7 @@ public class BtScannerService extends Service {
         if (command != null) {
             switch (command) {
                 case "start":
-                    startScan();
+                    //startScan();
                     break;
                 case "stop":
                     stopScan();

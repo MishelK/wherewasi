@@ -18,6 +18,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -28,10 +29,24 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.CancellationToken;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnTokenCanceledListener;
+import com.google.android.gms.tasks.Task;
 import com.kdkvit.wherewasi.BuildConfig;
 import com.kdkvit.wherewasi.MainActivity;
 import com.kdkvit.wherewasi.R;
@@ -53,10 +68,10 @@ public class LocationService extends Service {
     private final long TIME_BETWEEN_CHECKING_LOCATIONS = Configs.TIME_BETWEEN_CHECKING_LOCATIONS;
     private final double KM_BETWEEN_LOCATIONS = Configs.KM_BETWEEN_LOCATIONS;
 
-    public LocationManager mlocManager;
+    public FusedLocationProviderClient mlocManager;
     public MyLocationListener listener;
     public MyLocation previousBestLocation = null;
-    private HashMap<String, Interaction> btInteractions =new HashMap<>();
+    private HashMap<String, Interaction> btInteractions = new HashMap<>();
 
     DatabaseHandler db;
     Geocoder geocoder;
@@ -110,7 +125,7 @@ public class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(intent != null) {
+        if (intent != null) {
             String command = intent.getStringExtra("command");
             if (command != null) {
                 switch (command) {
@@ -138,7 +153,7 @@ public class LocationService extends Service {
     public void initLocation() {
         db = new DatabaseHandler(this); // init database handler
 
-        mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mlocManager = LocationServices.getFusedLocationProviderClient(this);
         listener = new MyLocationListener();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -146,15 +161,55 @@ public class LocationService extends Service {
             return;
         }
 
-        mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, TIME_BETWEEN_CHECKING_LOCATIONS, 0, (LocationListener) listener);
-        if(mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME_BETWEEN_CHECKING_LOCATIONS, 0, (LocationListener) listener);
-        }
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(15 * 1000);
+        locationRequest.setFastestInterval(5 * 1000);
+        locationRequest.setSmallestDisplacement(50);
+
+
+        mlocManager.requestLocationUpdates(locationRequest, listener, Looper.getMainLooper());
 
         locationsTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Log.i("test","timer test");
+                Log.i("test", "timer test");
+                if (ActivityCompat.checkSelfPermission(LocationService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(LocationService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                Task<Location> task = mlocManager.getCurrentLocation(5, new CancellationToken() {
+                    @Override
+                    public boolean isCancellationRequested() {
+                        return false;
+                    }
+
+                    @NonNull
+                    @Override
+                    public CancellationToken onCanceledRequested(@NonNull OnTokenCanceledListener onTokenCanceledListener) {
+                        return null;
+                    }
+                });
+                task.addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        Log.i("********* location2", String.valueOf(location.getLatitude()));
+                        Log.i("********* location3", String.valueOf(location.getLongitude()));
+                    }
+                });
+                mlocManager.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        Log.i("********* location", String.valueOf(location.getLatitude()));
+                        Log.i("********* location", String.valueOf(location.getLongitude()));
+                    }
+                });
                 if(previousBestLocation!=null && previousBestLocation.getId() > 0){
                     previousBestLocation.setEndTime(System.currentTimeMillis());
                     previousBestLocation.setUpdateTime(System.currentTimeMillis());
@@ -327,7 +382,7 @@ public class LocationService extends Service {
             stopScanning();
         }catch (Exception e){}
         try {
-            mlocManager.removeUpdates(listener);
+            mlocManager.removeLocationUpdates(listener);
         }catch (Exception e){
 
         }
@@ -350,11 +405,16 @@ public class LocationService extends Service {
         return t;
     }
 
-    public class MyLocationListener implements LocationListener {
+    public class MyLocationListener extends LocationCallback {
 
-        public void onLocationChanged(final Location loc) {
+        @Override
+        public void onLocationResult(@NonNull LocationResult locationResult) {
+            super.onLocationResult(locationResult);
             Log.i("*****", "Location changed");
-
+            Log.i("*****", String.valueOf(locationResult.getLastLocation().getLatitude()));
+            Log.i("*****", String.valueOf(locationResult.getLastLocation().getLongitude()));
+            Log.i("*****", String.valueOf(locationResult.getLocations().size()));
+            Location loc = locationResult.getLastLocation();
             long now = System.currentTimeMillis();
             MyLocation location = new MyLocation(loc.getLatitude(), loc.getLongitude(),loc.getProvider(),now,now,loc.getAccuracy());
             if (isBetterLocation(location, previousBestLocation)) { //Check if better location; if it is writing new line if not updating current one
@@ -373,9 +433,9 @@ public class LocationService extends Service {
 
                 //Determine location quality using a combination of timeliness and accuracy
                 if (isMoreAccurate) {
-                  previousBestLocation.setAccuracy(location.getAccuracy());
-                  previousBestLocation.setLatitude(location.getLatitude());
-                  previousBestLocation.setLongitude(location.getLongitude());
+                    previousBestLocation.setAccuracy(location.getAccuracy());
+                    previousBestLocation.setLatitude(location.getLatitude());
+                    previousBestLocation.setLongitude(location.getLongitude());
                 }
 
                 previousBestLocation.setEndTime(location.getEndTime());
@@ -385,18 +445,10 @@ public class LocationService extends Service {
         }
 
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            Toast.makeText(getApplicationContext(), "Status Changed", Toast.LENGTH_SHORT).show();
+        public void onLocationAvailability(@NonNull LocationAvailability locationAvailability) {
+            super.onLocationAvailability(locationAvailability);
         }
 
-        public void onProviderDisabled(String provider) {
-            Toast.makeText(getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT).show();
-        }
-
-
-        public void onProviderEnabled(String provider) {
-            Toast.makeText(getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void sendLocationEvent(MyLocation location) {
@@ -458,4 +510,5 @@ public class LocationService extends Service {
             }
         }
     }
+
 }
