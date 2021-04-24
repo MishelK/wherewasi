@@ -31,4 +31,7 @@
     <string name="days_ago">Days ago</string>
     <string name="no_notifications">No Notifications Found</string>
     <string name="running">Active</string>
+    <string name="today_interactions">Today Interactions</string>
+    <string name="today_positives">Today Positives</string>
+    <string name="loading">Loading</string>
 </resources>

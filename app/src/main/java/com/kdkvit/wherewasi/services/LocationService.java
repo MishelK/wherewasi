@@ -85,7 +85,9 @@ public class LocationService extends Service {
     private Timer locationsTimer = new Timer();
     private Timer advertisingTimer = new Timer();
     private Timer scanningTimer = new Timer();
+    private Timer interactionsTimer = new Timer();
     private BroadcastReceiver scannerBroadcast;
+    private RemoteViews remoteViews;
 
 
     @Override
@@ -101,7 +103,12 @@ public class LocationService extends Service {
         builder = new NotificationCompat.Builder(this, channelId);
         builder.setNotificationSilent();
 
-        RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notif_layout);
+        remoteViews = new RemoteViews(getPackageName(), R.layout.notif_layout);
+
+        //        Intent closeIntent = new Intent(this, LocationService.class);
+//        closeIntent.putExtra("command", "close");
+//        PendingIntent closePendingIntent = PendingIntent.getService(this, 1, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        remoteViews.setOnClickPendingIntent(R.id.stop_service_btn, closePendingIntent);
 
 //        Intent closeIntent = new Intent(this, LocationService.class);
 //        closeIntent.putExtra("command", "close");
@@ -131,6 +138,7 @@ public class LocationService extends Service {
                 switch (command) {
                     case "app_created":
                         initLocation();
+                        initNotificationInteractions();
 //                return START_STICKY;
                         break;
                     case "close":
@@ -140,6 +148,18 @@ public class LocationService extends Service {
             }
         }
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void initNotificationInteractions() {
+        interactionsTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                long currentTime = System.currentTimeMillis();
+                int all = db.getNumOfInteractionsOnDay(currentTime,false);
+                int positives = db.getNumOfInteractionsOnDay(currentTime,true);
+                updateNotifView(all,positives);
+            }
+        },500,60*1000);
     }
 
     private void close() {
@@ -511,4 +531,18 @@ public class LocationService extends Service {
         }
     }
 
+    private void updateNotifView(int all,int positives){
+        String allText = getResources().getString(R.string.today_interactions) + ": " + String.valueOf(all);
+        String positivesText = getResources().getString(R.string.today_positives) + ": " + String.valueOf(all);
+        remoteViews.setTextViewText(R.id.notification_interactions_text,allText);
+        remoteViews.setTextViewText(R.id.notification_positives_text,positivesText);
+        if(positives > 0) {
+            remoteViews.setImageViewResource(R.id.notification_status, R.drawable.circle_dra_red);
+        }else if (all > 0){
+            remoteViews.setImageViewResource(R.id.notification_status, R.drawable.circle_dra_orange);
+        }else{
+            remoteViews.setImageViewResource(R.id.notification_status, R.drawable.circle_dra_gren);
+        }
+        manager.notify(NOTIF_ID,builder.build());
+    }
 }
