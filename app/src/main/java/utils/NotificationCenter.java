@@ -7,6 +7,7 @@ import com.kdkvit.wherewasi.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import models.Interaction;
 import models.MyNotification;
 
 public class NotificationCenter {
@@ -34,10 +35,18 @@ public class NotificationCenter {
         for (int i = 0; i < 14 ; i++){ // finding max
             long currentTime = System.currentTimeMillis();
             long dateInMillis = currentTime - (i * MILLIS_IN_DAY);
-            int num = db.getNumOfInteractionsOnDay(dateInMillis,true);
-            if(num > 0) {
-                String text = context.getString(R.string.positive_founds);
-                text = String.format(text, String.valueOf(num));
+            List<Interaction> interactions = db.getInteractionsOnDay(dateInMillis);
+            int all = interactions.size();
+            if(all > 0) {
+                int positives = 0;
+                for (Interaction interaction : interactions) {
+                    if (interaction.isPositive()) {
+                        positives++;
+                    }
+                }
+
+                String text = context.getString(R.string.interactions_found);
+                text = String.format(text, String.valueOf(all),String.valueOf(positives));
                 notifList.add(new MyNotification(i, text));
             }
         }

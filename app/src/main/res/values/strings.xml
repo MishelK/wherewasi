@@ -25,7 +25,7 @@
     <string name="export">Export</string>
     <string name="alert">Alert</string>
     <string name="you_have_been_expose">Someone that been around you marked himself as positive</string>
-    <string name="positive_founds">%s new positive interactions reported</string>
+    <string name="interactions_found">Interactions: %s \nPositives Interactions %s</string>
     <string name="today">Today</string>
     <string name="yestrday">Yestrday</string>
     <string name="days_ago">Days ago</string>
@@ -34,4 +34,5 @@
     <string name="today_interactions">Today Interactions</string>
     <string name="today_positives">Today Positives</string>
     <string name="loading">Loading</string>
+
 </resources>

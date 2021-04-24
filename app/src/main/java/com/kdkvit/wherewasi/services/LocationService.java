@@ -155,8 +155,14 @@ public class LocationService extends Service {
             @Override
             public void run() {
                 long currentTime = System.currentTimeMillis();
-                int all = db.getNumOfInteractionsOnDay(currentTime,false);
-                int positives = db.getNumOfInteractionsOnDay(currentTime,true);
+                List<Interaction> interactions = db.getInteractionsOnDay(currentTime);
+                int all = interactions.size();
+                int positives = 0;
+                for (Interaction interaction : interactions){
+                    if(interaction.isPositive()){
+                        positives++;
+                    }
+                }
                 updateNotifView(all,positives);
             }
         },500,60*1000);
