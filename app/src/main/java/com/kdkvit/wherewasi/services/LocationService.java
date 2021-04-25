@@ -210,32 +210,7 @@ public class LocationService extends Service {
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-                Task<Location> task = mlocManager.getCurrentLocation(5, new CancellationToken() {
-                    @Override
-                    public boolean isCancellationRequested() {
-                        return false;
-                    }
 
-                    @NonNull
-                    @Override
-                    public CancellationToken onCanceledRequested(@NonNull OnTokenCanceledListener onTokenCanceledListener) {
-                        return null;
-                    }
-                });
-                task.addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        Log.i("********* location2", String.valueOf(location.getLatitude()));
-                        Log.i("********* location3", String.valueOf(location.getLongitude()));
-                    }
-                });
-                mlocManager.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        Log.i("********* location", String.valueOf(location.getLatitude()));
-                        Log.i("********* location", String.valueOf(location.getLongitude()));
-                    }
-                });
                 if(previousBestLocation!=null && previousBestLocation.getId() > 0){
                     previousBestLocation.setEndTime(System.currentTimeMillis());
                     previousBestLocation.setUpdateTime(System.currentTimeMillis());
