@@ -110,11 +110,6 @@ public class LocationService extends Service {
 //        PendingIntent closePendingIntent = PendingIntent.getService(this, 1, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 //        remoteViews.setOnClickPendingIntent(R.id.stop_service_btn, closePendingIntent);
 
-//        Intent closeIntent = new Intent(this, LocationService.class);
-//        closeIntent.putExtra("command", "close");
-//        PendingIntent closePendingIntent = PendingIntent.getService(this, 1, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        remoteViews.setOnClickPendingIntent(R.id.stop_service_btn, closePendingIntent);
-
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("working", true);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -275,8 +270,13 @@ public class LocationService extends Service {
 
             if(btInteractions.containsKey(interaction.getUuid())){
                 btInteractions.get(interaction.getUuid()).setLastSeen(System.currentTimeMillis());
+
             }else{
                 btInteractions.put(interaction.getUuid(),interaction);
+
+            }
+            if (btInteractions.get(interaction.getUuid()).getRssi() < -30 && btInteractions.get(interaction.getUuid()).getRssi() > -100) { // Case interaction within danger range
+                btInteractions.get(interaction.getUuid()).setIsDangerous(1);
             }
         }
     }
@@ -306,16 +306,6 @@ public class LocationService extends Service {
         startService(intent);
     }
 
-//    @Override
-//    public void onStart(Intent intent, int startId) {
-//        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//        listener = new MyLocationListener();
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        }
-//        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 4000, 0, (LocationListener) listener);
-//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 4000, 0, listener);
-//    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -428,9 +418,7 @@ public class LocationService extends Service {
                 int accuracyDelta = (int) (location.getAccuracy() - previousBestLocation.getAccuracy());
                 boolean isMoreAccurate = accuracyDelta > 0;
 
-                // Check if the old and new location are from the same provider
-//                boolean isFromSameProvider = isSameProvider(location.getProvider(),
-//                        previousBestLocation.getProvider());
+
 
                 //Determine location quality using a combination of timeliness and accuracy
                 if (isMoreAccurate) {
@@ -505,7 +493,7 @@ public class LocationService extends Service {
                 // Here we want to remove device from the map and in case user was in contact for long enough, log contact in database
                 btInteractions.remove(interaction.getUuid());
                 Log.i("BLE", "Removing idle device from map: " + interaction.toString());
-                if (interaction.getLastSeen() - interaction.getFirstSeen() >= CONTACT_DURATION) { // If the interaction lasted for long enough for it to be logged
+                if (interaction.getLastSeen() - interaction.getFirstSeen() >= CONTACT_DURATION && interaction.getIsDangerous() == 1) { // If the interaction lasted for long enough for it to be logged and if it is withing danger range
                     db.addInteraction(interaction);
                 }
             }
