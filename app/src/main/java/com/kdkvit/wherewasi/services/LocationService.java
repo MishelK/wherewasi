@@ -213,8 +213,13 @@ public class LocationService extends Service {
 
             if(btInteractions.containsKey(interaction.getUuid())){
                 btInteractions.get(interaction.getUuid()).setLastSeen(System.currentTimeMillis());
+
             }else{
                 btInteractions.put(interaction.getUuid(),interaction);
+
+            }
+            if (btInteractions.get(interaction.getUuid()).getRssi() < -30 && btInteractions.get(interaction.getUuid()).getRssi() > -100) { // Case interaction within danger range
+                btInteractions.get(interaction.getUuid()).setIsDangerous(1);
             }
         }
     }
@@ -434,7 +439,7 @@ public class LocationService extends Service {
                 // Here we want to remove device from the map and in case user was in contact for long enough, log contact in database
                 btInteractions.remove(interaction.getUuid());
                 Log.i("BLE", "Removing idle device from map: " + interaction.toString());
-                if (interaction.getLastSeen() - interaction.getFirstSeen() >= CONTACT_DURATION) { // If the interaction lasted for long enough for it to be logged
+                if (interaction.getLastSeen() - interaction.getFirstSeen() >= CONTACT_DURATION && interaction.getIsDangerous() == 1) { // If the interaction lasted for long enough for it to be logged and if it is withing danger range
                     db.addInteraction(interaction);
                 }
             }

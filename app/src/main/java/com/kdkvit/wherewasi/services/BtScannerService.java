@@ -100,7 +100,7 @@ public class BtScannerService extends Service {
                     interaction.setLastSeen(now.getTime());
                     interaction.setUuid(device_uuid);
                     interaction.setRssi(result.getRssi());
-                    Log.i("BLE", "Adding device to btInteractions : " + interaction.getUuid());
+                    Log.i("BLE", "Adding device to btInteractions : " + interaction.getUuid()  + " Rssi: " + interaction.getRssi());
                     btInteractions.add(interaction);
             }
 
@@ -136,7 +136,7 @@ public class BtScannerService extends Service {
                     interaction.setLastSeen(now.getTime());
                     interaction.setUuid(device_uuid);
                     interaction.setRssi(results.get(i).getRssi());
-                    Log.i("BLE", "Adding device to btInteractions : " + interaction.getUuid());
+                    Log.i("BLE", "Adding device to btInteractions : " + interaction.getUuid() + " Rssi: " + interaction.getRssi());
                     btInteractions.add(interaction);
                 }
             }
