@@ -71,5 +71,11 @@
         <item>@string/l2_permission_level_text</item>
         <item>@string/decline_permission_level_text</item>
     </string-array>
-
+    <string name="permissionRequestExplanation">Microphone permission is needed to receive messages via sound.</string>
+    <string name="on_receiving_listening_permission_required">Data-over-sound permission required to receive messages</string>
+    <string name="on_sending_sending_permission_required">Data-over-sound permission required to send messages</string>
+    <string name="decoder_start_text">Start listening...</string>
+    <string name="permission_request_explanation_positive">Open the Permission Menu</string>
+    <string name="permission_request_explanation_negative">No thanks</string>
+    <string name="signal_generator_not_created">No Signal was created yet!</string>
 </resources>
