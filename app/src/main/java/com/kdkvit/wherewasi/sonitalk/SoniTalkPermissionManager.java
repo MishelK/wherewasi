@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
     /*package-private*/ boolean currentRequestAnswered;
     /*package-private*/ boolean sessionPermissionGranted;
 
-    /*package-private*/ static final String PERMISSION_SONITALK_L0 = "at.ac.fhstp.permission_all_ultrasonic_communication";
+    /*package-private*/ static final String PERMISSION_SONITALK_L0 = "com.kdkvit.wherewasi.sonitalk.permission_all_ultrasonic_communication";
     /*package-private*/ static final int PERMISSION_SONITALK_L0_REQUEST_CODE = 1;
     /*package-private*/ static final int PERMISSION_LEVEL_1_CODE = 101;
     /*package-private*/ static final int PERMISSION_LEVEL_2_CODE = 102;

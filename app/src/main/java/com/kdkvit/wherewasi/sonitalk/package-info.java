@@ -18,7 +18,7 @@
  */
 
 /**
- * The package at.ac.fhstp.sonitalk is a library enabling developers to use the loudspeaker and
+ * The package com.kdkvit.wherewasi.sonitalk is a library enabling developers to use the loudspeaker and
  * microphone of a device to exchange data.
  */
 package com.kdkvit.wherewasi.sonitalk;

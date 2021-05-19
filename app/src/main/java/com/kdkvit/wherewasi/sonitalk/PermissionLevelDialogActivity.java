@@ -43,7 +43,7 @@ import com.kdkvit.wherewasi.R;
  */
 public class PermissionLevelDialogActivity extends AppCompatActivity {
     private static final String TAG_PermissionLevelDialogFragment = "TAG_PermissionLevelDialogFragment";
-    /*package-private*/static final String EXTRA_PERMISSION_LEVEL_LISTENER = "at.ac.fhstp.sonitalk.EXTRA_PERMISSION_LEVEL_LISTENER";
+    /*package-private*/static final String EXTRA_PERMISSION_LEVEL_LISTENER = "com.kdkvit.wherewasi.sonitalk.EXTRA_PERMISSION_LEVEL_LISTENER";
 
     // Can we use only this listener ? Remove the one in Fragment ?
     PermissionLevelDialogListener internalListenerActivity;

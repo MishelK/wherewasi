@@ -66,5 +66,13 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <permission
+        android:name="com.kdkvit.wherewasi.sonitalk.permission_all_ultrasonic_communication"
+        android:label="@string/permission_l0_label"
+        android:description="@string/permission_l0_description"
+        android:permissionGroup="SoniTalk"
+        android:protectionLevel="dangerous" />
+
+    <uses-permission android:name="com.kdkvit.wherewasi.sonitalk.permission_all_ultrasonic_communication"/>
 
 </manifest>

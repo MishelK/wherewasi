@@ -18,7 +18,7 @@
  */
 
 /**
- * The package at.ac.fhstp.sonitalk.utils is providing functionality for processing messages
+ * The package com.kdkvit.wherewasi.sonitalk.utils is providing functionality for processing messages
  * and audio data.
  */
 package com.kdkvit.wherewasi.sonitalk.utils;

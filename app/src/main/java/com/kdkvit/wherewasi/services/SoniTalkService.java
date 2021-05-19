@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,6 +33,8 @@ import com.kdkvit.wherewasi.sonitalk.utils.ConfigFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS;
 
@@ -40,6 +43,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
     private SoniTalkSender soniTalkSender;
     private SoniTalkPermissionsResultReceiver soniTalkPermissionsResultReceiver;
     SoniTalkConfig config;
+    private SoniTalkEncoder soniTalkEncoder;
 
     @Nullable
     @Override
@@ -67,8 +71,8 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
             soniTalkContext = SoniTalkContext.getInstance(this, soniTalkPermissionsResultReceiver);
         }
         try {
-            config = ConfigFactory.getDefaultConfig(this);
-            
+            //config = ConfigFactory.getDefaultConfig(this);
+            config = ConfigFactory.loadFromJson("hearable4000.json",this);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -76,8 +80,69 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
             e.printStackTrace();
         }
     }
+    private AudioTrack playerFrequency;
+    private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
+    public static final ScheduledExecutorService threadPool = Executors.newScheduledThreadPool(NUMBER_OF_CORES + 1);
+
+    public void generateMessage(){
+        if(playerFrequency!=null){
+            playerFrequency.stop();
+            playerFrequency.flush();
+            playerFrequency.release();
+            playerFrequency = null;
+            //Log.d("Releaseaudio","playerFrequency releaese");
+        }
+        //Log.d("GenerateClick","I got clicked");
 
 
+        sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        int bitperiod = Integer.valueOf(sp.getString(ConfigConstants.BIT_PERIOD, ConfigConstants.SETTING_BIT_PERIOD_DEFAULT));
+        int pauseperiod = Integer.valueOf(sp.getString(ConfigConstants.PAUSE_PERIOD, ConfigConstants.SETTING_PAUSE_PERIOD_DEFAULT));
+        int f0 = Integer.valueOf(sp.getString(ConfigConstants.FREQUENCY_ZERO, ConfigConstants.SETTING_FREQUENCY_ZERO_DEFAULT));
+        int nFrequencies = Integer.valueOf(sp.getString(ConfigConstants.NUMBER_OF_FREQUENCIES, ConfigConstants.SETTING_NUMBER_OF_FREQUENCIES_DEFAULT));
+        int frequencySpace = Integer.valueOf(sp.getString(ConfigConstants.SPACE_BETWEEN_FREQUENCIES, ConfigConstants.SETTING_SPACE_BETWEEN_FREQUENCIES_DEFAULT));
+        int nMaxBytes = Integer.valueOf(sp.getString(ConfigConstants.NUMBER_OF_BYTES, ConfigConstants.SETTING_NUMBER_OF_BYTES_DEFAULT));
+
+        int nMessageBlocks = (nMaxBytes+2) / 2; // We want 10 message blocks by default
+        SoniTalkConfig config = new SoniTalkConfig(f0, bitperiod, pauseperiod, nMessageBlocks, nFrequencies, frequencySpace);
+        if (soniTalkContext == null) {
+            soniTalkContext = SoniTalkContext.getInstance(this, soniTalkPermissionsResultReceiver);
+        }
+        soniTalkEncoder = soniTalkContext.getEncoder(config);
+
+        //final String textToSend = sp.getString(ConfigConstants.SIGNAL_TEXT,"Hallo Sonitalk");
+        final String textToSend = "hello";
+        //Log.d("changeToBitStringUTF8",String.valueOf(isUTF8MisInterpreted(textToSend, "Windows-1252")));
+
+        sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if(!sp.contains(ConfigConstants.TEXT_TO_SEND)){
+            SharedPreferences.Editor ed = sp.edit();
+            ed.putString(ConfigConstants.TEXT_TO_SEND, textToSend);
+            ed.apply();
+        }
+
+        if(sp.getString(ConfigConstants.TEXT_TO_SEND,"Hallo SoniTalk").equals(textToSend) && currentMessage != null){
+            sendMessage();
+        }else {
+            SharedPreferences.Editor ed = sp.edit();
+            ed.putString(ConfigConstants.TEXT_TO_SEND, textToSend);
+            ed.apply();
+
+            final byte[] bytes = textToSend.getBytes(StandardCharsets.UTF_8);
+
+
+            // Move the background execution handling away from the Activity (in Encoder or Service or AsyncTask). Creating Runnables here may leak the Activity
+            threadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    currentMessage = soniTalkEncoder.generateMessage(bytes);
+                    sendMessage();
+                }
+            });
+
+        }
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { //Called from startService()
@@ -96,13 +161,14 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
     }
 
     public void startSending(){
-        sendMessage();
+        generateMessage();
     }
 
 
-    public void sendMessage(){
+    public void sendMessage() {
         //Log.d("PlayClick","I got clicked");
-        currentMessage = generateMessage(soniTalkContext,config,"a1");
+
+        if (currentMessage != null) {
             AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
             int currentVolume = audioManager.getStreamVolume(3);
             sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -111,20 +177,20 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
             ed.apply();
 
             int volume = Integer.valueOf(sp.getString(ConfigConstants.LOUDNESS, ConfigConstants.SETTING_LOUDNESS_DEFAULT));
-            audioManager.setStreamVolume(3, (int) Math.round((audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) * volume/100.0D)), 0);
+            audioManager.setStreamVolume(3, (int) Math.round((audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) * volume / 100.0D)), 0);
 
             if (soniTalkContext == null) {
                 soniTalkContext = SoniTalkContext.getInstance(this, soniTalkPermissionsResultReceiver);
             }
             soniTalkSender = soniTalkContext.getSender();
             soniTalkSender.send(currentMessage, ON_SENDING_REQUEST_CODE);
-            Log.i("SonitalkService","success!");
-//        } else{
-//            Toast.makeText(getApplicationContext(), getString(R.string.signal_generator_not_created),Toast.LENGTH_LONG).show();
-//        }
+
+        } else {
+            Toast.makeText(getApplicationContext(), getString(R.string.signal_generator_not_created), Toast.LENGTH_LONG).show();
+        }
     }
 
-    @Override
+        @Override
     public void onSoniTalkPermissionResult(int resultCode, Bundle resultData) {
         int actionCode = 0;
         if(resultData != null){

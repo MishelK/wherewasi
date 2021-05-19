@@ -35,7 +35,7 @@
     <string name="today_positives">Today Positives</string>
     <string name="loading">Loading</string>
 
-    <string name="context_preference_key" translatable="false">at.ac.fhstp.sonitalk.context_preference_key_</string>
+    <string name="context_preference_key" translatable="false">com.kdkvit.wherewasi.sonitalk.context_preference_key_</string>
     <string name="permission_level_key" translatable="false">PERMISSION_LEVEL</string>
     <string name="bundleRequestCode_key" translatable="false">BUNDLE_REQUEST_CODE_KEY</string>
     <string name="currentRequestAction_key" translatable="false">CURRENT_REQUEST_ACTION</string>

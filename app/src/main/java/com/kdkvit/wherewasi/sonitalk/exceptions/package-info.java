@@ -18,7 +18,7 @@
  */
 
 /**
- * The package at.ac.fhstp.sonitalk.exceptions is providing custom exceptions for
+ * The package com.kdkvit.wherewasi.sonitalk.exceptions is providing custom exceptions for
  * the library.
  */
 package com.kdkvit.wherewasi.sonitalk.exceptions;
