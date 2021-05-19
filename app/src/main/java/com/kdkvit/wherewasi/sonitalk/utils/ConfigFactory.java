@@ -41,7 +41,7 @@ import marytts.util.math.ArrayUtils;
 public final class ConfigFactory {
     private static final String TAG = ConfigFactory.class.getSimpleName();
 
-    public static final String DEFAULT_PROFILE_FILENAME = "default_config.json";
+    public static final String DEFAULT_PROFILE_FILENAME = "near_ultrasonic.json";
 
     public static SoniTalkConfig getDefaultConfig(Context context) throws IOException, ConfigException {
         return loadFromJson(DEFAULT_PROFILE_FILENAME, context);

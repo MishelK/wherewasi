@@ -66,7 +66,9 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
             soniTalkContext = SoniTalkContext.getInstance(this, soniTalkPermissionsResultReceiver);
         }
         try {
-            config =  ConfigFactory.getDefaultConfig(this.getApplicationContext());
+            config = ConfigFactory.getDefaultConfig(this);
+            
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ConfigException e) {

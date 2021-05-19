@@ -30,12 +30,12 @@ public class ConfigConstants {
      * The following String values are used as keys for the json configuration files.
      * Please do not modify, or if you do, keep everything in sync.
      */
-//    public static final String FREQUENCY_ZERO = "frequency-zero"; // Lowest frequency used in Hz
-//    public static final String BIT_PERIOD = "bit-period"; // Bit duration in ms
-//    public static final String PAUSE_PERIOD = "pause-period"; // Pause duration in ms
+    public static final String FREQUENCY_ZERO = "frequency-zero"; // Lowest frequency used in Hz
+    public static final String BIT_PERIOD = "bit-period"; // Bit duration in ms
+    public static final String PAUSE_PERIOD = "pause-period"; // Pause duration in ms
     public static final String NUMBER_OF_MESSAGE_BLOCKS = "number-of-message-blocks";
-//    public static final String NUMBER_OF_FREQUENCIES = "number-of-frequencies";
-//    public static final String SPACE_BETWEEN_FREQUENCIES = "space-between-frequencies"; // In Hz
+    public static final String NUMBER_OF_FREQUENCIES = "number-of-frequencies";
+    public static final String SPACE_BETWEEN_FREQUENCIES = "space-between-frequencies"; // In Hz
     /*** ***/
 
     /* NOT used in this version.
@@ -51,13 +51,13 @@ public class ConfigConstants {
 */
     public static final byte[] GENERATOR_POLYNOM = new byte[] { 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1}; //CRC-17-CAN : 0x1685B
     public static final String CONTROL_FILLING_CHARACTER = "00011001";
-    public static final String FREQUENCY_ZERO = "etprefFrequencyZero";
-    public static final String BIT_PERIOD = "etprefBitperiod";
-    public static final String PAUSE_PERIOD = "etprefPauseperiod";
-    public static final String NUMBER_OF_FREQUENCIES = "lpprefNFrequencies";
-    public static final String SPACE_BETWEEN_FREQUENCIES = "etprefFrequencyspace";
-    public static final String NUMBER_OF_BYTES = "etprefNMaxBytes";
-    public static final String LOUDNESS = "sbprefLoudness";
+//    public static final String FREQUENCY_ZERO = "FrequencyZero";
+//    public static final String BIT_PERIOD = "Bitperiod";
+//    public static final String PAUSE_PERIOD = "etprefPauseperiod";
+//    public static final String NUMBER_OF_FREQUENCIES = "lpprefNFrequencies";
+//    public static final String SPACE_BETWEEN_FREQUENCIES = "etprefFrequencyspace";
+    public static final String NUMBER_OF_BYTES = "NMaxBytes";
+    public static final String LOUDNESS = "Loudness";
     public static final String PRESET = "setPresetPreferences";
 
     public static final String SETTING_FREQUENCY_ZERO_DEFAULT = "18000";
