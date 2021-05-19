@@ -2,6 +2,7 @@ package com.kdkvit.wherewasi;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
@@ -28,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kdkvit.wherewasi.firebase.MyFirebaseMessagingService;
 import com.kdkvit.wherewasi.fragments.ActivityFragment;
@@ -53,6 +55,8 @@ import utils.NotificationCenter;
 import static actions.actions.sendUserToBe;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 42;
+    private String [] PERMISSIONS = {Manifest.permission.RECORD_AUDIO};
 
     private static final int LOCATION_PERMISSION_REQUEST = 1;
     public static User user;
@@ -110,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
             initLoggedInUser();
         }
+        requestAudioPermission();
     }
 
     private void initLoggedInUser() {
@@ -185,6 +190,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void requestAudioPermission() {
+        Log.i("SoniTalkService", "Audio permission has NOT been granted. Requesting permission.");
+        // If an explanation is needed
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                Manifest.permission.RECORD_AUDIO)) {
+            Log.i("mainac","Displaying audio permission rationale to provide additional context.");
+
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.RECORD_AUDIO},
+                    REQUEST_RECORD_AUDIO_PERMISSION);
+
+        } else {
+            // First time, no explanation needed, we can request the permission.
+            ActivityCompat.requestPermissions(MainActivity.this, PERMISSIONS, REQUEST_RECORD_AUDIO_PERMISSION);
+        }
+    }
+
+
     private void initService() {
         Intent intent = new Intent(this, LocationService.class);
         intent.putExtra("command", "app_created");
@@ -205,6 +228,20 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             }).setCancelable(false).show();
+        }
+        if (grantResults.length == 0) {
+            //we will show an explanation next time the user click on start
+            Toast.makeText(this, R.string.permissionRequestExplanation, Toast.LENGTH_SHORT).show();
+        }
+        switch (requestCode){
+            case REQUEST_RECORD_AUDIO_PERMISSION:
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "recived permissions", Toast.LENGTH_SHORT).show();
+                }
+                else if(grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    Toast.makeText(this, "permissions denied", Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
     }
 

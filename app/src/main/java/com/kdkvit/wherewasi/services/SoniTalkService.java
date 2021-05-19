@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -75,6 +76,8 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
             e.printStackTrace();
         }
     }
+
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { //Called from startService()
