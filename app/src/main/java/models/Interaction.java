@@ -12,7 +12,9 @@ public class Interaction implements Parcelable {
     private String uuid;
     private Long firstSeen;
     private Long lastSeen;
+    private int rssi = 0;
     private long interactionID;
+    private int isDangerous = 0;
     private boolean positive = false;
 
     public Interaction(){}
@@ -22,6 +24,8 @@ public class Interaction implements Parcelable {
         this.firstSeen = in.readLong();
         this.lastSeen = in.readLong();
         this.interactionID = in.readInt();
+        this.rssi = in.readInt();
+        this.isDangerous = in.readInt();
     }
 
     public Long getFirstSeen() {
@@ -56,6 +60,22 @@ public class Interaction implements Parcelable {
         this.interactionID = interactionID;
     }
 
+    public int getRssi() {
+        return rssi;
+    }
+
+    public void setRssi(int rssi) {
+        this.rssi = rssi;
+    }
+
+    public int getIsDangerous() {
+        return isDangerous;
+    }
+
+    public void setIsDangerous(int isDangerous) {
+        this.isDangerous = isDangerous;
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -74,6 +94,8 @@ public class Interaction implements Parcelable {
         parcel.writeLong(lastSeen);
         parcel.writeLong(lastSeen);
         parcel.writeLong(interactionID);
+        parcel.writeInt(rssi);
+        parcel.writeInt(isDangerous);
     }
 
     public static final Creator<Interaction> CREATOR = new Creator<Interaction>() {

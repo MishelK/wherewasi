@@ -99,7 +99,8 @@ public class BtScannerService extends Service {
                     interaction.setFirstSeen(now.getTime());
                     interaction.setLastSeen(now.getTime());
                     interaction.setUuid(device_uuid);
-                    Log.i("BLE", "Adding device to btInteractions : " + interaction.getUuid());
+                    interaction.setRssi(result.getRssi());
+                    Log.i("BLE", "Adding device to btInteractions : " + interaction.getUuid()  + " Rssi: " + interaction.getRssi());
                     btInteractions.add(interaction);
             }
 
@@ -134,7 +135,8 @@ public class BtScannerService extends Service {
                     interaction.setFirstSeen(now.getTime());
                     interaction.setLastSeen(now.getTime());
                     interaction.setUuid(device_uuid);
-                    Log.i("BLE", "Adding device to btInteractions : " + interaction.getUuid());
+                    interaction.setRssi(results.get(i).getRssi());
+                    Log.i("BLE", "Adding device to btInteractions : " + interaction.getUuid() + " Rssi: " + interaction.getRssi());
                     btInteractions.add(interaction);
                 }
             }
@@ -168,11 +170,9 @@ public class BtScannerService extends Service {
         List<ScanFilter> filters = new ArrayList<>();
 
         scanner.startScan(filters, settings, scanCallback);
-        //scanner.startScan(scanCallback);
 
         Log.i("BLE","Start Scan");
 
-        //Schedule checkIdleConnections
     }
 
     public void stopScan() {
