@@ -33,7 +33,7 @@ public class ConfigConstants {
 //    public static final String FREQUENCY_ZERO = "frequency-zero"; // Lowest frequency used in Hz
 //    public static final String BIT_PERIOD = "bit-period"; // Bit duration in ms
 //    public static final String PAUSE_PERIOD = "pause-period"; // Pause duration in ms
-//    public static final String NUMBER_OF_MESSAGE_BLOCKS = "number-of-message-blocks";
+    public static final String NUMBER_OF_MESSAGE_BLOCKS = "number-of-message-blocks";
 //    public static final String NUMBER_OF_FREQUENCIES = "number-of-frequencies";
 //    public static final String SPACE_BETWEEN_FREQUENCIES = "space-between-frequencies"; // In Hz
     /*** ***/

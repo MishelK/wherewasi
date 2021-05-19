@@ -24,8 +24,11 @@ import com.anychart.enums.Anchor;
 import com.anychart.enums.HoverMode;
 import com.anychart.enums.Position;
 import com.anychart.enums.TooltipPositionMode;
+import com.google.android.material.button.MaterialButton;
 import com.kdkvit.wherewasi.R;
 import com.kdkvit.wherewasi.adapters.NotificationsAdapter;
+import com.kdkvit.wherewasi.services.BtAdvertiserService;
+import com.kdkvit.wherewasi.services.SoniTalkService;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -84,6 +87,16 @@ public class MainFragment extends Fragment {
         SnapHelper snapHelper = new PagerSnapHelper();
         recyclerView.setLayoutManager(layoutManager);
         snapHelper.attachToRecyclerView(recyclerView);
+
+        MaterialButton button = rootView.findViewById(R.id.send_message);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), SoniTalkService.class);
+                intent.putExtra("command", "start");
+                view.getContext().startService(intent);
+            }
+        });
 
         initReceiver();
 

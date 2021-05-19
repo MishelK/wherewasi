@@ -19,11 +19,18 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import com.kdkvit.wherewasi.R;
+import com.kdkvit.wherewasi.sonitalk.SoniTalkConfig;
 import com.kdkvit.wherewasi.sonitalk.SoniTalkContext;
+import com.kdkvit.wherewasi.sonitalk.SoniTalkEncoder;
 import com.kdkvit.wherewasi.sonitalk.SoniTalkMessage;
 import com.kdkvit.wherewasi.sonitalk.SoniTalkPermissionsResultReceiver;
 import com.kdkvit.wherewasi.sonitalk.SoniTalkSender;
+import com.kdkvit.wherewasi.sonitalk.exceptions.ConfigException;
 import com.kdkvit.wherewasi.sonitalk.utils.ConfigConstants;
+import com.kdkvit.wherewasi.sonitalk.utils.ConfigFactory;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS;
 
@@ -31,6 +38,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
     private SoniTalkContext soniTalkContext;
     private SoniTalkSender soniTalkSender;
     private SoniTalkPermissionsResultReceiver soniTalkPermissionsResultReceiver;
+    SoniTalkConfig config;
 
     @Nullable
     @Override
@@ -57,6 +65,13 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
         if (soniTalkContext == null) {
             soniTalkContext = SoniTalkContext.getInstance(this, soniTalkPermissionsResultReceiver);
         }
+        try {
+            config =  ConfigFactory.getDefaultConfig(this.getApplicationContext());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ConfigException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -76,13 +91,13 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
     }
 
     public void startSending(){
-
+        sendMessage();
     }
 
 
     public void sendMessage(){
         //Log.d("PlayClick","I got clicked");
-
+        currentMessage = generateMessage(soniTalkContext,config,"a1");
             AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
             int currentVolume = audioManager.getStreamVolume(3);
             sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -98,7 +113,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
             }
             soniTalkSender = soniTalkContext.getSender();
             soniTalkSender.send(currentMessage, ON_SENDING_REQUEST_CODE);
-
+            Log.i("SonitalkService","success!");
 //        } else{
 //            Toast.makeText(getApplicationContext(), getString(R.string.signal_generator_not_created),Toast.LENGTH_LONG).show();
 //        }
@@ -240,5 +255,12 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
         );
         builder.setNegativeButton(R.string.permission_request_explanation_negative, null);
         builder.show();
+    }
+
+    private SoniTalkMessage generateMessage(SoniTalkContext soniTalkContext, SoniTalkConfig soniTalkConfig, String string) {
+        final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+        SoniTalkEncoder soniTalkEncoder = soniTalkContext.getEncoder(soniTalkConfig);
+        SoniTalkMessage soniTalkMessage = soniTalkEncoder.generateMessage(bytes);
+        return  soniTalkMessage;
     }
 }
