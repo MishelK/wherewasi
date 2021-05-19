@@ -55,4 +55,13 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     implementation 'com.github.AnyChart:AnyChart-Android:1.1.2'
+
+    implementation 'uk.me.berndporr:iirj:1.1'
+    implementation 'de.dfki.mary:marytts-signalproc:5.1.2'
+    implementation 'org.apache.commons:commons-lang3:3.8.1'
+    implementation 'edu.emory.mathcs.util:emory-util-io:2.1'
+    implementation 'edu.emory.mathcs.util:emory-util-concurrent:2.1'
+    implementation 'edu.emory.mathcs:JTransforms:2.4'
+
+
 }
