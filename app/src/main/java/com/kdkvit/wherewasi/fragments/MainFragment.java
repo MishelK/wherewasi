@@ -92,9 +92,10 @@ public class MainFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), SoniTalkService.class);
+                Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
                 intent.putExtra("command", "start");
-                view.getContext().startService(intent);
+                //view.getContext().startService(intent);
+                rootView.getContext().startService(intent);
             }
         });
 

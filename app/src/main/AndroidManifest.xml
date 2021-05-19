@@ -50,6 +50,7 @@
         <service android:name=".services.LocationService" />
         <service android:name=".services.BtScannerService" />
         <service android:name=".services.BtAdvertiserService" />
+        <service android:name=".services.SoniTalkService" />
         <service android:name=".firebase.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
