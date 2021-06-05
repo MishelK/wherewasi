@@ -219,21 +219,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(!checkGrantResults(permissions,grantResults)){
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("Attention").setMessage("The application must have location and bluetooth permission in order for it to work").setPositiveButton("Settings", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                    intent.setData(Uri.parse("package:" + getPackageName()));
-                    startActivity(intent);
-                }
-            }).setCancelable(false).show();
-        }
-        if (grantResults.length == 0) {
-            //we will show an explanation next time the user click on start
-            Toast.makeText(this, R.string.permissionRequestExplanation, Toast.LENGTH_SHORT).show();
-        }
+//        if(!checkGrantResults(permissions,grantResults)){
+//            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//            builder.setTitle("Attention").setMessage("The application must have location and bluetooth permission in order for it to work").setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialogInterface, int i) {
+//                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+//                    intent.setData(Uri.parse("package:" + getPackageName()));
+//                    startActivity(intent);
+//                }
+//            }).setCancelable(false).show();
+//        }
+//        if (grantResults.length == 0) {
+//            //we will show an explanation next time the user click on start
+//            Toast.makeText(this, R.string.permissionRequestExplanation, Toast.LENGTH_SHORT).show();
+//        }
         switch (requestCode){
             case REQUEST_RECORD_AUDIO_PERMISSION:
                 if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {

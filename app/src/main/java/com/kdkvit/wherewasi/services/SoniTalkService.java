@@ -13,23 +13,28 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.kdkvit.wherewasi.R;
 import com.kdkvit.wherewasi.sonitalk.SoniTalkConfig;
 import com.kdkvit.wherewasi.sonitalk.SoniTalkContext;
+import com.kdkvit.wherewasi.sonitalk.SoniTalkDecoder;
 import com.kdkvit.wherewasi.sonitalk.SoniTalkEncoder;
 import com.kdkvit.wherewasi.sonitalk.SoniTalkMessage;
 import com.kdkvit.wherewasi.sonitalk.SoniTalkPermissionsResultReceiver;
 import com.kdkvit.wherewasi.sonitalk.SoniTalkSender;
 import com.kdkvit.wherewasi.sonitalk.exceptions.ConfigException;
+import com.kdkvit.wherewasi.sonitalk.exceptions.DecoderStateException;
 import com.kdkvit.wherewasi.sonitalk.utils.ConfigConstants;
 import com.kdkvit.wherewasi.sonitalk.utils.ConfigFactory;
+import com.kdkvit.wherewasi.sonitalk.utils.DecoderUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,13 +42,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS;
+import static utils.NotificationCenter.NOTIFICATIONS_RECEIVER;
 
-public class SoniTalkService extends Service implements SoniTalkPermissionsResultReceiver.Receiver {
+public class SoniTalkService extends Service implements SoniTalkPermissionsResultReceiver.Receiver,  SoniTalkDecoder.MessageListener {
+    private static final String TAG = "SoniTalkService";
+    public static final String SONITALK_RECEIVER = "SoniTalkReceiver";
+
     private SoniTalkContext soniTalkContext;
     private SoniTalkSender soniTalkSender;
     private SoniTalkPermissionsResultReceiver soniTalkPermissionsResultReceiver;
     SoniTalkConfig config;
     private SoniTalkEncoder soniTalkEncoder;
+    private SoniTalkDecoder soniTalkDecoder;
+    private int samplingRate = 44100;
+    private int fftResolution = 4410;
 
     @Nullable
     @Override
@@ -154,6 +166,9 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
                     break;
                 case "stop":
                     //stopScan();
+                    break;
+                case "start_listening":
+                    startDecoder();
                     break;
             }
         }
@@ -333,5 +348,138 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
         SoniTalkEncoder soniTalkEncoder = soniTalkContext.getEncoder(soniTalkConfig);
         SoniTalkMessage soniTalkMessage = soniTalkEncoder.generateMessage(bytes);
         return  soniTalkMessage;
+    }
+
+    private void startDecoder() {
+        int frequencyOffsetForSpectrogram = 50;
+        int stepFactor = 8;
+
+        sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        int bitperiod = Integer.valueOf(sp.getString(ConfigConstants.BIT_PERIOD, ConfigConstants.SETTING_BIT_PERIOD_DEFAULT));
+        int pauseperiod = Integer.valueOf(sp.getString(ConfigConstants.PAUSE_PERIOD, ConfigConstants.SETTING_PAUSE_PERIOD_DEFAULT));
+        int f0 = Integer.valueOf(sp.getString(ConfigConstants.FREQUENCY_ZERO, ConfigConstants.SETTING_FREQUENCY_ZERO_DEFAULT));
+        int nFrequencies = Integer.valueOf(sp.getString(ConfigConstants.NUMBER_OF_FREQUENCIES, ConfigConstants.SETTING_NUMBER_OF_BYTES_DEFAULT));
+        int frequencySpace = Integer.valueOf(sp.getString(ConfigConstants.SPACE_BETWEEN_FREQUENCIES, ConfigConstants.SETTING_SPACE_BETWEEN_FREQUENCIES_DEFAULT));
+        int nMaxBytes = Integer.valueOf(sp.getString(ConfigConstants.NUMBER_OF_BYTES, ConfigConstants.SETTING_NUMBER_OF_BYTES_DEFAULT));
+
+        try {
+            SoniTalkConfig config = ConfigFactory.getDefaultConfig(this.getApplicationContext());
+            // Note: here for debugging purpose we allow to change almost all the settings of the protocol.
+            config.setFrequencyZero(f0);
+            config.setBitperiod(bitperiod);
+            config.setPauseperiod(pauseperiod);
+            int nMessageBlocks = (nMaxBytes+2) / 2; // Default is 10 (transmitting 20 bytes with 16 frequencies)
+            config.setnMessageBlocks(nMessageBlocks);
+            config.setnFrequencies(nFrequencies);
+            config.setFrequencySpace(frequencySpace);
+
+            // Testing usage of a config file placed in the final-app asset folder.
+            // SoniTalkConfig config = ConfigFactory.loadFromJson("lowFrequenciesConfig.json", this.getApplicationContext());
+
+            if (soniTalkContext == null) {
+                soniTalkContext = SoniTalkContext.getInstance(this, soniTalkPermissionsResultReceiver);
+            }
+            soniTalkDecoder = soniTalkContext.getDecoder(samplingRate, config); //, stepFactor, frequencyOffsetForSpectrogram, silentMode);
+            soniTalkDecoder.addMessageListener(this); // MainActivity will be notified of messages received (calls onMessageReceived)
+            //soniTalkDecoder.addSpectrumListener(this); // Can be used to receive the spectrum when a message is decoded.
+
+            // Should not throw the DecoderStateException as we just initialized the Decoder
+            soniTalkDecoder.receiveBackground(ON_RECEIVING_REQUEST_CODE);
+
+        } catch (DecoderStateException e) {
+            setReceivedText("getString(R.string.decoder_exception_state)" + e.getMessage());
+        } catch (IOException e) {
+            Log.e(TAG, "getString(R.string.decoder_exception_io)" + e.getMessage());
+        } catch (ConfigException e) {
+            Log.e(TAG, "getString(R.string.decoder_exception_config)" + e.getMessage());
+        }
+
+    }
+
+    public void onButtonStopListening(){
+        stopDecoder();
+        setReceivedText("");
+    }
+
+    private void stopDecoder() {
+
+        if (soniTalkDecoder != null) {
+            soniTalkDecoder.stopReceiving();
+        }
+        soniTalkDecoder = null;
+        Intent receiverIntent = new Intent(SONITALK_RECEIVER);
+        receiverIntent.putExtra("command","stop_listening");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(receiverIntent);
+    }
+
+    public void setReceivedText(String decodedText){
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+
+            @Override
+            public void run() {
+                Toast.makeText(SoniTalkService.this.getApplicationContext(), decodedText, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+
+    @Override
+    public void onMessageReceived(SoniTalkMessage receivedMessage) {
+
+        if (receivedMessage.isCrcCorrect()) {
+            //Log.d("ParityCheck", "The message was correctly received");
+            final String textReceived = DecoderUtils.byteToUTF8(receivedMessage.getMessage());
+            //Log.d("Received message", textReceived);
+
+            // We stop when CRC is correct and we are not in silent mode
+
+            // Update text displayed
+            setReceivedText(textReceived + " (" + String.valueOf(receivedMessage.getDecodingTimeNanosecond() / 1000000) + "ms)");
+
+            if (currentToast != null) {
+                currentToast.cancel(); // NOTE: Cancel so fast that only the last one in a series really is displayed.
+            }
+            // Stops recording if needed and shows a Toast
+            if (false) {
+                // STOP everything.
+                stopDecoder();
+//                        currentToast = Toast.makeText(MainActivity.this, "Correctly received a message. Stopped.", Toast.LENGTH_SHORT);
+//                        currentToast.show();
+            } else {
+//                        currentToast = Toast.makeText(MainActivity.this, "Correctly received a message. Keep listening.", Toast.LENGTH_SHORT);
+//                        currentToast.show();
+            }
+        } else {
+            //Log.d("ParityCheck", "The message was NOT correctly received");
+
+            //main.setReceivedText("Please try again, could not detect or decode the message!");
+
+            if (currentToast != null) {
+                currentToast.cancel(); // NOTE: Cancel so fast that only the last one in a series really is displayed.
+            }
+            if (true) {
+                setReceivedText("Message received");
+                stopDecoder();
+                //setReceivedText("getString(R.string.detection_crc_incorrect)");
+//                        currentToast = Toast.makeText(MainActivity.this, getString(R.string.detection_crc_incorrect_toast_message), Toast.LENGTH_LONG);
+//                        currentToast.show();
+            } else {
+                setReceivedText("getString(R.string.detection_crc_incorrect_keep_listening)");
+//                        currentToast = Toast.makeText(MainActivity.this, getString(R.string.detection_crc_incorrect_keep_listening_toast_message), Toast.LENGTH_LONG);
+//                        currentToast.show();
+            }
+        }
+
+    }
+
+    @Override
+    public void onDecoderError(String errorMessage) {
+        //Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+        // STOP everything.
+        stopDecoder();
+        setReceivedText(errorMessage);
     }
 }
