@@ -53,13 +53,9 @@ public class MainFragment extends Fragment {
     public static final long MILLIS_IN_DAY = 86400000;
     public static List<MyNotification> notifications = new ArrayList<>();
     BroadcastReceiver receiver;
-    private boolean listening = false;
 
     private View rootView;
     NotificationsAdapter adapter = new NotificationsAdapter(getContext());
-    private BroadcastReceiver soniTalkReceiver;
-    private MaterialButton listenBtn;
-
 
     public MainFragment() {
         // Required empty public constructor
@@ -92,33 +88,6 @@ public class MainFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         snapHelper.attachToRecyclerView(recyclerView);
 
-        MaterialButton button = rootView.findViewById(R.id.send_message);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
-                intent.putExtra("command", "start");
-                //view.getContext().startService(intent);
-                rootView.getContext().startService(intent);
-            }
-        });
-        listenBtn = rootView.findViewById(R.id.listen);
-        listenBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listening = !listening;
-                if(listening){
-                    listenBtn.setText("Stop");
-                }else{
-                    listenBtn.setText("Listen");
-                }
-                Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
-                intent.putExtra("command", "start_listening");
-                //view.getContext().startService(intent);
-                rootView.getContext().startService(intent);
-
-            }
-        });
         initReceiver();
 
         return rootView;
@@ -140,22 +109,6 @@ public class MainFragment extends Fragment {
         LocalBroadcastManager.getInstance(rootView.getContext()).registerReceiver(receiver, filter);
 
         IntentFilter soniFilter = new IntentFilter(SoniTalkService.SONITALK_RECEIVER);
-        soniTalkReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String command = intent.getStringExtra("command");
-                if(command.equals("stop_listening")){
-                    listening = !listening;
-                    new Handler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listenBtn.setText("Listen");
-                        }
-                    });
-                }
-            }
-        };
-        LocalBroadcastManager.getInstance(rootView.getContext()).registerReceiver(soniTalkReceiver,soniFilter);
     }
 
     private void initNotifications() {
@@ -264,7 +217,6 @@ public class MainFragment extends Fragment {
     @Override
     public void onDestroyView() {
         LocalBroadcastManager.getInstance(rootView.getContext()).unregisterReceiver(receiver);
-        LocalBroadcastManager.getInstance(rootView.getContext()).unregisterReceiver(soniTalkReceiver);
         super.onDestroyView();
     }
 }

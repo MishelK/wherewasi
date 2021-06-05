@@ -15,6 +15,10 @@
             android:title="@string/export"
             android:icon="@drawable/ic_import_export"
             />
+        <item android:id="@+id/communication_tab"
+            android:title="@string/communication"
+            android:icon="@drawable/ic_communication"
+            />
     </group>
 <!--    <item android:id="@+id/submenu"-->
 <!--        android:title="Sub menu"-->

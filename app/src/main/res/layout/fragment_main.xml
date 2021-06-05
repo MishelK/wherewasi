@@ -18,18 +18,7 @@
             android:orientation="vertical"
             android:padding="10dp"
             >
-            <com.google.android.material.button.MaterialButton
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Send"
-                android:id="@+id/send_message"
-                />
-            <com.google.android.material.button.MaterialButton
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Listen"
-                android:id="@+id/listen"
-                />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

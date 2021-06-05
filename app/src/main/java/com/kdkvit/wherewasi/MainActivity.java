@@ -33,6 +33,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kdkvit.wherewasi.firebase.MyFirebaseMessagingService;
 import com.kdkvit.wherewasi.fragments.ActivityFragment;
+import com.kdkvit.wherewasi.fragments.CommunicationFragment;
 import com.kdkvit.wherewasi.fragments.ExportFragment;
 import com.kdkvit.wherewasi.fragments.MainFragment;
 import com.kdkvit.wherewasi.fragments.WelcomeFragment;
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView headerIcon;
     private TextView headerText;
     private ImageView headerRightIcon;
+    private CommunicationFragment communicationFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +181,14 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.export_tab:
                         exportFragment = new ExportFragment();
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, exportFragment).commit();
+                        headerText.setVisibility(View.VISIBLE);
+                        headerText.setText(R.string.export);
+                        headerRightIcon.setVisibility(View.GONE);
+                        headerIcon.setVisibility(View.GONE);
+                        break;
+                    case R.id.communication_tab:
+                        communicationFragment = new CommunicationFragment();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.main_fragment_container, communicationFragment).commit();
                         headerText.setVisibility(View.VISIBLE);
                         headerText.setText(R.string.export);
                         headerRightIcon.setVisibility(View.GONE);
