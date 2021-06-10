@@ -32,6 +32,7 @@
         -->
 
         <activity android:name=".MapActivity" android:launchMode="singleInstance" android:screenOrientation="portrait"/>
+        <activity android:name=".sonitalk.PermissionLevelDialogActivity" android:launchMode="singleInstance" android:screenOrientation="portrait"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -92,10 +92,9 @@ public class CommunicationFragment extends Fragment {
                     listenBtn.setText("Listen");
                 }
                 Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
-                intent.putExtra("command", "start_listening");
+                intent.putExtra("command", listening ? "start_listening" : "stop_listening");
                 //view.getContext().startService(intent);
                 rootView.getContext().startService(intent);
-
             }
         });
         initReceiver();

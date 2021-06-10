@@ -158,18 +158,24 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { //Called from startService()
-        String command = intent.getStringExtra("command");
-        if (command != null) {
-            switch (command) {
-                case "start":
-                    startSending();
-                    break;
-                case "stop":
-                    //stopScan();
-                    break;
-                case "start_listening":
-                    startDecoder();
-                    break;
+        if (intent.hasExtra("command")) {
+            String command = intent.getStringExtra("command");
+
+            if (command != null) {
+                switch (command) {
+                    case "start":
+                        startSending();
+                        break;
+                    case "stop":
+                        //stopScan();
+                        break;
+                    case "start_listening":
+                        startDecoder();
+                        break;
+                    case "stop_listening":
+                        stopDecoder();
+                        break;
+                }
             }
         }
         return super.onStartCommand(intent, flags, startId);
