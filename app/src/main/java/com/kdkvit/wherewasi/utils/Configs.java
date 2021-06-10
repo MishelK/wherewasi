@@ -6,6 +6,7 @@ public final class Configs {
     public static final int SIGNIFICANT_TIME = 30 * 60 * 1000;
     public static final int ADVERTISING_DELAY = 30 * 1000;
     public static final int SCANNING_DELAY = 60 * 1000;
+    public static final int SENDING_DELAY = 10 * 1000;
     public static final int TIME_BETWEEN_CHECKING_LOCATIONS = 60 * 1000;
     public static final double KM_BETWEEN_LOCATIONS = 0.1;
     public static final int IDLE_DURATION = 15 * 60 * 1000;

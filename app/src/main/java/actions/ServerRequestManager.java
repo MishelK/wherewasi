@@ -24,7 +24,7 @@ import java.util.Map;
 
 import models.User;
 
-public class actions {
+public class ServerRequestManager {
 
     static final String BE_URL = Configs.server_url;
 //    static final String BE_URL = "http://192.168.1.178:3030/";
@@ -84,8 +84,55 @@ public class actions {
 
 
     public interface ActionsCallback{
-        void onSuccess();
+        void onSuccess() throws InterruptedException;
         void onFailure();
+    }
+
+    public static void sendConfirmationRequest(Context context, String uuid, ActionsCallback callback){
+        User user = SharedPreferencesUtils.getUser(context);
+        final JSONObject rootObject = new JSONObject();
+        try{
+            RequestQueue queue = Volley.newRequestQueue(context);
+            rootObject.put("user_id", user.getDeviceId());
+            rootObject.put("target_id", uuid);
+            String url = USERS_URL+"sound_ping";
+            Log.i("url",url);
+            StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    JSONObject obj = null;
+                        if (response.equals("success")){
+                            try {
+                                callback.onSuccess();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }else{
+                            callback.onFailure();
+                        }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    callback.onFailure();
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    return headers;
+                }
+
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    return rootObject.toString().getBytes();
+                }
+            };
+            queue.add(request);
+        }catch (JSONException e){
+            callback.onFailure();
+        }
     }
 
     public static void sendPositive(Context context, Long date, ActionsCallback callback){
@@ -110,7 +157,7 @@ public class actions {
                         }else{
                             callback.onFailure();
                         }
-                    } catch (JSONException e) {
+                    } catch (JSONException | InterruptedException e) {
                     }
                 }
             }, new Response.ErrorListener() {

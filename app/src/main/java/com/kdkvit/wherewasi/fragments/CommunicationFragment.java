@@ -30,6 +30,7 @@ import com.kdkvit.wherewasi.R;
 import com.kdkvit.wherewasi.adapters.NotificationsAdapter;
 import com.kdkvit.wherewasi.services.BtAdvertiserService;
 import com.kdkvit.wherewasi.services.SoniTalkService;
+import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,11 +42,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
+
+import actions.ServerRequestManager;
 import models.MyNotification;
 import utils.DatabaseHandler;
 import utils.NotificationCenter;
 
 import static com.kdkvit.wherewasi.MainActivity.user;
+import static com.kdkvit.wherewasi.utils.Configs.SENDING_DELAY;
 import static utils.NotificationCenter.NOTIFICATIONS_RECEIVER;
 
 public class CommunicationFragment extends Fragment {
@@ -75,10 +79,23 @@ public class CommunicationFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
-                intent.putExtra("command", "start");
-                //view.getContext().startService(intent);
-                rootView.getContext().startService(intent);
+//                Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
+//                intent.putExtra("command", "start");
+//                rootView.getContext().startService(intent);
+                String id = SharedPreferencesUtils.getUser(getContext()).getDeviceId();
+                ServerRequestManager.sendConfirmationRequest(getContext(), id, new ServerRequestManager.ActionsCallback() {
+                    @Override
+                    public void onSuccess() throws InterruptedException {
+                        Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
+                        intent.putExtra("command", "start");
+                        rootView.getContext().startService(intent);
+                    }
+
+                    @Override
+                    public void onFailure() {
+
+                    }
+                });
             }
         });
         listenBtn = rootView.findViewById(R.id.listen);

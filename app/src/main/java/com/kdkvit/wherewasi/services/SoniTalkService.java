@@ -56,6 +56,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
     private SoniTalkDecoder soniTalkDecoder;
     private int samplingRate = 44100;
     private int fftResolution = 4410;
+    private boolean isListening, isSending = false;
 
     @Nullable
     @Override
@@ -106,7 +107,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
         }
         //Log.d("GenerateClick","I got clicked");
 
-
+        isSending = true;
         sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         int bitperiod = Integer.valueOf(sp.getString(ConfigConstants.BIT_PERIOD, ConfigConstants.SETTING_BIT_PERIOD_DEFAULT));
@@ -150,6 +151,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
                 public void run() {
                     currentMessage = soniTalkEncoder.generateMessage(bytes);
                     sendMessage();
+                    isSending = false;
                 }
             });
 
@@ -158,13 +160,14 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { //Called from startService()
-        if (intent.hasExtra("command")) {
+        if (intent != null && intent.hasExtra("command")) {
             String command = intent.getStringExtra("command");
 
             if (command != null) {
                 switch (command) {
                     case "start":
-                        startSending();
+                        if (!isSending)
+                            startSending();
                         break;
                     case "stop":
                         //stopScan();
@@ -173,7 +176,8 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
                         startDecoder();
                         break;
                     case "stop_listening":
-                        stopDecoder();
+                        if (isListening)
+                            stopDecoder();
                         break;
                 }
             }
@@ -359,6 +363,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
     private void startDecoder() {
         int frequencyOffsetForSpectrogram = 50;
         int stepFactor = 8;
+        isListening = true;
 
         sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -410,6 +415,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
 
     private void stopDecoder() {
 
+        isListening = false;
         if (soniTalkDecoder != null) {
             soniTalkDecoder.stopReceiving();
         }

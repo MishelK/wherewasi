@@ -16,6 +16,7 @@ public class Interaction implements Parcelable {
     private long interactionID;
     private int isDangerous = 0;
     private boolean positive = false;
+    private boolean confirmed = false;
 
     public Interaction(){}
 
@@ -74,6 +75,14 @@ public class Interaction implements Parcelable {
 
     public void setIsDangerous(int isDangerous) {
         this.isDangerous = isDangerous;
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
+    }
+
+    public void setConfirmed(boolean confirmed) {
+        this.confirmed = confirmed;
     }
 
     @NonNull

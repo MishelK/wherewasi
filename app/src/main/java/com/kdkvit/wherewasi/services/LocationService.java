@@ -13,10 +13,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
@@ -34,24 +31,17 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.CancellationToken;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.OnTokenCanceledListener;
-import com.google.android.gms.tasks.Task;
-import com.kdkvit.wherewasi.BuildConfig;
 import com.kdkvit.wherewasi.MainActivity;
 import com.kdkvit.wherewasi.R;
 import com.kdkvit.wherewasi.utils.Configs;
 
+import actions.ServerRequestManager;
 import models.Interaction;
 import models.MyLocation;
 import utils.DatabaseHandler;
@@ -65,6 +55,7 @@ public class LocationService extends Service {
     private static final String CHANNEL_NAME = "WhereWasSI Channel";
     private final long ADVERTISING_DELAY = Configs.ADVERTISING_DELAY;
     private final long SCANNING_DELAY = Configs.SCANNING_DELAY;
+    private final long SENDING_DELAY = Configs.SENDING_DELAY;
     private final long TIME_BETWEEN_CHECKING_LOCATIONS = Configs.TIME_BETWEEN_CHECKING_LOCATIONS;
     private final double KM_BETWEEN_LOCATIONS = Configs.KM_BETWEEN_LOCATIONS;
 
@@ -269,13 +260,27 @@ public class LocationService extends Service {
 
             if(btInteractions.containsKey(interaction.getUuid())){
                 btInteractions.get(interaction.getUuid()).setLastSeen(System.currentTimeMillis());
-
             }else{
                 btInteractions.put(interaction.getUuid(),interaction);
-
             }
             if (btInteractions.get(interaction.getUuid()).getRssi() < -30 && btInteractions.get(interaction.getUuid()).getRssi() > -100) { // Case interaction within danger range
                 btInteractions.get(interaction.getUuid()).setIsDangerous(1);
+            }
+            if (!interaction.isConfirmed() && interaction.getLastSeen() - interaction.getFirstSeen() >= 15000) { // If interaction is 15 minutes and going
+                ServerRequestManager.sendConfirmationRequest(this, interaction.getUuid(), new ServerRequestManager.ActionsCallback() {
+                    @Override
+                    public void onSuccess() throws InterruptedException {
+                       // Start listening and wait for response
+                        Intent intent = new Intent(getApplicationContext(), SoniTalkService.class);
+                        intent.putExtra("command","start_listening");
+                        getApplicationContext().startService(intent);
+                    }
+
+                    @Override
+                    public void onFailure() {
+
+                    }
+                });
             }
         }
     }

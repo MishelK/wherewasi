@@ -1,28 +1,21 @@
 package com.kdkvit.wherewasi.fragments;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.os.Bundle;
 
-import actions.actions;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
+import actions.ServerRequestManager;
+
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 import models.MyLocation;
-import models.User;
 import utils.CSVManager;
 import utils.DatabaseHandler;
 
-import android.transition.CircularPropagation;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,14 +26,11 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.kdkvit.wherewasi.R;
-import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import static actions.actions.sendPositive;
+import static actions.ServerRequestManager.sendPositive;
 
 
 public class ExportFragment extends Fragment {
@@ -112,7 +102,7 @@ public class ExportFragment extends Fragment {
                         ;
                         // Get the offset from our timezone and UTC.
                         markPositiveBtn.startAnimation();
-                        sendPositive(getContext(), selectedDate, new actions.ActionsCallback() {
+                        sendPositive(getContext(), selectedDate, new ServerRequestManager.ActionsCallback() {
                             @Override
                             public void onSuccess() {
                                 if(getContext()!=null) {
