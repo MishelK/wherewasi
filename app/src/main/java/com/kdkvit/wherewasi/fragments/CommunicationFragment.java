@@ -49,25 +49,9 @@ public class CommunicationFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
-//                intent.putExtra("command", "start");
-//                rootView.getContext().startService(intent);
-                String id = SharedPreferencesUtils.getUser(getContext()).getDeviceId();
-                ServerRequestManager.sendConfirmationRequest(getContext(), id, new ServerRequestManager.ActionsCallback() {
-                    @Override
-                    public void onSuccess() throws InterruptedException {
-                        if (!SoniTalkService.isBusy()) {
-                            Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
-                            intent.putExtra("command", "start_playing");
-                            rootView.getContext().startService(intent);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure() {
-
-                    }
-                });
+                Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
+                intent.putExtra("command", "start");
+                rootView.getContext().startService(intent);
             }
         });
         listenBtn = rootView.findViewById(R.id.listen);
