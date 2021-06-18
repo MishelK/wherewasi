@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -39,6 +38,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+
+import Managers.InteractionListManager;
+import Managers.ServerRequestManager;
 
 import static android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS;
 
@@ -398,7 +400,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
             soniTalkDecoder.receiveBackground(ON_RECEIVING_REQUEST_CODE);
 
         } catch (DecoderStateException e) {
-            setReceivedText("getString(R.string.decoder_exception_state)" + e.getMessage());
+            listeningSuccessful();
         } catch (IOException e) {
             Log.e(TAG, "getString(R.string.decoder_exception_io)" + e.getMessage());
         } catch (ConfigException e) {
@@ -409,7 +411,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
 
     public void onButtonStopListening(){
         stopDecoder();
-        setReceivedText("");
+        listeningSuccessful();
     }
 
     private void stopDecoder() {
@@ -424,16 +426,9 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
         LocalBroadcastManager.getInstance(this).sendBroadcast(receiverIntent);
     }
 
-    public void setReceivedText(String decodedText){
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-
-            @Override
-            public void run() {
-                Toast.makeText(SoniTalkService.this.getApplicationContext(), decodedText, Toast.LENGTH_SHORT).show();
-            }
-        });
-
+    public void listeningSuccessful(){
+        InteractionListManager.getInstance(getApplicationContext()).setInteractionSameSpace(InteractionListManager.getInstance(getApplicationContext()).getUuidUnderTest(), true);
+        ServerRequestManager.sendListeningSuccessful(getApplicationContext(), InteractionListManager.getInstance(getApplicationContext()).getUuidUnderTest(), null);
     }
 
 
@@ -448,7 +443,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
             // We stop when CRC is correct and we are not in silent mode
 
             // Update text displayed
-            setReceivedText(textReceived + " (" + String.valueOf(receivedMessage.getDecodingTimeNanosecond() / 1000000) + "ms)");
+            listeningSuccessful();
 
             if (currentToast != null) {
                 currentToast.cancel(); // NOTE: Cancel so fast that only the last one in a series really is displayed.
@@ -471,17 +466,9 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
             if (currentToast != null) {
                 currentToast.cancel(); // NOTE: Cancel so fast that only the last one in a series really is displayed.
             }
-            if (true) {
-                setReceivedText("Message received");
-                stopDecoder();
-                //setReceivedText("getString(R.string.detection_crc_incorrect)");
-//                        currentToast = Toast.makeText(MainActivity.this, getString(R.string.detection_crc_incorrect_toast_message), Toast.LENGTH_LONG);
-//                        currentToast.show();
-            } else {
-                setReceivedText("getString(R.string.detection_crc_incorrect_keep_listening)");
-//                        currentToast = Toast.makeText(MainActivity.this, getString(R.string.detection_crc_incorrect_keep_listening_toast_message), Toast.LENGTH_LONG);
-//                        currentToast.show();
-            }
+
+            listeningSuccessful();
+            stopDecoder();
         }
 
     }
@@ -491,7 +478,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
         //Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
         // STOP everything.
         stopDecoder();
-        setReceivedText(errorMessage);
+        listeningSuccessful();
     }
 
     public static boolean isBusy() {

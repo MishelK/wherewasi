@@ -84,8 +84,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     break;
                 case "start_listening":
                     if (!SoniTalkService.isBusy()) {
-                        // TODO: extract uuid and store it in manager to mark interaction as confirmed if successful
-                        //InteractionListManager.getInstance(getApplicationContext()).setUuidUnderTest();
+                        if (remoteMessage.getData().containsKey("user_id"))
+                            InteractionListManager.getInstance(getApplicationContext()).setUuidUnderTest(remoteMessage.getData().get("user_id"));
                         Intent intent = new Intent(getApplicationContext(), SoniTalkService.class);
                         intent.putExtra("command", "start_listening");
                         getApplicationContext().startService(intent);
@@ -107,6 +107,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         timer.schedule(delayedThreadStartTask, 60 * 1000); // 1 minute
                     }
                     break;
+                case "sound_received":
+                    if (remoteMessage.getData().containsKey("user_id"))
+                        InteractionListManager.getInstance(getApplicationContext()).setInteractionSameSpace(remoteMessage.getData().get("user_id"), true);
             }
 
             // If application is not in foreground then post notification

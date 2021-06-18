@@ -133,6 +133,51 @@ public class ServerRequestManager {
         }
     }
 
+    public static void sendListeningSuccessful(Context context, String uuid, ActionsCallback callback){
+        User user = SharedPreferencesUtils.getUser(context);
+        final JSONObject rootObject = new JSONObject();
+        try{
+            RequestQueue queue = Volley.newRequestQueue(context);
+            rootObject.put("user_id", user.getDeviceId());
+            rootObject.put("target_id", uuid);
+            String url = USERS_URL+"sound_received";
+            Log.i("url",url);
+            StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    if (callback != null) {
+                        try {
+                            callback.onSuccess();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if (callback != null)
+                        callback.onFailure();
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    return headers;
+                }
+
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    return rootObject.toString().getBytes();
+                }
+            };
+            queue.add(request);
+        }catch (JSONException e){
+            callback.onFailure();
+        }
+    }
+
     public static void sendPositive(Context context, Long date, ActionsCallback callback){
         User user = SharedPreferencesUtils.getUser(context);
         final JSONObject rootObject = new JSONObject();
