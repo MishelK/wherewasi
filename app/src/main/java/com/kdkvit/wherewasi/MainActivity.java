@@ -34,7 +34,7 @@ import java.util.UUID;
 
 import models.User;
 
-import static actions.ServerRequestManager.sendUserToBe;
+import static Managers.ServerRequestManager.sendUserToBe;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 42;

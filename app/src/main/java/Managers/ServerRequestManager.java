@@ -1,8 +1,7 @@
-package actions;
+package Managers;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -11,14 +10,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.kdkvit.wherewasi.BuildConfig;
 import com.kdkvit.wherewasi.utils.Configs;
 import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +26,7 @@ public class ServerRequestManager {
     static final String BE_URL = Configs.server_url;
 //    static final String BE_URL = "http://192.168.1.178:3030/";
     static final String USERS_URL = BE_URL + "api/users/";
+
 
     public static void sendUserToBe(Context context, User user){
         final JSONObject rootObject = new JSONObject();

@@ -14,9 +14,10 @@ public class Interaction implements Parcelable {
     private Long lastSeen;
     private int rssi = 0;
     private long interactionID;
-    private int isDangerous = 0;
-    private boolean positive = false;
-    private boolean confirmed = false;
+    private boolean isDangerous; // Confirmed by rssi strength
+    private boolean isPositive = false; // Confirmed by user who declares themselves positive
+    private boolean isConfirmedSameSpace = false; // Confirmed by ultra sound transmission
+    private long lastConfirmationRequest;
 
     public Interaction(){}
 
@@ -26,7 +27,7 @@ public class Interaction implements Parcelable {
         this.lastSeen = in.readLong();
         this.interactionID = in.readInt();
         this.rssi = in.readInt();
-        this.isDangerous = in.readInt();
+        this.isDangerous = in.readInt() == 1;
     }
 
     public Long getFirstSeen() {
@@ -69,26 +70,26 @@ public class Interaction implements Parcelable {
         this.rssi = rssi;
     }
 
-    public int getIsDangerous() {
+    public boolean isDangerous() {
         return isDangerous;
     }
 
-    public void setIsDangerous(int isDangerous) {
+    public void setIsDangerous(boolean isDangerous) {
         this.isDangerous = isDangerous;
     }
 
-    public boolean isConfirmed() {
-        return confirmed;
-    }
+    public boolean isConfirmedSameSpace() {return isConfirmedSameSpace; }
 
-    public void setConfirmed(boolean confirmed) {
-        this.confirmed = confirmed;
-    }
+    public void setConfirmedSameSpace(boolean confirmedSameSpace) { this.isConfirmedSameSpace = confirmedSameSpace; }
+
+    public long getLastConfirmationRequest() { return lastConfirmationRequest; }
+
+    public void setLastConfirmationRequest(long lastConfirmationRequest) { this.lastConfirmationRequest = lastConfirmationRequest; }
 
     @NonNull
     @Override
     public String toString() {
-        String string = "UUID : " + this.uuid + " FirstSeen : " + new Date(this.getFirstSeen()).toString() + "IsPositive : " + this.positive;
+        String string = "UUID : " + this.uuid + " FirstSeen : " + new Date(this.getFirstSeen()).toString() + "IsPositive : " + this.isPositive;
         return string;
     }
 
@@ -104,7 +105,7 @@ public class Interaction implements Parcelable {
         parcel.writeLong(lastSeen);
         parcel.writeLong(interactionID);
         parcel.writeInt(rssi);
-        parcel.writeInt(isDangerous);
+        parcel.writeInt(isDangerous ? 1 : 0);
     }
 
     public static final Creator<Interaction> CREATOR = new Creator<Interaction>() {
@@ -120,10 +121,10 @@ public class Interaction implements Parcelable {
     };
 
     public boolean isPositive() {
-        return positive;
+        return isPositive;
     }
 
     public void setPositive(boolean positive) {
-        this.positive = positive;
+        this.isPositive = positive;
     }
 }

@@ -73,7 +73,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + InteractionsColumn.DEVICE_ID.toString() + " TEXT,"
                 + InteractionsColumn.FIRST_SEEN.toString() + " INTEGER,"
                 + InteractionsColumn.LAST_SEEN.toString() + " INTEGER,"
-                + InteractionsColumn.POSITIVE.toString() + " INTEGER "
+                + InteractionsColumn.POSITIVE.toString() + " INTEGER,"
+                + InteractionsColumn.IS_DANGEROUS.toString() + " INTEGER,"
+                + InteractionsColumn.IS_CONFIRMED_SPACE.toString() + " INTEGER "
                 + ")";
         db.execSQL(CREATE_INTERACTIONS_TABLE);
     }
@@ -546,6 +548,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(InteractionsColumn.POSITIVE.toString(), 1);
         else
             values.put(InteractionsColumn.POSITIVE.toString(), 0);
+        if (interaction.isDangerous())
+            values.put(InteractionsColumn.IS_DANGEROUS.toString(), 1);
+        else
+            values.put(InteractionsColumn.IS_DANGEROUS.toString(), 0);
+        if (interaction.isConfirmedSameSpace())
+            values.put(InteractionsColumn.IS_CONFIRMED_SPACE.toString(), 1);
+        else
+            values.put(InteractionsColumn.IS_CONFIRMED_SPACE.toString(), 0);
 
         long id = db.insert(TABLE_INTERACTIONS, null, values);
         db.close();
@@ -566,6 +576,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(InteractionsColumn.POSITIVE.toString(), 1);
         else
             values.put(InteractionsColumn.POSITIVE.toString(), 0);
+        if (interaction.isDangerous())
+            values.put(InteractionsColumn.IS_DANGEROUS.toString(), 1);
+        else
+            values.put(InteractionsColumn.IS_DANGEROUS.toString(), 0);
+        if (interaction.isConfirmedSameSpace())
+            values.put(InteractionsColumn.IS_CONFIRMED_SPACE.toString(), 1);
+        else
+            values.put(InteractionsColumn.IS_CONFIRMED_SPACE.toString(), 0);
 
         // updating row
         int updated = db.update(TABLE_INTERACTIONS, values, InteractionsColumn.INTERACTION_ID.toString() + " = ?",
@@ -599,6 +617,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 interaction.setFirstSeen(result.getLong(2));
                 interaction.setLastSeen(result.getLong(3));
                 interaction.setPositive(result.getInt(4) == 1);
+                interaction.setIsDangerous(result.getInt(5) == 1);
+                interaction.setConfirmedSameSpace(result.getInt(6) == 1);
 
                 interactions.add(interaction);
             }
@@ -628,6 +648,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 interaction.setFirstSeen(result.getLong(2));
                 interaction.setLastSeen(result.getLong(3));
                 interaction.setPositive(result.getInt(4) == 1);
+                interaction.setIsDangerous(result.getInt(5) == 1);
+                interaction.setConfirmedSameSpace(result.getInt(6) == 1);
 
                 interactions.add(interaction);
             }
@@ -675,6 +697,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 interaction.setFirstSeen(result.getLong(2));
                 interaction.setLastSeen(result.getLong(3));
                 interaction.setPositive(result.getInt(4) == 1);
+                interaction.setIsDangerous(result.getInt(5) == 1);
+                interaction.setConfirmedSameSpace(result.getInt(6) == 1);
 
                 interactions.add(interaction);
             }
@@ -710,6 +734,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 interaction.setFirstSeen(result.getLong(2));
                 interaction.setLastSeen(result.getLong(3));
                 interaction.setPositive(result.getInt(4) == 1);
+                interaction.setIsDangerous(result.getInt(5) == 1);
+                interaction.setConfirmedSameSpace(result.getInt(6) == 1);
 
                 interactions.add(interaction);
             }
@@ -733,6 +759,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 interaction.setFirstSeen(result.getLong(2));
                 interaction.setLastSeen(result.getLong(3));
                 interaction.setPositive(result.getInt(4) == 1);
+                interaction.setIsDangerous(result.getInt(5) == 1);
+                interaction.setConfirmedSameSpace(result.getInt(6) == 1);
 
                 interactions.add(interaction);
             }

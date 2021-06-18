@@ -16,7 +16,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -42,7 +41,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS;
-import static utils.NotificationCenter.NOTIFICATIONS_RECEIVER;
 
 public class SoniTalkService extends Service implements SoniTalkPermissionsResultReceiver.Receiver,  SoniTalkDecoder.MessageListener {
     private static final String TAG = "SoniTalkService";
@@ -56,7 +54,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
     private SoniTalkDecoder soniTalkDecoder;
     private int samplingRate = 44100;
     private int fftResolution = 4410;
-    private boolean isListening, isSending = false;
+    private static boolean isListening, isSending = false;
 
     @Nullable
     @Override
@@ -165,11 +163,12 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
 
             if (command != null) {
                 switch (command) {
-                    case "start":
-                        if (!isSending)
+                    case "start_playing":
+                        if (!isSending) {
                             startSending();
+                        }
                         break;
-                    case "stop":
+                    case "stop_playing":
                         //stopScan();
                         break;
                     case "start_listening":
@@ -493,5 +492,9 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
         // STOP everything.
         stopDecoder();
         setReceivedText(errorMessage);
+    }
+
+    public static boolean isBusy() {
+        return isListening || isSending;
     }
 }

@@ -7,7 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
-import actions.ServerRequestManager;
+import Managers.ServerRequestManager;
 
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
@@ -30,7 +30,7 @@ import com.kdkvit.wherewasi.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import static actions.ServerRequestManager.sendPositive;
+import static Managers.ServerRequestManager.sendPositive;
 
 
 public class ExportFragment extends Fragment {

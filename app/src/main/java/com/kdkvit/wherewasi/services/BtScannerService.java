@@ -54,7 +54,7 @@ public class BtScannerService extends Service {
         if (command != null) {
             switch (command) {
                 case "start":
-                    //startScan();
+                    startScan();
                     break;
                 case "stop":
                     stopScan();
@@ -163,7 +163,7 @@ public class BtScannerService extends Service {
         ScanSettings settings = new ScanSettings.Builder()
                 .setLegacy(false)
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                .setReportDelay(5000)
+                .setReportDelay(10000)
                 .setUseHardwareBatchingIfSupported(true)
                 .build();
 

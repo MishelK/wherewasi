@@ -41,7 +41,8 @@ import com.kdkvit.wherewasi.MainActivity;
 import com.kdkvit.wherewasi.R;
 import com.kdkvit.wherewasi.utils.Configs;
 
-import actions.ServerRequestManager;
+import Managers.InteractionListManager;
+import Managers.ServerRequestManager;
 import models.Interaction;
 import models.MyLocation;
 import utils.DatabaseHandler;
@@ -62,11 +63,10 @@ public class LocationService extends Service {
     public FusedLocationProviderClient mlocManager;
     public MyLocationListener listener;
     public MyLocation previousBestLocation = null;
-    private HashMap<String, Interaction> btInteractions = new HashMap<>();
+    //private HashMap<String, Interaction> btInteractions = new HashMap<>();
 
     DatabaseHandler db;
     Geocoder geocoder;
-
     boolean isScanning, isAdvertising = false;
 
     NotificationManager manager;
@@ -115,7 +115,6 @@ public class LocationService extends Service {
 
     }
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
@@ -159,7 +158,6 @@ public class LocationService extends Service {
         receiverIntent.putExtra("command", "close");
         LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(receiverIntent);
     }
-
 
     public void initLocation() {
         db = new DatabaseHandler(this); // init database handler
@@ -229,7 +227,8 @@ public class LocationService extends Service {
                     public void run() {
                         super.run();
                         Log.i("BLE", "Received interactions list from service : " + interactions);
-                        addNewInteractions(interactions);
+                        if (interactions != null)
+                            InteractionListManager.getInstance(getApplicationContext()).addNewInteractions(interactions);
                     }
                 };
                 thread.start();
@@ -241,7 +240,7 @@ public class LocationService extends Service {
             public void run() {
                 if(isScanning) {
                     stopScanning();
-                    checkIdleConnections();
+                    InteractionListManager.getInstance(getApplicationContext()).checkIdleConnections();
                     isScanning = false;
                 }
                 else {
@@ -254,36 +253,49 @@ public class LocationService extends Service {
         geocoder = new Geocoder(this);
     }
 
-    private void addNewInteractions(ArrayList<Interaction> interactions) {
-
-        for(Interaction interaction : interactions){
-
-            if(btInteractions.containsKey(interaction.getUuid())){
-                btInteractions.get(interaction.getUuid()).setLastSeen(System.currentTimeMillis());
-            }else{
-                btInteractions.put(interaction.getUuid(),interaction);
-            }
-            if (btInteractions.get(interaction.getUuid()).getRssi() < -30 && btInteractions.get(interaction.getUuid()).getRssi() > -100) { // Case interaction within danger range
-                btInteractions.get(interaction.getUuid()).setIsDangerous(1);
-            }
-            if (!interaction.isConfirmed() && interaction.getLastSeen() - interaction.getFirstSeen() >= 15000) { // If interaction is 15 minutes and going
-                ServerRequestManager.sendConfirmationRequest(this, interaction.getUuid(), new ServerRequestManager.ActionsCallback() {
-                    @Override
-                    public void onSuccess() throws InterruptedException {
-                       // Start listening and wait for response
-                        Intent intent = new Intent(getApplicationContext(), SoniTalkService.class);
-                        intent.putExtra("command","start_listening");
-                        getApplicationContext().startService(intent);
-                    }
-
-                    @Override
-                    public void onFailure() {
-
-                    }
-                });
-            }
-        }
-    }
+//    private void addNewInteractions(ArrayList<Interaction> interactions) {
+//
+//        for(Interaction interaction : interactions){
+//
+//            if(btInteractions.containsKey(interaction.getUuid())){
+//                btInteractions.get(interaction.getUuid()).setLastSeen(System.currentTimeMillis());
+//            }else{
+//                btInteractions.put(interaction.getUuid(),interaction);
+//            }
+//            if (btInteractions.get(interaction.getUuid()).getRssi() < -30 && btInteractions.get(interaction.getUuid()).getRssi() > -100) { // Case interaction within danger range
+//                btInteractions.get(interaction.getUuid()).setIsDangerous(1);
+//            }
+//            if (!SoniTalkService.isBusy() && !interaction.isConfirmedSameSpace() && interaction.getLastSeen() - interaction.getFirstSeen() >= 15000) { // If interaction is 15 minutes and going
+//                ServerRequestManager.sendConfirmationRequest(this, interaction.getUuid(), new ServerRequestManager.ActionsCallback() {
+//                    @Override
+//                    public void onSuccess() throws InterruptedException {
+//                       // Start listening and wait for response
+//                        if (!SoniTalkService.isBusy()) {
+//                            Timer timer = new Timer();
+//                            TimerTask delayedThreadStartTask = new TimerTask() {
+//                                @Override
+//                                public void run() {
+//                                    new Thread(new Runnable() {
+//                                        @Override
+//                                        public void run() {
+//                                            Intent intent = new Intent(getApplicationContext(), SoniTalkService.class);
+//                                            intent.putExtra("command", "start_playing");
+//                                            getApplicationContext().startService(intent);
+//                                        }
+//                                    }).start();
+//                                }
+//                            };
+//                            timer.schedule(delayedThreadStartTask, 10 * 1000); //1 minute
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure() {
+//                    }
+//                });
+//            }
+//        }
+//    }
 
     private void startScanning(){
         Intent intent = new Intent(this, BtScannerService.class);
@@ -422,8 +434,6 @@ public class LocationService extends Service {
                 int accuracyDelta = (int) (location.getAccuracy() - previousBestLocation.getAccuracy());
                 boolean isMoreAccurate = accuracyDelta > 0;
 
-
-
                 //Determine location quality using a combination of timeliness and accuracy
                 if (isMoreAccurate) {
                     previousBestLocation.setAccuracy(location.getAccuracy());
@@ -485,24 +495,24 @@ public class LocationService extends Service {
     }
 
     // Iterates over devices and checks for devices last seen more than 5 minutes ago, in order to close the connection and log duration spent together
-    private void checkIdleConnections() {
-        Long currentTime = System.currentTimeMillis();
-
-        Log.i("BLE", "Checking for idle devices");
-        Log.i("BLE", "Devices in map:" + btInteractions.toString());
-
-        for (Interaction interaction : btInteractions.values()) {
-            if (currentTime - interaction.getLastSeen() >= IDLE_DURATION) { // Case device last seen longer than IDLE_DURATION
-
-                // Here we want to remove device from the map and in case user was in contact for long enough, log contact in database
-                btInteractions.remove(interaction.getUuid());
-                Log.i("BLE", "Removing idle device from map: " + interaction.toString());
-                if (interaction.getLastSeen() - interaction.getFirstSeen() >= CONTACT_DURATION && interaction.getIsDangerous() == 1) { // If the interaction lasted for long enough for it to be logged and if it is withing danger range
-                    db.addInteraction(interaction);
-                }
-            }
-        }
-    }
+//    private void checkIdleConnections() {
+//        Long currentTime = System.currentTimeMillis();
+//
+//        Log.i("BLE", "Checking for idle devices");
+//        Log.i("BLE", "Devices in map:" + btInteractions.toString());
+//
+//        for (Interaction interaction : btInteractions.values()) {
+//            if (currentTime - interaction.getLastSeen() >= IDLE_DURATION) { // Case device last seen longer than IDLE_DURATION
+//
+//                // Here we want to remove device from the map and in case user was in contact for long enough, log contact in database
+//                btInteractions.remove(interaction.getUuid());
+//                Log.i("BLE", "Removing idle device from map: " + interaction.toString());
+//                if (interaction.getLastSeen() - interaction.getFirstSeen() >= CONTACT_DURATION && interaction.getIsDangerous() == 1) { // If the interaction lasted for long enough for it to be logged and if it is withing danger range
+//                    db.addInteraction(interaction);
+//                }
+//            }
+//        }
+//    }
 
     private void updateNotifView(int all,int positives){
         String allText = getResources().getString(R.string.today_interactions) + ": " + String.valueOf(all);

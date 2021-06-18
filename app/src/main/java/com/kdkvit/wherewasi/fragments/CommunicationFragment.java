@@ -12,45 +12,15 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.anychart.APIlib;
-import com.anychart.AnyChart;
-import com.anychart.AnyChartView;
-import com.anychart.chart.common.dataentry.DataEntry;
-import com.anychart.chart.common.dataentry.ValueDataEntry;
-import com.anychart.charts.Cartesian;
-import com.anychart.core.cartesian.series.Column;
-import com.anychart.enums.Anchor;
-import com.anychart.enums.HoverMode;
-import com.anychart.enums.Position;
-import com.anychart.enums.TooltipPositionMode;
 import com.google.android.material.button.MaterialButton;
 import com.kdkvit.wherewasi.R;
-import com.kdkvit.wherewasi.adapters.NotificationsAdapter;
-import com.kdkvit.wherewasi.services.BtAdvertiserService;
 import com.kdkvit.wherewasi.services.SoniTalkService;
 import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.PagerSnapHelper;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SnapHelper;
 
-import actions.ServerRequestManager;
-import models.MyNotification;
-import utils.DatabaseHandler;
-import utils.NotificationCenter;
-
-import static com.kdkvit.wherewasi.MainActivity.user;
-import static com.kdkvit.wherewasi.utils.Configs.SENDING_DELAY;
-import static utils.NotificationCenter.NOTIFICATIONS_RECEIVER;
+import Managers.ServerRequestManager;
 
 public class CommunicationFragment extends Fragment {
 
@@ -86,9 +56,11 @@ public class CommunicationFragment extends Fragment {
                 ServerRequestManager.sendConfirmationRequest(getContext(), id, new ServerRequestManager.ActionsCallback() {
                     @Override
                     public void onSuccess() throws InterruptedException {
-                        Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
-                        intent.putExtra("command", "start");
-                        rootView.getContext().startService(intent);
+                        if (!SoniTalkService.isBusy()) {
+                            Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
+                            intent.putExtra("command", "start_playing");
+                            rootView.getContext().startService(intent);
+                        }
                     }
 
                     @Override
@@ -102,16 +74,18 @@ public class CommunicationFragment extends Fragment {
         listenBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listening = !listening;
-                if(listening){
-                    listenBtn.setText("Stop");
-                }else{
-                    listenBtn.setText("Listen");
+                if (!SoniTalkService.isBusy()) {
+                    listening = !listening;
+                    if (listening) {
+                        listenBtn.setText("Stop");
+                    } else {
+                        listenBtn.setText("Listen");
+                    }
+                    Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
+                    intent.putExtra("command", listening ? "start_listening" : "stop_listening");
+                    //view.getContext().startService(intent);
+                    rootView.getContext().startService(intent);
                 }
-                Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
-                intent.putExtra("command", listening ? "start_listening" : "stop_listening");
-                //view.getContext().startService(intent);
-                rootView.getContext().startService(intent);
             }
         });
         initReceiver();

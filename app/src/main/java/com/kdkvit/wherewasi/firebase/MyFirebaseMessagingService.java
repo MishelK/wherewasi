@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.Debug;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -19,19 +18,17 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.kdkvit.wherewasi.MainActivity;
 import com.kdkvit.wherewasi.R;
-import com.kdkvit.wherewasi.fragments.WelcomeFragment;
 import com.kdkvit.wherewasi.services.SoniTalkService;
 import com.kdkvit.wherewasi.utils.SharedPreferencesUtils;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 
+import Managers.InteractionListManager;
 import models.User;
 import utils.DatabaseHandler;
 
-import static actions.ServerRequestManager.sendUserToBe;
-import static com.kdkvit.wherewasi.utils.Configs.SENDING_DELAY;
+import static Managers.ServerRequestManager.sendUserToBe;
 import static utils.NotificationCenter.NOTIFICATIONS_RECEIVER;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
@@ -86,28 +83,29 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     }
                     break;
                 case "start_listening":
+                    if (!SoniTalkService.isBusy()) {
+                        // TODO: extract uuid and store it in manager to mark interaction as confirmed if successful
+                        //InteractionListManager.getInstance(getApplicationContext()).setUuidUnderTest();
+                        Intent intent = new Intent(getApplicationContext(), SoniTalkService.class);
+                        intent.putExtra("command", "start_listening");
+                        getApplicationContext().startService(intent);
 
-                    Intent intent = new Intent(getApplicationContext(), SoniTalkService.class);
-                    intent.putExtra("command","start_listening");
-                    getApplicationContext().startService(intent);
-
-                    Timer timer = new Timer();
-                    TimerTask delayedThreadStartTask = new TimerTask() {
-                        @Override
-                        public void run() {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Intent intent = new Intent(getApplicationContext(), SoniTalkService.class);
-                                    intent.putExtra("command","stop_listening");
-                                    getApplicationContext().startService(intent);
-                                }
-                            }).start();
-                        }
-                    };
-
-                    timer.schedule(delayedThreadStartTask, 15 * 1000); //1 minute
-
+                        Timer timer = new Timer();
+                        TimerTask delayedThreadStartTask = new TimerTask() { // Timer to stop listening after 60 seconds
+                            @Override
+                            public void run() {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Intent intent = new Intent(getApplicationContext(), SoniTalkService.class);
+                                        intent.putExtra("command", "stop_listening");
+                                        getApplicationContext().startService(intent);
+                                    }
+                                }).start();
+                            }
+                        };
+                        timer.schedule(delayedThreadStartTask, 60 * 1000); // 1 minute
+                    }
                     break;
             }
 
@@ -129,7 +127,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             NotificationChannel channel = new NotificationChannel("WWIS_ALERTS", "WWIS_ALERTS", NotificationManager.IMPORTANCE_HIGH);
             manager.createNotificationChannel(channel);
         }
-
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "WWIS_ALERTS");
         builder.setContentTitle("Notification Alert, Click Me!");
         Intent intent = new Intent(this, MainActivity.class);
