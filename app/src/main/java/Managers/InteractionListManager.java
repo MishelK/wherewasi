@@ -30,7 +30,7 @@ public class InteractionListManager {
     }
 
     public static InteractionListManager getInstance(Context context) {
-        if (interactionListManager != null)
+        if (interactionListManager == null)
             interactionListManager = new InteractionListManager(context);
         return interactionListManager;
     }

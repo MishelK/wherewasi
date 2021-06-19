@@ -49,8 +49,10 @@ public class BtScannerService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) { //Called from startService()
-        String command = intent.getStringExtra("command");
+    public int onStartCommand(Intent intent, int flags, int startId) { //Called from startService
+        String command = null;
+        if (intent.getExtras().containsKey("command"))
+            command = intent.getStringExtra("command");
         if (command != null) {
             switch (command) {
                 case "start":

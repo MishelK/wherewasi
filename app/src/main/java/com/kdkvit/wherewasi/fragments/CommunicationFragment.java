@@ -49,28 +49,31 @@ public class CommunicationFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
-                intent.putExtra("command", "start");
-                rootView.getContext().startService(intent);
+                if (!SoniTalkService.isBusy()) {
+                    Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
+                    intent.putExtra("command", "start_playing");
+                    rootView.getContext().startService(intent);
+                }
             }
         });
         listenBtn = rootView.findViewById(R.id.listen);
         listenBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!SoniTalkService.isBusy()) {
-                    listening = !listening;
-                    if (listening) {
-                        listenBtn.setText("Stop");
-                    } else {
+                listening = !listening;
+                if (listening) {
+                    listenBtn.setText("Stop");
+                } else {
+                    if (!SoniTalkService.isBusy()) {
                         listenBtn.setText("Listen");
                     }
-                    Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
-                    intent.putExtra("command", listening ? "start_listening" : "stop_listening");
-                    //view.getContext().startService(intent);
-                    rootView.getContext().startService(intent);
                 }
+                Intent intent = new Intent(rootView.getContext(), SoniTalkService.class);
+                intent.putExtra("command", listening ? "start_listening" : "stop_listening");
+                //view.getContext().startService(intent);
+                rootView.getContext().startService(intent);
             }
+
         });
         initReceiver();
 
@@ -84,7 +87,7 @@ public class CommunicationFragment extends Fragment {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String command = intent.getStringExtra("command");
-                if(command.equals("stop_listening")){
+                if (command.equals("stop_listening")) {
                     listening = !listening;
                     new Handler().post(new Runnable() {
                         @Override
@@ -95,7 +98,7 @@ public class CommunicationFragment extends Fragment {
                 }
             }
         };
-        LocalBroadcastManager.getInstance(rootView.getContext()).registerReceiver(soniTalkReceiver,soniFilter);
+        LocalBroadcastManager.getInstance(rootView.getContext()).registerReceiver(soniTalkReceiver, soniFilter);
     }
 
 
