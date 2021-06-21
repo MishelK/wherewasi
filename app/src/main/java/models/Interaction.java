@@ -21,6 +21,17 @@ public class Interaction implements Parcelable {
 
     public Interaction(){}
 
+    public Interaction(String uuid, Long firstSeen, Long lastSeen, int rssi, long interactionID, boolean isDangerous, boolean isPositive, boolean isConfirmedSameSpace) {
+        this.uuid = uuid;
+        this.firstSeen = firstSeen;
+        this.lastSeen = lastSeen;
+        this.rssi = rssi;
+        this.interactionID = interactionID;
+        this.isDangerous = isDangerous;
+        this.isPositive = isPositive;
+        this.isConfirmedSameSpace = isConfirmedSameSpace;
+    }
+
     protected Interaction(Parcel in) {
         this.uuid = in.readString();
         this.firstSeen = in.readLong();

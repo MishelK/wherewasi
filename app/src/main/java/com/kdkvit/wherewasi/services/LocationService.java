@@ -516,7 +516,7 @@ public class LocationService extends Service {
 
     private void updateNotifView(int all,int positives){
         String allText = getResources().getString(R.string.today_interactions) + ": " + String.valueOf(all);
-        String positivesText = getResources().getString(R.string.today_positives) + ": " + String.valueOf(all);
+        String positivesText = getResources().getString(R.string.today_positives) + ": " + String.valueOf(positives);
         remoteViews.setTextViewText(R.id.notification_interactions_text,allText);
         remoteViews.setTextViewText(R.id.notification_positives_text,positivesText);
         if(positives > 0) {

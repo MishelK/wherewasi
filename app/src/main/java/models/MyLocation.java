@@ -61,6 +61,23 @@ public class MyLocation implements Serializable, ClusterItem {
         initLatLang();
     }
 
+    public MyLocation(long id, double latitude, double longitude, String provider, long startTime, long endTime, long updateTime, float accuracy, String adminArea, String countryCode, String featureName, String addressLine) {
+        this.id = id;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.provider = provider;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.updateTime = updateTime;
+        this.accuracy = accuracy;
+        this.adminArea = adminArea;
+        this.countryCode = countryCode;
+        this.featureName = featureName;
+        this.locality = locality;
+        this.subAdminArea = subAdminArea;
+        this.addressLine = addressLine;
+    }
+
     private void initLatLang() {
         this.latLng = new LatLng(this.latitude,this.longitude);
     }
