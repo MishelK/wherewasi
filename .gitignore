@@ -85,7 +85,7 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
-/app/google-services.json
+android/app/google-services.json
 android/app/src/main/res/values/google_maps_api.xml
 
 
