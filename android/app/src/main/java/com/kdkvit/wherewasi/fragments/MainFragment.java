@@ -111,6 +111,9 @@ public class MainFragment extends Fragment {
         IntentFilter soniFilter = new IntentFilter(SoniTalkService.SONITALK_RECEIVER);
     }
 
+    /**
+     * Initiates the notification list
+     */
     private void initNotifications() {
         notifications =  NotificationCenter.generateDailyNotifications(getContext());
         if(notifications.size() == 0){
@@ -119,6 +122,9 @@ public class MainFragment extends Fragment {
     }
 
 
+    /**
+     * Initiates the interaction char with interactions queried from sqLite
+     */
     public void initInteractionChart() {
 
         AnyChartView anyChartView = rootView.findViewById(R.id.chart_view);
@@ -166,6 +172,9 @@ public class MainFragment extends Fragment {
 
     }
 
+    /**
+     * Initiates the locations char with interactions queried from sqLite
+     */
     public void initLocationChart() {
 
         AnyChartView anyChartView = rootView.findViewById(R.id.chart_view2);

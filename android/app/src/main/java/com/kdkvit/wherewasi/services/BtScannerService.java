@@ -73,6 +73,9 @@ public class BtScannerService extends Service {
     }
 
 
+    /**
+     * Callback for BLE scan results, filters the results using the service identifier in order to add only application users to the interaction list
+     */
     ScanCallback scanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, @NonNull ScanResult result) {
@@ -152,12 +155,18 @@ public class BtScannerService extends Service {
         }
     };
 
+    /**
+     * Sends interaction list on the broadcast channel
+     */
     private void sendListInBroadcast(ArrayList<Interaction> btInteractions) {
         Intent receiverIntent = new Intent(BLE_SCANNING_CHANNEL);
         receiverIntent.putParcelableArrayListExtra("ble_list", btInteractions);
         LocalBroadcastManager.getInstance(BtScannerService.this).sendBroadcast(receiverIntent);
     }
 
+    /**
+     * Starts BLE scanning
+     */
     public void startScan(){
 
         BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
@@ -177,6 +186,9 @@ public class BtScannerService extends Service {
 
     }
 
+    /**
+     * Stops BLE scanning
+     */
     public void stopScan() {
 
         BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();

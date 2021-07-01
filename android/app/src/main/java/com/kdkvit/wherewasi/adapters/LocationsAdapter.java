@@ -31,6 +31,9 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
 
     private LocationListener listener;
 
+    /**
+     * @param listener - callback for adapter item clicks
+     */
     public void setListener(LocationListener listener) {
         this.listener = listener;
     }

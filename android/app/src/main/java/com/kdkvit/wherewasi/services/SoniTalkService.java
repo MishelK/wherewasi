@@ -97,6 +97,9 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
     private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
     public static final ScheduledExecutorService threadPool = Executors.newScheduledThreadPool(NUMBER_OF_CORES + 1);
 
+    /**
+     * Generates Data Over Sound Message
+     */
     public void generateMessage(){
         if(playerFrequency!=null){
             playerFrequency.stop();
@@ -191,6 +194,9 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
     }
 
 
+    /**
+     * Sends data over sound message
+     */
     public void sendMessage() {
         //Log.d("PlayClick","I got clicked");
 
@@ -336,6 +342,9 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
         }
     }
 
+    /**
+     * Shows bottom dialog prompting for soni talk permission
+     */
     private void showRequestPermissionExplanation(int messageId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(messageId);
@@ -361,6 +370,9 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
         return  soniTalkMessage;
     }
 
+    /**
+     * Starts the data over sound message decoding process
+     */
     private void startDecoder() {
         int frequencyOffsetForSpectrogram = 50;
         int stepFactor = 8;
@@ -414,6 +426,9 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
         listeningSuccessful();
     }
 
+    /**
+     * Stops data over sound message decoding
+     */
     private void stopDecoder() {
 
         isListening = false;
