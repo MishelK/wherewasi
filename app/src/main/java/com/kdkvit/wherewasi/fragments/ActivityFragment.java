@@ -144,6 +144,9 @@ public class ActivityFragment extends Fragment {
         drawerLayout.openDrawer(GravityCompat.END);
     }
 
+    /**
+     * Loads locations from db
+     */
     private  void getLocationsHistory(){
         loaderLayout.setVisibility(View.VISIBLE);
         new Thread(){
@@ -168,6 +171,9 @@ public class ActivityFragment extends Fragment {
         startActivity(intent);
     }
 
+    /**
+     * Initiates the location service broadcast received, when a location update is received, it will arrive here
+     */
     private void initReceiver() {
         IntentFilter filter = new IntentFilter(BROADCAST_CHANNEL);
         receiver = new BroadcastReceiver() {

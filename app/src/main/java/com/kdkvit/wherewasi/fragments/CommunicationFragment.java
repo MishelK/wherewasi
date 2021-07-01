@@ -80,6 +80,9 @@ public class CommunicationFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Initiates the broadcast receiver for the SoniTalk service
+     */
     private void initReceiver() {
 
         IntentFilter soniFilter = new IntentFilter(SoniTalkService.SONITALK_RECEIVER);

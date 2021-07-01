@@ -39,6 +39,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     // Notification messages will arrive at system tray if app is in background and will arrive at onMessageReceived if app is in foreground
     // Data Notification which have a payload will always arrive to this service onMessageReceived
 
+    /**
+     * Called when a new token is generated, updates user if one exists
+     */
     @Override
     public void onNewToken(@NonNull String s) {
         super.onNewToken(s);
@@ -52,6 +55,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
+    /**
+     * Called when a firebase push message arrives when the app is in foreground
+     */
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
@@ -124,6 +130,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
 
+    /**
+     * Displays Notification
+     */
     private void showNotification(){
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= 26) {
@@ -145,6 +154,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     }
 
+    /**
+     * Returns firebase token
+     */
     public static String getToken(Context context) {
         return context.getSharedPreferences("_", MODE_PRIVATE).getString("fb", "");
     }

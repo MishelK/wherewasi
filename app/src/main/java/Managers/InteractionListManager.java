@@ -17,6 +17,9 @@ import utils.DatabaseHandler;
 import static com.kdkvit.wherewasi.services.BtScannerService.CONTACT_DURATION;
 import static com.kdkvit.wherewasi.services.BtScannerService.IDLE_DURATION;
 
+/**
+ * Manages the interaction list operations, adding, saving to db, and interaction logic including space confirmations
+ */
 public class InteractionListManager {
 
     private HashMap<String, Interaction> btInteractions;
@@ -43,6 +46,9 @@ public class InteractionListManager {
         this.btInteractions = interactionList;
     }
 
+    /**
+     * Called when a new interaction list is provided, if an interaction is new, it is added to the list, if it already exists, the last seen timestamp is updated
+     */
     public void addNewInteractions(ArrayList<Interaction> interactions) {
 
         for(Interaction interaction : interactions){
@@ -89,6 +95,9 @@ public class InteractionListManager {
         }
     }
 
+    /**
+     * Marks and interaction as confirmed in the same space
+     */
     public void setInteractionSameSpace(String uuid, boolean isSameSpace) {
         if (btInteractions.containsKey(uuid))
             btInteractions.get(uuid).setConfirmedSameSpace(isSameSpace);
@@ -102,6 +111,9 @@ public class InteractionListManager {
         return uuidUnderTest;
     }
 
+    /**
+     * Checks for connections that have not been seen for x time and saves them if so.
+     */
     // Iterates over devices and checks for devices last seen more than 5 minutes ago, in order to close the connection and log duration spent together
     public void checkIdleConnections() {
         DatabaseHandler db = new DatabaseHandler(context);

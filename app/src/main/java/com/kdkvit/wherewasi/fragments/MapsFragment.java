@@ -81,6 +81,9 @@ public class MapsFragment extends Fragment {
         }
     }
 
+    /**
+     * Places markers on the map at the locaations the user has stayed at
+     */
     public void setMapPointers() {
         if (googleMap != null && getContext()!=null) {
             googleMap.clear();
@@ -129,6 +132,9 @@ public class MapsFragment extends Fragment {
         }
     }
 
+    /**
+     * Initiates a location report cluster into one market
+     */
     private void initCluster() {
         mClusterManager.clearItems();
         for(LocationsGroup group:locations)

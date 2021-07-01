@@ -28,6 +28,9 @@ public class ServerRequestManager {
     static final String USERS_URL = BE_URL + "api/users/";
 
 
+    /**
+     * Sends user details to Backend
+     */
     public static void sendUserToBe(Context context, User user){
         final JSONObject rootObject = new JSONObject();
         try{
@@ -86,6 +89,9 @@ public class ServerRequestManager {
         void onFailure();
     }
 
+    /**
+     * Sends confirmation request to server in order to attempt to start space confirmation process with provided uuid
+     */
     public static void sendConfirmationRequest(Context context, String uuid, ActionsCallback callback){
         User user = SharedPreferencesUtils.getUser(context);
         final JSONObject rootObject = new JSONObject();
@@ -133,6 +139,9 @@ public class ServerRequestManager {
         }
     }
 
+    /**
+     * Sends confirmation when a listener has successfully received data over sound message and can confirm interaction as same-space
+     */
     public static void sendListeningSuccessful(Context context, String uuid, ActionsCallback callback){
         User user = SharedPreferencesUtils.getUser(context);
         final JSONObject rootObject = new JSONObject();
@@ -178,6 +187,9 @@ public class ServerRequestManager {
         }
     }
 
+    /**
+     * Sent when a user has marked themselves as positive at provided date, server will send out push notifications to all users with userID and date
+     */
     public static void sendPositive(Context context, Long date, ActionsCallback callback){
         User user = SharedPreferencesUtils.getUser(context);
         final JSONObject rootObject = new JSONObject();

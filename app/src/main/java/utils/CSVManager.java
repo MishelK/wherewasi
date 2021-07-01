@@ -21,6 +21,9 @@ public class CSVManager {
         this.context = context;
     }
 
+    /**
+     * Exports location list as a CSV file containing all data in a chart form
+     */
     public void exportLocations(List<MyLocation> locationList) {
 
         StringBuilder data = new StringBuilder();

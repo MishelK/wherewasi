@@ -134,6 +134,9 @@ public class LocationService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    /**
+     * Initiates the notification that displays number of interactions
+     */
     private void initNotificationInteractions() {
         interactionsTimer.schedule(new TimerTask() {
             @Override
@@ -152,6 +155,9 @@ public class LocationService extends Service {
         },500,60*1000);
     }
 
+    /**
+     * Closers location service
+     */
     private void close() {
         stopSelf();
         Intent receiverIntent = new Intent(BROADCAST_CHANNEL);
@@ -159,6 +165,9 @@ public class LocationService extends Service {
         LocalBroadcastManager.getInstance(LocationService.this).sendBroadcast(receiverIntent);
     }
 
+    /**
+     * Initiates location sampling
+     */
     public void initLocation() {
         db = new DatabaseHandler(this); // init database handler
 
@@ -297,25 +306,36 @@ public class LocationService extends Service {
 //        }
 //    }
 
+    /**
+     * Starts the BLE scanner service
+     */
     private void startScanning(){
         Intent intent = new Intent(this, BtScannerService.class);
         intent.putExtra("command", "start");
         startService(intent);
     }
 
+    /**
+     * Stops the BLE scanner service
+     */
     private void stopScanning(){
         Intent intent = new Intent(this, BtScannerService.class);
         intent.putExtra("command", "stop");
         startService(intent);
     }
 
+    /**
+     * Starts the BLE advertiser service
+     */
     private void startBLE() {
         Intent intent = new Intent(this, BtAdvertiserService.class);
         intent.putExtra("command", "start");
         startService(intent);
     }
 
-
+    /**
+     * Stops the BLE advertiser service
+     */
     private void stopBLE(){
         Intent intent = new Intent(this, BtAdvertiserService.class);
         intent.putExtra("command", "stop");
@@ -328,6 +348,9 @@ public class LocationService extends Service {
         return null;
     }
 
+    /**
+     * Checks if location update is better then the previous one
+     */
     protected boolean isBetterLocation(MyLocation location, MyLocation currentBestLocation) {
         if (currentBestLocation == null) {
             // A new location is always better than no location
@@ -351,6 +374,10 @@ public class LocationService extends Service {
         return diffInKM >= KM_BETWEEN_LOCATIONS;
     }
 
+
+    /**
+     * Returns distance from LatLan to LatLan
+     */
     public double getDistanceFromLatLonInKm(double lat1,double lon1,double lat2,double lon2) {
         int R = 6371; // Radius of the earth in km
         double dLat = deg2rad(lat2 - lat1);  // deg2rad below
@@ -514,6 +541,9 @@ public class LocationService extends Service {
 //        }
 //    }
 
+    /**
+     * Updates the notification according to level of risk from interactions
+     */
     private void updateNotifView(int all,int positives){
         String allText = getResources().getString(R.string.today_interactions) + ": " + String.valueOf(all);
         String positivesText = getResources().getString(R.string.today_positives) + ": " + String.valueOf(positives);

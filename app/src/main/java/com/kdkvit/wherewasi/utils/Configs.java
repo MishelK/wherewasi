@@ -1,5 +1,8 @@
 package com.kdkvit.wherewasi.utils;
 
+/**
+ * Appplication variable configuration file, controls key application service timing and criteria
+ */
 public final class Configs {
     public static final String APPLICATION_ID = "com.kdkvit.wherewasi";
     public static final String server_url = "https://wherewasi-be.herokuapp.com/";

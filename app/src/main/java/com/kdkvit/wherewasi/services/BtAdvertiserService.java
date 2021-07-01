@@ -60,6 +60,9 @@ public class BtAdvertiserService extends Service {
         super.onDestroy();
     }
 
+    /**
+     * Callback for BLE advertising
+     */
     AdvertiseCallback advertiseCallback = new AdvertiseCallback() {
         @Override
         public void onStartSuccess(AdvertiseSettings settingsInEffect) {
@@ -77,6 +80,9 @@ public class BtAdvertiserService extends Service {
         }
     };
 
+    /**
+     * Starts BLE advertising with Unique service identifier
+     */
     public void startAdvertising(){
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -105,6 +111,9 @@ public class BtAdvertiserService extends Service {
         }
     }
 
+    /**
+     * Stops BLE advertising
+     */
     public void stopAdvertising(){
 
         Log.i("BLE","Advertising Stopped");
@@ -119,7 +128,9 @@ public class BtAdvertiserService extends Service {
         }
     }
 
-    // Returns device's UUID or generates one if there is no UUID stored
+    /**
+     * Returns device's UUID or generates one if there is no UUID stored
+     */
     private UUID getDeviceUUID() {
         User user = SharedPreferencesUtils.getUser(this);
         return UUID.fromString(user.getDeviceId());
