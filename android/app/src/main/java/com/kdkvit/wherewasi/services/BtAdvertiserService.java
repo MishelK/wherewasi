@@ -99,6 +99,7 @@ public class BtAdvertiserService extends Service {
                         .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
                         .build();
 
+                //Adding advertising data that include the user id for other devices that scans
                 AdvertiseData dataUUID = new AdvertiseData.Builder()
                         .setIncludeDeviceName(false)
                         .setIncludeTxPowerLevel(false)

@@ -37,6 +37,9 @@ public class MapActivity extends AppCompatActivity {
     LocationsGroup group;
     private long TIME_STAYED = Configs.TIME_STAYED;
 
+    /**
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +68,9 @@ public class MapActivity extends AppCompatActivity {
         initData(group);
     }
 
+    /**
+     * @param location Group of locations to set in map
+     */
     private void initData(LocationsGroup location) {
 
         String startTime = new SimpleDateFormat("HH:mm dd-MM").format(location.getStartTime());
@@ -112,6 +118,9 @@ public class MapActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Add points to map
+     */
     public void setMapPointers() {
         if (googleMap != null) {
             googleMap.clear();
@@ -143,6 +152,9 @@ public class MapActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * @param myLocation Location to focus on
+     */
     public void focus(MyLocation myLocation) {
         LatLng mapPoint = new LatLng(myLocation.getLatitude(),myLocation.getLongitude());
         float zoom = 15.0f;

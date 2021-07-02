@@ -98,6 +98,7 @@ public class BtScannerService extends Service {
                 }
             }
 
+            //Checks if interaction found
             if(device_uuid != null) { // Only if device had "wwi" in service data
                     Date now = new Date();
                     Interaction interaction = new Interaction();
@@ -134,6 +135,7 @@ public class BtScannerService extends Service {
                     }
                 }
 
+                //Check if interaction found
                 if(device_uuid != null) {
                     Date now = new Date();
                     Interaction interaction = new Interaction();

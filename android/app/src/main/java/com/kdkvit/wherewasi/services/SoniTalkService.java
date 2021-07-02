@@ -112,7 +112,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
 
         isSending = true;
         sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
+        //Intit from configs
         int bitperiod = Integer.valueOf(sp.getString(ConfigConstants.BIT_PERIOD, ConfigConstants.SETTING_BIT_PERIOD_DEFAULT));
         int pauseperiod = Integer.valueOf(sp.getString(ConfigConstants.PAUSE_PERIOD, ConfigConstants.SETTING_PAUSE_PERIOD_DEFAULT));
         int f0 = Integer.valueOf(sp.getString(ConfigConstants.FREQUENCY_ZERO, ConfigConstants.SETTING_FREQUENCY_ZERO_DEFAULT));
@@ -127,8 +127,8 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
         }
         soniTalkEncoder = soniTalkContext.getEncoder(config);
 
-        //final String textToSend = sp.getString(ConfigConstants.SIGNAL_TEXT,"Hallo Sonitalk");
-        final String textToSend = "hello";
+        //Text to send
+        final String textToSend = "wwi";
         //Log.d("changeToBitStringUTF8",String.valueOf(isUTF8MisInterpreted(textToSend, "Windows-1252")));
 
         sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -138,7 +138,7 @@ public class SoniTalkService extends Service implements SoniTalkPermissionsResul
             ed.apply();
         }
 
-        if(sp.getString(ConfigConstants.TEXT_TO_SEND,"Hallo SoniTalk").equals(textToSend) && currentMessage != null){
+        if(sp.getString(ConfigConstants.TEXT_TO_SEND,"wwi").equals(textToSend) && currentMessage != null){
             sendMessage();
         }else {
             SharedPreferences.Editor ed = sp.edit();

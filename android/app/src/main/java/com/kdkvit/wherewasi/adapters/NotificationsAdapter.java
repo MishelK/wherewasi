@@ -50,6 +50,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     @Override
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
+        //Sets Notification in view
         MyNotification notification = notifications.get(position);
         if(notification.getDays() == 0){
             holder.dateTV.setText(context.getString(R.string.today));

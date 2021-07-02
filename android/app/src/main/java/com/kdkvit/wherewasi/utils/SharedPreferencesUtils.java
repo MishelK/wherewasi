@@ -11,6 +11,10 @@ import models.User;
 
 public class SharedPreferencesUtils {
 
+    /**
+     * @param context Application context
+     * @return User
+     */
     public static User getUser(Context context) {
         SharedPreferences sp = context.getSharedPreferences("user", Context.MODE_PRIVATE);
         String userString = sp.getString("user", null);
@@ -23,6 +27,10 @@ public class SharedPreferencesUtils {
         return user;
     }
 
+    /**
+     * @param context Application Context
+     * @param user User to save
+     */
     public static void setUser(Context context,User user) {
         SharedPreferences sp = context.getSharedPreferences("user", Context.MODE_PRIVATE);
         Gson gson = new Gson();

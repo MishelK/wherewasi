@@ -38,6 +38,7 @@ public class InteractionListManager {
         return interactionListManager;
     }
 
+
     public HashMap<String, Interaction> getInteractionList() {
         return btInteractions;
     }

@@ -74,6 +74,7 @@
         android:permissionGroup="SoniTalk"
         android:protectionLevel="dangerous" />
 
+
     <uses-permission android:name="com.kdkvit.wherewasi.sonitalk.permission_all_ultrasonic_communication"/>
 
 </manifest>

@@ -58,4 +58,5 @@
     <string name="permission_request_explanation_negative">לא תודה</string>
     <string name="signal_generator_not_created">טרם נוצר אות!</string>
     <string name="communication">תקשורת</string>
+    <string name="statusChannelName">ערוץ סטטוס נתונתים מעל צליל</string>
 </resources>

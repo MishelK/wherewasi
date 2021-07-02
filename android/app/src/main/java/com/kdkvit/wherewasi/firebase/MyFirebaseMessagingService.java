@@ -79,7 +79,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         DatabaseHandler db = new DatabaseHandler(getApplicationContext());
 
                         if (db.updateInteractionsToPositive(uuid, markTime, insTime) > 0) {
-                            showNotification();
+                            showPositiveAlertNotification();
                             Intent receiverIntent = new Intent(NOTIFICATIONS_RECEIVER);
                             receiverIntent.putExtra("new_notification", true);
                             LocalBroadcastManager.getInstance(this).sendBroadcast(receiverIntent);
@@ -131,9 +131,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 
     /**
-     * Displays Notification
+     * Displays Notification in device notifications center
      */
-    private void showNotification(){
+    private void showPositiveAlertNotification(){
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationChannel channel = new NotificationChannel("WWIS_ALERTS", "WWIS_ALERTS", NotificationManager.IMPORTANCE_HIGH);
