@@ -1,0 +1,13 @@
+Managers
+com.kdkvit.wherewasi
+com.kdkvit.wherewasi.adapters
+com.kdkvit.wherewasi.firebase
+com.kdkvit.wherewasi.fragments
+com.kdkvit.wherewasi.services
+com.kdkvit.wherewasi.sonitalk
+com.kdkvit.wherewasi.sonitalk.exceptions
+com.kdkvit.wherewasi.sonitalk.utils
+com.kdkvit.wherewasi.utils
+enums
+models
+utils
